@@ -34,7 +34,7 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
 The easiest way to use the Allbridge Core REST API is to use the existing docker image. You can pull the image from the Docker Hub and run it with the following command:
 
 ```bash
-docker run -p 3000:3000 -d ooallbridge/io.allbridge.rest-api:latest \
+docker run -p 3000:3000 -d allbridge/io.allbridge.rest-api:latest \
     -e ENVIRONMENT="production" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
@@ -50,7 +50,7 @@ docker run -p 3000:3000 -d ooallbridge/io.allbridge.rest-api:latest \
 or use environment variables from the `.env` file:
 
 ```bash
-docker run -p 3000:3000 --env-file .env -d ooallbridge/io.allbridge.rest-api:latest
+docker run -p 3000:3000 --env-file .env -d allbridge/io.allbridge.rest-api:latest
 ```
 
 ### 2. Build and run the docker image
