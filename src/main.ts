@@ -3,7 +3,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import safeStringify from 'fast-safe-stringify';
-//import bodyParser from 'body-parser';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { AppModule } from './app.module';

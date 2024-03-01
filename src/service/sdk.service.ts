@@ -5,33 +5,32 @@ import {
   ChainDetailsMap,
   ChainSymbol,
   CheckAddressResponse,
+  CheckAllowanceParams,
   ExtraGasMaxLimitResponse,
   GasBalanceResponse,
   GasFeeOptions,
+  GetAllowanceParams,
   GetNativeTokenBalanceParams,
   GetTokenBalanceParams,
+  LiquidityPoolsApproveParams,
   LiquidityPoolsParams,
   LiquidityPoolsParamsWithAmount,
-  mainnet,
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
+  RawTransaction,
   SendParams,
   SwapParams,
-  testnet,
   TokenWithChainDetails,
+  TransferStatusResponse,
   UserBalanceInfo,
+  mainnet,
+  testnet,
 } from '@allbridge/bridge-core-sdk';
-import { TransferStatusResponse } from '@allbridge/bridge-core-sdk/dist/src/models';
-import {
-  ApproveParams, CheckAllowanceParams,
-  GetAllowanceParams
-} from "@allbridge/bridge-core-sdk/dist/src/services/liquidity-pool/models";
-import { RawTransaction } from '@allbridge/bridge-core-sdk/dist/src/services/models';
+
 import { Injectable } from '@nestjs/common';
 import Big from 'big.js';
 import { getLogger } from '../utils/logger-factory';
-import { TelegramSender } from '../utils/telegram-sender';
 import { ConfigService } from './config.service';
 
 export interface BridgeAmounts {
@@ -57,7 +56,6 @@ export interface TransferAmountData {
 export class SDKService {
   sdk: AllbridgeCoreSdk;
   logger = getLogger(`SDKService`);
-  telegramSender = new TelegramSender(`TelegramSender(SDKService)`);
   private _chainDetailsMap?: ChainDetailsMap;
 
   constructor() {
@@ -209,7 +207,7 @@ export class SDKService {
     return this.sdk.pool.getUserBalanceInfo(account, token);
   }
 
-  async approve(params: ApproveParams): Promise<RawTransaction> {
+  async approve(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
     return this.sdk.pool.rawTxBuilder.approve(params);
   }
 
