@@ -5,34 +5,36 @@ import {
   ChainDetailsMap,
   ChainSymbol,
   CheckAddressResponse,
+  CheckAllowanceParams,
   ExtraGasMaxLimitResponse,
   GasBalanceResponse,
   GasFeeOptions,
+  GetAllowanceParams,
   GetNativeTokenBalanceParams,
   GetTokenBalanceParams,
+  LiquidityPoolsApproveParams,
   LiquidityPoolsParams,
   LiquidityPoolsParamsWithAmount,
-  mainnet,
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
+  RawBridgeSolanaTransaction,
+  RawPoolSolanaTransaction,
+  RawTransaction,
   SendParams,
   SwapParams,
-  testnet,
   TokenWithChainDetails,
+  TransferStatusResponse,
   UserBalanceInfo,
+  mainnet,
+  testnet,
 } from '@allbridge/bridge-core-sdk';
-import { TransferStatusResponse } from '@allbridge/bridge-core-sdk/dist/src/models';
-import {
-  ApproveParams, CheckAllowanceParams,
-  GetAllowanceParams
-} from "@allbridge/bridge-core-sdk/dist/src/services/liquidity-pool/models";
-import { RawTransaction } from '@allbridge/bridge-core-sdk/dist/src/services/models';
+
 import { Injectable } from '@nestjs/common';
 import Big from 'big.js';
 import { getLogger } from '../utils/logger-factory';
-import { TelegramSender } from '../utils/telegram-sender';
 import { ConfigService } from './config.service';
+import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
 
 export interface BridgeAmounts {
   amountInFloat: string;
@@ -57,7 +59,6 @@ export interface TransferAmountData {
 export class SDKService {
   sdk: AllbridgeCoreSdk;
   logger = getLogger(`SDKService`);
-  telegramSender = new TelegramSender(`TelegramSender(SDKService)`);
   private _chainDetailsMap?: ChainDetailsMap;
 
   constructor() {
@@ -158,6 +159,13 @@ export class SDKService {
     return this.sdk.checkAddress(chain, address, tokenAddress);
   }
 
+  async checkBalanceLine(
+    address: string,
+    tokenAddress: string,
+  ): Promise<HorizonApi.BalanceLineAsset> {
+    return await this.sdk.utils.srb.getBalanceLine(address, tokenAddress);
+  }
+
   async getPendingStatusInfo(
     amount: string,
     format: AmountFormat,
@@ -174,7 +182,16 @@ export class SDKService {
 
   // Bridge
   async send(params: SwapParams | SendParams): Promise<RawTransaction> {
-    return this.sdk.bridge.rawTxBuilder.send(params);
+    console.debug(params);
+    const rawTx = await this.sdk.bridge.rawTxBuilder.send(params);
+    if (params.sourceToken.chainSymbol === ChainSymbol.SOL) {
+      return Buffer.from(
+        (
+          rawTx as RawBridgeSolanaTransaction | RawPoolSolanaTransaction
+        ).serialize(),
+      ).toString('hex');
+    }
+    return rawTx;
   }
 
   // Pools
@@ -209,7 +226,7 @@ export class SDKService {
     return this.sdk.pool.getUserBalanceInfo(account, token);
   }
 
-  async approve(params: ApproveParams): Promise<RawTransaction> {
+  async approve(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
     return this.sdk.pool.rawTxBuilder.approve(params);
   }
 
@@ -361,6 +378,16 @@ export class SDKService {
       destinationLiquidityFee: destLPSwap.fee,
       destinationSwap: destLPSwap.swap,
     };
+  }
+
+  async simulateAndCheckRestoreTxRequiredSoroban(
+    xdrTx: string,
+    sourceAccount: string,
+  ): Promise<string> {
+    return await this.sdk.utils.srb.simulateAndCheckRestoreTxRequiredSoroban(
+      xdrTx,
+      sourceAccount,
+    );
   }
 
   // History

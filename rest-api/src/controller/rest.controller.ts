@@ -5,27 +5,27 @@ import {
   ChainSymbol,
   CheckAddressResponse,
   ExtraGasMaxLimitResponse,
+  FeePaymentMethod,
   GasBalanceResponse,
   GasFeeOptions,
-  GetNativeTokenBalanceParams,
-  GetTokenBalanceParams,
-  LiquidityPoolsParams,
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
-  SendParams,
-  SwapParams,
   TokenWithChainDetails,
+  TransferStatusResponse,
   UserBalanceInfo,
 } from '@allbridge/bridge-core-sdk';
 import {
-  FeePaymentMethod,
-  TransferStatusResponse,
-} from '@allbridge/bridge-core-sdk/dist/src/models';
-import { LiquidityPoolsParamsWithAmount } from '@allbridge/bridge-core-sdk/dist/src/services/liquidity-pool/models/pool.model';
-import { Controller, Get, Query } from '@nestjs/common';
+  Controller,
+  Get,
+  HttpException,
+  HttpExceptionBody,
+  HttpStatus,
+  Query,
+} from '@nestjs/common';
 import { VersionedTransaction } from '@solana/web3.js';
-import { Example, Route, Tags } from 'tsoa';
+import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon/horizon_api';
+import { Example, Response, Route, Tags } from 'tsoa';
 import { TransactionConfig } from 'web3-core';
 import {
   BridgeAmounts,
@@ -47,24 +47,35 @@ export class RestController {
   /**
    * Returns ChainDetailsMap containing a list of supported tokens groped by chain.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/chains')
   @Tags('Tokens')
   async chainDetailsMap(): Promise<ChainDetailsMap> {
-    return this.sdkService.chainDetailsMap();
+    try {
+      return this.sdkService.chainDetailsMap();
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Returns a list of supported tokens.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/tokens')
   @Tags('Tokens')
   async getTokens(): Promise<TokenWithChainDetails[]> {
-    return this.sdkService.getTokens();
+    try {
+      return this.sdkService.getTokens();
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for approving tokens usage by the bridge
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/approve')
   @Tags('Tokens', 'Pool', 'Transfers', 'Raw Transactions')
   async approve(
@@ -72,7 +83,7 @@ export class RestController {
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
     /**
      * The integer amount of tokens to approve.<br/>
      * <i><u>Optional.</u></i><br/>
@@ -80,17 +91,26 @@ export class RestController {
      */
     @Query('amount') amount?: string,
   ): Promise<RawTransaction> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    return await this.sdkService.approve({
-      token: poolAddressObj,
-      owner: ownerAddress,
-      amount: amount,
-    });
+    const tokenAddressObj =
+      await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.approve({
+        token: tokenAddressObj,
+        owner: ownerAddress,
+        amount: amount,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for initiating the swap of tokens on one chain
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/swap')
   @Tags('Transfers', 'Raw Transactions')
   async getRawSwap(
@@ -115,28 +135,49 @@ export class RestController {
     @Query('minimumReceiveAmount') minimumReceiveAmount?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const floatAmount = parseFloat(amount) / 10 ** sourceTokenObj.decimals;
-    const minimumReceiveAmountFloat = (
-      parseFloat(minimumReceiveAmount) /
-      10 ** destinationTokenObj.decimals
-    ).toString();
-    return await this.sdkService.send(<SwapParams>{
-      amount: floatAmount.toString(),
-      destinationToken: destinationTokenObj,
-      fromAccountAddress: sender,
-      minimumReceiveAmount: minimumReceiveAmount
-        ? minimumReceiveAmountFloat
-        : undefined,
-      sourceToken: sourceTokenObj,
-      toAccountAddress: recipient,
-    });
+    if (isNaN(floatAmount)) {
+      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
+    }
+    const minimumReceiveAmountFloat =
+      parseFloat(minimumReceiveAmount) / 10 ** destinationTokenObj.decimals;
+    if (isNaN(minimumReceiveAmountFloat)) {
+      throw new HttpException(
+        'Invalid minimumReceiveAmount',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      return await this.sdkService.send({
+        amount: floatAmount.toString(),
+        destinationToken: destinationTokenObj,
+        fromAccountAddress: sender,
+        minimumReceiveAmount: minimumReceiveAmount
+          ? minimumReceiveAmountFloat.toString()
+          : undefined,
+        sourceToken: sourceTokenObj,
+        toAccountAddress: recipient,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for initiating the transfer of tokens from one chain to another. <br/>
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/bridge')
   @Tags('Transfers', 'Raw Transactions')
   @Example<TransactionConfig>(
@@ -148,53 +189,13 @@ export class RestController {
     },
     'EVM transaction',
   )
-  @Example<object>(
-    {
-      signatures: [{ '0': 0 }],
-      message: {
-        header: {
-          numRequiredSignatures: 1,
-          numReadonlySignedAccounts: 0,
-          numReadonlyUnsignedAccounts: 2,
-        },
-        staticAccountKeys: [
-          '00000000000000000000000000000000000000000000',
-          '11111111111111111111111111111111111111111111',
-          'ComputeBudget111111111111111111111111111111',
-          'BrdgBrdgBrdgBrdgBrdgBrdgBrdgBrdgBrdgBrdgBrdg',
-        ],
-        recentBlockhash: '9tmV9tmV9tmV9tmV9tmV9tmV9tmV9tmV9tmV9tmV9tmV',
-        compiledInstructions: [
-          {
-            programIdIndex: 2,
-            accountKeyIndexes: [],
-            data: {
-              type: 'Buffer',
-              data: [0, 0, 0, 0, 0],
-            },
-          },
-          {
-            programIdIndex: 3,
-            accountKeyIndexes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            data: {
-              type: 'Buffer',
-              data: [
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0,
-              ],
-            },
-          },
-        ],
-        addressTableLookups: [
-          {
-            accountKey: '33333333333333333333333333333333333333333333',
-            writableIndexes: [0, 0, 0],
-            readonlyIndexes: [0, 0, 0],
-          },
-        ],
-      },
-    },
+  @Example<string>(
+    '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
     'Solana transaction',
+  )
+  @Example<string>(
+    '0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+    'Stellar transaction',
   )
   @Example<object>(
     {
@@ -266,30 +267,78 @@ export class RestController {
     extraGas?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!Object.keys(Messenger).includes(messenger)) {
+      throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
+    }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+
+    if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
+      throw new HttpException(
+        'Invalid feePaymentMethod',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const feePaymentMethodEnum =
       FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
     const amountFloat = parseFloat(amount) / 10 ** sourceTokenObj.decimals;
-    return await this.sdkService.send(<SendParams>{
-      amount: amountFloat.toString(),
-      destinationToken: destinationTokenObj,
-      fromAccountAddress: sender,
-      sourceToken: sourceTokenObj,
-      toAccountAddress: recipient,
-      messenger: messengerEnum,
-      fee: fee,
-      feeFormat: AmountFormat.INT,
-      extraGas: extraGas,
-      extraGasFormat: AmountFormat.INT,
-      gasFeePaymentMethod: feePaymentMethodEnum,
-    });
+    if (isNaN(amountFloat) || amountFloat <= 0) {
+      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.send({
+        amount: amountFloat.toString(),
+        destinationToken: destinationTokenObj,
+        fromAccountAddress: sender,
+        sourceToken: sourceTokenObj,
+        toAccountAddress: recipient,
+        messenger: messengerEnum,
+        fee: fee,
+        feeFormat: AmountFormat.INT,
+        extraGas: extraGas,
+        extraGasFormat: AmountFormat.INT,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Simulate and check if restore needed for Stellar transaction <br/>
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/stellar/restore/')
+  @Tags('Transfers', 'Raw Transactions')
+  async simulateAndCheckRestoreTxRequiredSoroban(
+    @Query('xdrTx') xdrTx: string,
+    @Query('sender') sender: string,
+  ): Promise<string> {
+    try {
+      return await this.sdkService.simulateAndCheckRestoreTxRequiredSoroban(
+        xdrTx,
+        sender,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Gets the average time in ms to complete a transfer for given tokens and messenger.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/transfer/time')
   @Tags('Transfers')
   async getTransferTime(
@@ -304,32 +353,57 @@ export class RestController {
     @Query('messenger') messenger: keyof typeof Messenger,
   ): Promise<number | null> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!Object.keys(Messenger).includes(messenger)) {
+      throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
+    }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
-    return this.sdkService.getTransferTime(
-      sourceTokenObj,
-      destinationTokenObj,
-      messengerEnum,
-    );
+    try {
+      return this.sdkService.getTransferTime(
+        sourceTokenObj,
+        destinationTokenObj,
+        messengerEnum,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Fetches information about tokens transfer by chosen chainSymbol and transaction Id from the Allbridge Core API.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/transfer/status')
   @Tags('Transfers')
   async getTransferStatus(
     @Query('chain') chain: keyof typeof ChainSymbol,
     @Query('txId') txId: string,
   ): Promise<TransferStatusResponse> {
+    if (!Object.keys(ChainSymbol).includes(chain)) {
+      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
+    }
     const chainEnum = ChainSymbol[chain as keyof typeof ChainSymbol];
-    return await this.sdkService.getTransferStatus(chainEnum, txId);
+    try {
+      return await this.sdkService.getTransferStatus(chainEnum, txId);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get token balance
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/balance')
   @Tags('Tokens')
   async getTokenBalance(
@@ -337,48 +411,70 @@ export class RestController {
     @Query('token') token: string,
   ): Promise<{ result: string }> {
     const tokenObj = await this.sdkService.getTokenByAddress(token);
-    return {
-      result: await this.sdkService.getTokenBalance(<GetTokenBalanceParams>{
-        account: address,
-        token: tokenObj,
-      }),
-    };
+    if (!tokenObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return {
+        result: await this.sdkService.getTokenBalance({
+          account: address,
+          token: tokenObj,
+        }),
+      };
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get native (gas) token balance
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/native/balance')
   @Tags('Tokens')
   async getTokenNativeBalance(
     @Query('address') address: string,
     @Query('chain') chain: keyof typeof ChainSymbol,
   ): Promise<AmountFormatted> {
+    if (!Object.keys(ChainSymbol).includes(chain)) {
+      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
+    }
     const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
-    return await this.sdkService.getNativeTokenBalance(<
-      GetNativeTokenBalanceParams
-    >{
-      account: address,
-      chainSymbol: chainSymbol,
-    });
+    try {
+      return await this.sdkService.getNativeTokenBalance({
+        account: address,
+        chainSymbol: chainSymbol,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/details')
   @Tags('Tokens')
   async getTokenByChainAndAddress(
     @Query('address') address: string,
     @Query('chain') chain: keyof typeof ChainSymbol,
   ): Promise<TokenWithChainDetails | undefined> {
+    if (!Object.keys(ChainSymbol).includes(chain)) {
+      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
+    }
     const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
-    return await this.sdkService.getTokenByChainAndAddress(
-      chainSymbol,
-      address,
-    );
+    try {
+      return await this.sdkService.getTokenByChainAndAddress(
+        chainSymbol,
+        address,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Fetches possible ways to pay the transfer gas fee.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/gas/fee')
   @Tags('Tokens')
   async getGasFeeOptions(
@@ -393,32 +489,57 @@ export class RestController {
     @Query('messenger') messenger: keyof typeof Messenger,
   ): Promise<GasFeeOptions> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!Object.keys(Messenger).includes(messenger)) {
+      throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
+    }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
-    return await this.sdkService.getGasFeeOptions(
-      <TokenWithChainDetails>sourceTokenObj,
-      <TokenWithChainDetails>destinationTokenObj,
-      messengerEnum,
-    );
+    try {
+      return await this.sdkService.getGasFeeOptions(
+        sourceTokenObj,
+        destinationTokenObj,
+        messengerEnum,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get gas balance
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/gas/balance')
   @Tags('Tokens')
   async getGasBalance(
     @Query('address') address: string,
     @Query('chain') chain: keyof typeof ChainSymbol,
   ): Promise<GasBalanceResponse> {
+    if (!Object.keys(ChainSymbol).includes(chain)) {
+      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
+    }
     const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
-    return await this.sdkService.getGasBalance(chainSymbol, address);
+    try {
+      return await this.sdkService.getGasBalance(chainSymbol, address);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get possible limit of extra gas amount.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/gas/extra/limits')
   @Tags('Tokens')
   async getExtraGasMaxLimits(
@@ -426,17 +547,31 @@ export class RestController {
     @Query('destinationToken') destinationToken: string,
   ): Promise<ExtraGasMaxLimitResponse> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
-    return await this.sdkService.getExtraGasMaxLimits(
-      <TokenWithChainDetails>sourceTokenObj,
-      <TokenWithChainDetails>destinationTokenObj,
-    );
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      return await this.sdkService.getExtraGasMaxLimits(
+        sourceTokenObj,
+        destinationTokenObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Returns information about pending transactions for the same destination chain and the amount of tokens can be received as a result of transfer considering pending transactions.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pending/info')
   @Tags('Transfers')
   async getPendingStatusInfo(
@@ -448,19 +583,33 @@ export class RestController {
     @Query('destinationToken') destinationToken: string,
   ): Promise<PendingStatusInfoResponse> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
-    return await this.sdkService.getPendingStatusInfo(
-      amount,
-      AmountFormat.INT,
-      <TokenWithChainDetails>sourceTokenObj,
-      <TokenWithChainDetails>destinationTokenObj,
-    );
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      return await this.sdkService.getPendingStatusInfo(
+        amount,
+        AmountFormat.INT,
+        sourceTokenObj,
+        destinationTokenObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Show swap amount changes (fee and amount adjustment) during send through pools
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/swap/details')
   @Tags('Transfers')
   async swapDetails(
@@ -478,19 +627,33 @@ export class RestController {
     @Query('destinationToken') destinationToken: string,
   ): Promise<SwapCalcInfo> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
-    return await this.sdkService.swapAndBridgeDetails(
-      amount,
-      AmountFormat.INT,
-      sourceTokenObj,
-      destinationTokenObj,
-    );
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      return await this.sdkService.swapAndBridgeDetails(
+        amount,
+        AmountFormat.INT,
+        sourceTokenObj,
+        destinationTokenObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Show bridge amount changes (fee and amount adjustment) during send through pools on source and destination chains
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/bridge/details')
   @Tags('Transfers')
   async bridgeDetails(
@@ -508,19 +671,33 @@ export class RestController {
     @Query('destinationToken') destinationToken: string,
   ): Promise<SwapCalcInfo> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
-    return await this.sdkService.swapAndBridgeDetails(
-      amount,
-      AmountFormat.INT,
-      sourceTokenObj,
-      destinationTokenObj,
-    );
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    try {
+      return await this.sdkService.swapAndBridgeDetails(
+        amount,
+        AmountFormat.INT,
+        sourceTokenObj,
+        destinationTokenObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Calculates the amount of tokens to be received as a result of transfer.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/bridge/receive/calculate')
   @Tags('Transfers')
   async getAmountToBeReceived(
@@ -545,8 +722,20 @@ export class RestController {
     @Query('relayerFeeInStables') relayerFeeInStables?: string,
   ): Promise<BridgeAmounts> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!Object.keys(Messenger).includes(messenger)) {
+      throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
+    }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
     const feeFloat = relayerFeeInStables
       ? (
@@ -554,19 +743,24 @@ export class RestController {
           10 ** sourceTokenObj.decimals
         ).toString()
       : undefined;
-    return await this.sdkService.getAmountToBeReceived(
-      amount,
-      sourceTokenObj,
-      destinationTokenObj,
-      messengerEnum,
-      refreshingPools ?? false,
-      feeFloat,
-    );
+    try {
+      return await this.sdkService.getAmountToBeReceived(
+        amount,
+        sourceTokenObj,
+        destinationTokenObj,
+        messengerEnum,
+        refreshingPools ?? false,
+        feeFloat,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Calculates the amount of tokens to send based on requested tokens amount be received as a result of transfer.
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/bridge/send/calculate')
   @Tags('Transfers')
   async getAmountToSend(
@@ -591,8 +785,20 @@ export class RestController {
     @Query('relayerFeeInStables') relayerFeeInStables?: string,
   ): Promise<BridgeAmounts> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException(
+        'Destination token not found',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (!Object.keys(Messenger).includes(messenger)) {
+      throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
+    }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
     const feeFloat = relayerFeeInStables
       ? (
@@ -600,19 +806,24 @@ export class RestController {
           10 ** sourceTokenObj.decimals
         ).toString()
       : undefined;
-    return await this.sdkService.getAmountToSend(
-      amount,
-      sourceTokenObj,
-      destinationTokenObj,
-      messengerEnum,
-      refreshingPools ?? false,
-      feeFloat,
-    );
+    try {
+      return await this.sdkService.getAmountToSend(
+        amount,
+        sourceTokenObj,
+        destinationTokenObj,
+        messengerEnum,
+        refreshingPools ?? false,
+        feeFloat,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for depositing tokens to Liquidity pool
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/deposit')
   @Tags('Pool', 'Raw Transactions')
   async deposit(
@@ -628,16 +839,24 @@ export class RestController {
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
-    return await this.sdkService.deposit(<LiquidityPoolsParamsWithAmount>{
-      amount: amount.toString(),
-      accountAddress: ownerAddress,
-      token: tokenAddressObj,
-    });
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.deposit({
+        amount: amount.toString(),
+        accountAddress: ownerAddress,
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for withdrawing tokens from Liquidity pool
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/withdraw')
   @Tags('Pool', 'Raw Transactions')
   async withdraw(
@@ -653,16 +872,24 @@ export class RestController {
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
-    return await this.sdkService.withdraw(<LiquidityPoolsParamsWithAmount>{
-      amount: amount.toString(),
-      accountAddress: ownerAddress,
-      token: tokenAddressObj,
-    });
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.withdraw({
+        amount: amount.toString(),
+        accountAddress: ownerAddress,
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Creates a Raw Transaction for claiming rewards from Liquidity pool
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/claim')
   @Tags('Pool', 'Raw Transactions')
   async claimRewards(
@@ -674,15 +901,23 @@ export class RestController {
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
-    return await this.sdkService.claimRewards(<LiquidityPoolsParams>{
-      accountAddress: ownerAddress,
-      token: tokenAddressObj,
-    });
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.claimRewards({
+        accountAddress: ownerAddress,
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Check address and show gas balance
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/check/address')
   @Tags('Tokens', 'Transfers')
   async checkAddress(
@@ -690,13 +925,38 @@ export class RestController {
     @Query('address') address: string,
     @Query('token') token: string,
   ): Promise<CheckAddressResponse> {
+    if (!Object.keys(ChainSymbol).includes(chain)) {
+      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
+    }
     const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
-    return await this.sdkService.checkAddress(chainSymbol, address, token);
+    try {
+      return await this.sdkService.checkAddress(chainSymbol, address, token);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /**
+   * Get Balance Line information if exists
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/check/stellar/balanceline')
+  @Tags('Tokens', 'Transfers')
+  async checkBalanceLine(
+    @Query('address') address: string,
+    @Query('token') token: string,
+  ): Promise<HorizonApi.BalanceLineAsset> {
+    try {
+      return await this.sdkService.checkBalanceLine(address, token);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Check if the amount of approved tokens is enough
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/check/allowance')
   @Tags('Pool', 'Transfers')
   async checkAllowance(
@@ -708,24 +968,42 @@ export class RestController {
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
   ): Promise<boolean> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
+    const tokenAddressObj =
+      await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
+      throw new HttpException(
+        'Invalid feePaymentMethod',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const feePaymentMethodEnum =
       FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
-    const floatAmount = parseFloat(amount) / 10 ** poolAddressObj.decimals;
-    return await this.sdkService.checkAllowance({
-      amount: floatAmount.toString(),
-      owner: ownerAddress,
-      token: poolAddressObj,
-      gasFeePaymentMethod: feePaymentMethodEnum,
-    });
+    const floatAmount = parseFloat(amount) / 10 ** tokenAddressObj.decimals;
+    if (isNaN(floatAmount) || floatAmount <= 0) {
+      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.checkAllowance({
+        amount: floatAmount.toString(),
+        owner: ownerAddress,
+        token: tokenAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Gets information about the pool-info by token from server
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pool/info/server')
   @Tags('Pool')
   async getPoolInfoByServer(
@@ -735,12 +1013,20 @@ export class RestController {
     @Query('poolAddress') poolAddress: string,
   ): Promise<PoolInfo> {
     const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    return await this.sdkService.getPoolInfoFromServer(poolAddressObj);
+    if (!poolAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getPoolInfoFromServer(poolAddressObj);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Gets information about the pool-info by token from blockchain
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pool/info/blockchain')
   @Tags('Pool')
   async getPoolInfoFromBlockchain(
@@ -750,12 +1036,20 @@ export class RestController {
     @Query('poolAddress') poolAddress: string,
   ): Promise<Required<PoolInfo>> {
     const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    return await this.sdkService.getPoolInfoFromBlockchain(poolAddressObj);
+    if (!poolAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getPoolInfoFromBlockchain(poolAddressObj);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get amount of tokens approved for poolInfo
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pool/allowance')
   @Tags('Pool')
   async getPoolAllowance(
@@ -767,18 +1061,32 @@ export class RestController {
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
   ): Promise<string> {
     const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
+    if (!poolAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
+      throw new HttpException(
+        'Invalid feePaymentMethod',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const feePaymentMethodEnum =
       FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
-    return await this.sdkService.getPoolAllowance({
-      owner: ownerAddress,
-      token: poolAddressObj,
-      gasFeePaymentMethod: feePaymentMethodEnum,
-    });
+    try {
+      return await this.sdkService.getPoolAllowance({
+        owner: ownerAddress,
+        token: poolAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Get user balance info on liquidity pool
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/liquidity/details')
   @Tags('Pool')
   async getUserPoolInfo(
@@ -789,12 +1097,23 @@ export class RestController {
     @Query('poolAddress') poolAddress: string,
   ): Promise<UserBalanceInfo> {
     const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    return await this.sdkService.getUserPoolInfo(ownerAddress, poolAddressObj);
+    if (!poolAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getUserPoolInfo(
+        ownerAddress,
+        poolAddressObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Calculates the amount of LP tokens that will be deposited
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/liquidity/deposit/calculate')
   @Tags('Pool')
   async getAmountToBeDeposited(
@@ -809,15 +1128,23 @@ export class RestController {
   ): Promise<string> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
-    return await this.sdkService.getAmountToBeDeposited(
-      amount,
-      tokenAddressObj,
-    );
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getAmountToBeDeposited(
+        amount,
+        tokenAddressObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   /**
    * Calculates the amount of tokens will be withdrawn
    */
+  @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/liquidity/withdrawn/calculate')
   @Tags('Pool')
   async getAmountToBeWithdrawn(
@@ -833,11 +1160,21 @@ export class RestController {
   ): Promise<string> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
     const floatAmount = parseFloat(amount) / 10 ** tokenAddressObj.decimals;
-    return await this.sdkService.getAmountToBeWithdrawn(
-      floatAmount.toString(),
-      ownerAddress,
-      tokenAddressObj,
-    );
+    if (isNaN(floatAmount) || floatAmount <= 0) {
+      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getAmountToBeWithdrawn(
+        floatAmount.toString(),
+        ownerAddress,
+        tokenAddressObj,
+      );
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

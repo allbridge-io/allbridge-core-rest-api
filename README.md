@@ -17,6 +17,9 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
 
 ## Table of Contents
 
+- [Configuration](#configuration)
+    - [Networks](#networks)
+    - [Environment variables](#environment-variables)
 - [How to get](#how-to-get)
     - [1. Use existing docker image](#1-use-existing-docker-image)
     - [2. Build and run the docker image](#2-build-and-run-the-docker-image)
@@ -27,6 +30,86 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
     - [Pools](#pools)
     - [Transfers](#transfers)
 
+## Configuration
+
+### Networks
+
+The Allbridge Core REST API supports the following networks:
+
+- Ethereum (ETH)
+- Binance Smart Chain (BSC)
+- Tron (TRX)
+- Arbitrum (ARB)
+- Polygon (POL)
+- Avalanche (AVA)
+- Optimism (OPT)
+- Base (BAS)
+- Celo (CEL)
+- Solana (SOL)
+- Stellar (STLR) & Soroban (SRB)
+
+### Environment variables
+
+The Allbridge Core REST API requires the following environment variables:
+
+- `ENVIRONMENT` - The environment in which the API is running. Possible values are `development` and `production`.
+- `ETH_NODE_URL` - The JSON RPC URL of the Ethereum node. For example:
+  - `https://ethereum-rpc.publicnode.com`
+  - `https://mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `BSC_NODE_URL` - The JSON RPC URL of the Binance Smart Chain node. For example:
+  - `https://bsc-rpc.publicnode.com`
+  - `https://bsc-dataseed1.binance.org`
+  - ...
+- `TRX_NODE_URL` - The JSON RPC URL of the Tron node. For example:
+  - `https://tron-rpc.publicnode.com`
+  - `https://api.trongrid.io`
+  - ...
+- `ARB_NODE_URL` - The JSON RPC URL of the Arbitrum node. For example:
+  - `https://arbitrum-one-rpc.publicnode.com`
+  - `https://arb1.arbitrum.io/rpc`
+  - `https://arbitrum-mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `POL_NODE_URL` - The JSON RPC URL of the Polygon node. For example:
+  - `https://polygon-bor-rpc.publicnode.com`
+  - `https://polygon-rpc.com`
+  - ...
+- `AVA_NODE_URL` - The JSON RPC URL of the Avalanche node. For example:
+  - `https://avalanche-c-chain-rpc.publicnode.com`
+  - `https://api.avax.network/ext/bc/C/rpc`
+  - `https://avalanche-mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `OPT_NODE_URL` - The JSON RPC URL of the Optimism node. For example:
+  - `https://optimism-rpc.publicnode.com`
+  - `https://mainnet.optimism.io`
+  - `https://optimism-mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `BAS_NODE_URL` - The JSON RPC URL of the Base node. For example:
+  - `https://base-rpc.publicnode.com`
+  - `https://mainnet.base.org`
+  - `https://base-mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `CEL_NODE_URL` - The JSON RPC URL of the Celo node. For example:
+  - `https://rpc.ankr.com/celo`
+  - `https://forno.celo.org`
+  - `https://celo-mainnet.infura.io/v3/YOUR-PROJECT-ID`
+  - ...
+- `SOL_NODE_URL` - The JSON RPC URL of the Solana node. For example:
+  - `https://api.mainnet-beta.solana.com`
+  - `https://solana-api.projectserum.com`
+  - `https://rpc.ankr.com/solana`
+  - ...
+- `SRB_NODE_URL` - The JSON RPC URL of the Soroban node. For example:
+  - `https://www.quicknode.com/stellar` (Soroban JSON RPC by QuickNode)
+  - `https://www.blockdaemon.com/soroban` (Blockdaemon)
+  - ...
+- `STLR_NODE_URL` - The JSON RPC URL of the Stellar node. For example:
+  - `https://horizon.stellar.org`
+  - `https://stellar-mainnet.rpcpool.com`
+  - ...
+- `NETWORKS` - A list of supported networks. Possible values are `ETH`, `BSC`, `TRX`, `ARB`, `POL`, `AVA`, `OPT`, `BAS`, `CEL`, `SOL`, `SRB`, `STLR`. For Stellar network, you need to provide both `STLR` and `SRB` networks.
+
+
 ## How to get
 
 ### 1. Use existing docker image
@@ -34,7 +117,7 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
 The easiest way to use the Allbridge Core REST API is to use the existing docker image. You can pull the image from the Docker Hub and run it with the following command:
 
 ```bash
-docker run -p 3000:3000 -d ooallbridge/io.allbridge.rest-api:latest \
+docker run -p 3000:3000 \
     -e ENVIRONMENT="production" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
@@ -44,19 +127,23 @@ docker run -p 3000:3000 -d ooallbridge/io.allbridge.rest-api:latest \
     -e AVA_NODE_URL="https://avalanche-c-chain-rpc.publicnode.com" \
     -e OPT_NODE_URL="https://optimism-rpc.publicnode.com" \
     -e BAS_NODE_URL="https://base-rpc.publicnode.com" \
+    -e CEL_NODE_URL="https://rpc.ankr.com/celo" \
     -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
-    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"SOL\"]"    
+    -e SRB_NODE_URL="...soroban rpc node..." \
+    -e STLR_NODE_URL="https://horizon.stellar.org" \
+    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\"]" \
+    -d allbridge/io.allbridge.rest-api:latest    
 ```
 or use environment variables from the `.env` file:
 
 ```bash
-docker run -p 3000:3000 --env-file .env -d ooallbridge/io.allbridge.rest-api:latest
+docker run -p 3000:3000 --env-file .env -d allbridge/io.allbridge.rest-api:latest
 ```
 
 ### 2. Build and run the docker image
 ```bash
 docker build -t allbridge-core-rest-api .
-docker run -p 3000:3000 -d allbridge-core-rest-api \
+docker run -p 3000:3000 \
     -e ENVIRONMENT="production" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
@@ -66,8 +153,12 @@ docker run -p 3000:3000 -d allbridge-core-rest-api \
     -e AVA_NODE_URL="https://avalanche-c-chain-rpc.publicnode.com" \
     -e OPT_NODE_URL="https://optimism-rpc.publicnode.com" \
     -e BAS_NODE_URL="https://base-rpc.publicnode.com" \
+    -e CEL_NODE_URL="https://rpc.ankr.com/celo" \
     -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
-    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"SOL\"]" 
+    -e SRB_NODE_URL="...soroban rpc node..." \
+    -e STLR_NODE_URL="https://horizon.stellar.org" \
+    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\"]" \
+    -d allbridge-core-rest-api 
 ```
 
 ## How to use
@@ -107,8 +198,6 @@ After running the docker image, you can access the swagger documentation at `htt
 `GET /gas/balance` - Get gas balance
 
 `GET /gas/extra/limits` - Get possible limit of extra gas amount.
-
-`GET /check/address` - Check address and show gas balance
 
 ### Pools
 
