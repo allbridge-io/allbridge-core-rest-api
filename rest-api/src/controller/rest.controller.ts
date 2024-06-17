@@ -915,28 +915,6 @@ export class RestController {
   }
 
   /**
-   * Check address and show gas balance
-   */
-  @Response<HttpExceptionBody>(400, 'Bad request')
-  @Get('/check/address')
-  @Tags('Tokens', 'Transfers')
-  async checkAddress(
-    @Query('chain') chain: keyof typeof ChainSymbol,
-    @Query('address') address: string,
-    @Query('token') token: string,
-  ): Promise<CheckAddressResponse> {
-    if (!Object.keys(ChainSymbol).includes(chain)) {
-      throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
-    }
-    const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
-    try {
-      return await this.sdkService.checkAddress(chainSymbol, address, token);
-    } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
-    }
-  }
-
-  /**
    * Get Balance Line information if exists
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
