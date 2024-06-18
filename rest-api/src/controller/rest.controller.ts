@@ -3,7 +3,6 @@ import {
   AmountFormatted,
   ChainDetailsMap,
   ChainSymbol,
-  CheckAddressResponse,
   ExtraGasMaxLimitResponse,
   FeePaymentMethod,
   GasBalanceResponse,
@@ -30,6 +29,7 @@ import { TransactionConfig } from 'web3-core';
 import {
   BridgeAmounts,
   SDKService,
+  SolanaTxFeeParamsMethod,
   SwapCalcInfo,
 } from '../service/sdk.service';
 
@@ -133,6 +133,21 @@ export class RestController {
      * see AllbridgeCoreSdk#getAmountToBeReceived
      */
     @Query('minimumReceiveAmount') minimumReceiveAmount?: string,
+    /**
+     * Solana's transaction <a href="https://solana.com/docs/core/fees" target="_blank"> prioritization fee</a> parameters<br/>
+     * <b><u>AUTO</u></b> - Priority Fee will be calculated based on <a href="https://solana-labs.github.io/solana-web3.js/classes/Connection.html#getRecentPrioritizationFees" target="_blank">solana/web3.js:Connection.getRecentPrioritizationFees</a><br/>
+     * <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> - Add Priority Fee as price per unit in micro-lamports<br/>
+     * <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> - Total Priority Fee impact will be as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeParams')
+    solanaTxFeeParams?: keyof typeof SolanaTxFeeParamsMethod,
+    /**
+     * Solana's transaction prioritization fee parameter value<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>AUTO</u></b> then value is ignored<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> then string value represent Priority Fee as price per unit in micro-lamports<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
@@ -158,17 +173,44 @@ export class RestController {
         HttpStatus.BAD_REQUEST,
       );
     }
+    if (
+      !!solanaTxFeeParams &&
+      !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
+    ) {
+      throw new HttpException(
+        'Invalid solanaTxFeeParams',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const params = {
+      amount: floatAmount.toString(),
+      destinationToken: destinationTokenObj,
+      fromAccountAddress: sender,
+      minimumReceiveAmount: minimumReceiveAmount
+        ? minimumReceiveAmountFloat.toString()
+        : undefined,
+      sourceToken: sourceTokenObj,
+      toAccountAddress: recipient,
+    };
+    if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
+      const solanaTxFeeParamsEnum =
+        SolanaTxFeeParamsMethod[
+          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+        ];
+      if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
+        params['txFeeParams'] = {
+          solana: SolanaTxFeeParamsMethod.AUTO,
+        };
+      } else {
+        params['txFeeParams'] = {
+          solana: {
+            [solanaTxFeeParamsEnum]: solanaTxFeeValue,
+          },
+        };
+      }
+    }
     try {
-      return await this.sdkService.send({
-        amount: floatAmount.toString(),
-        destinationToken: destinationTokenObj,
-        fromAccountAddress: sender,
-        minimumReceiveAmount: minimumReceiveAmount
-          ? minimumReceiveAmountFloat.toString()
-          : undefined,
-        sourceToken: sourceTokenObj,
-        toAccountAddress: recipient,
-      });
+      return await this.sdkService.send(params);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -265,6 +307,21 @@ export class RestController {
      */
     @Query('extraGas')
     extraGas?: string,
+    /**
+     * Solana's transaction <a href="https://solana.com/docs/core/fees" target="_blank"> prioritization fee</a> parameters<br/>
+     * <b><u>AUTO</u></b> - Priority Fee will be calculated based on <a href="https://solana-labs.github.io/solana-web3.js/classes/Connection.html#getRecentPrioritizationFees" target="_blank">solana/web3.js:Connection.getRecentPrioritizationFees</a><br/>
+     * <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> - Add Priority Fee as price per unit in micro-lamports<br/>
+     * <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> - Total Priority Fee impact will be as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeParams')
+    solanaTxFeeParams?: keyof typeof SolanaTxFeeParamsMethod,
+    /**
+     * Solana's transaction prioritization fee parameter value<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>AUTO</u></b> then value is ignored<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> then string value represent Priority Fee as price per unit in micro-lamports<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
@@ -296,20 +353,47 @@ export class RestController {
     if (isNaN(amountFloat) || amountFloat <= 0) {
       throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
     }
+    if (
+      !!solanaTxFeeParams &&
+      !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
+    ) {
+      throw new HttpException(
+        'Invalid solanaTxFeeParams',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const sendParams = {
+      amount: amountFloat.toString(),
+      destinationToken: destinationTokenObj,
+      fromAccountAddress: sender,
+      sourceToken: sourceTokenObj,
+      toAccountAddress: recipient,
+      messenger: messengerEnum,
+      fee: fee,
+      feeFormat: AmountFormat.INT,
+      extraGas: extraGas,
+      extraGasFormat: AmountFormat.INT,
+      gasFeePaymentMethod: feePaymentMethodEnum,
+    };
+    if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
+      const solanaTxFeeParamsEnum =
+        SolanaTxFeeParamsMethod[
+          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+        ];
+      if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
+        sendParams['txFeeParams'] = {
+          solana: SolanaTxFeeParamsMethod.AUTO,
+        };
+      } else {
+        sendParams['txFeeParams'] = {
+          solana: {
+            [solanaTxFeeParamsEnum]: solanaTxFeeValue,
+          },
+        };
+      }
+    }
     try {
-      return await this.sdkService.send({
-        amount: amountFloat.toString(),
-        destinationToken: destinationTokenObj,
-        fromAccountAddress: sender,
-        sourceToken: sourceTokenObj,
-        toAccountAddress: recipient,
-        messenger: messengerEnum,
-        fee: fee,
-        feeFormat: AmountFormat.INT,
-        extraGas: extraGas,
-        extraGasFormat: AmountFormat.INT,
-        gasFeePaymentMethod: feePaymentMethodEnum,
-      });
+      return await this.sdkService.send(sendParams);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -836,18 +920,60 @@ export class RestController {
      * selected token on the source chain.
      */
     @Query('tokenAddress') tokenAddress: string,
+    /**
+     * Solana's transaction <a href="https://solana.com/docs/core/fees" target="_blank"> prioritization fee</a> parameters<br/>
+     * <b><u>AUTO</u></b> - Priority Fee will be calculated based on <a href="https://solana-labs.github.io/solana-web3.js/classes/Connection.html#getRecentPrioritizationFees" target="_blank">solana/web3.js:Connection.getRecentPrioritizationFees</a><br/>
+     * <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> - Add Priority Fee as price per unit in micro-lamports<br/>
+     * <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> - Total Priority Fee impact will be as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeParams')
+    solanaTxFeeParams?: keyof typeof SolanaTxFeeParamsMethod,
+    /**
+     * Solana's transaction prioritization fee parameter value<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>AUTO</u></b> then value is ignored<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> then string value represent Priority Fee as price per unit in micro-lamports<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
+    if (
+      !!solanaTxFeeParams &&
+      !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
+    ) {
+      throw new HttpException(
+        'Invalid solanaTxFeeParams',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const params = {
+      amount: amount.toString(),
+      accountAddress: ownerAddress,
+      token: tokenAddressObj,
+    };
+    if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
+      const solanaTxFeeParamsEnum =
+        SolanaTxFeeParamsMethod[
+          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+        ];
+      if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
+        params['txFeeParams'] = {
+          solana: SolanaTxFeeParamsMethod.AUTO,
+        };
+      } else {
+        params['txFeeParams'] = {
+          solana: {
+            [solanaTxFeeParamsEnum]: solanaTxFeeValue,
+          },
+        };
+      }
+    }
     try {
-      return await this.sdkService.deposit({
-        amount: amount.toString(),
-        accountAddress: ownerAddress,
-        token: tokenAddressObj,
-      });
+      return await this.sdkService.deposit(params);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -869,18 +995,60 @@ export class RestController {
      * selected token on the source chain.
      */
     @Query('tokenAddress') tokenAddress: string,
+    /**
+     * Solana's transaction <a href="https://solana.com/docs/core/fees" target="_blank"> prioritization fee</a> parameters<br/>
+     * <b><u>AUTO</u></b> - Priority Fee will be calculated based on <a href="https://solana-labs.github.io/solana-web3.js/classes/Connection.html#getRecentPrioritizationFees" target="_blank">solana/web3.js:Connection.getRecentPrioritizationFees</a><br/>
+     * <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> - Add Priority Fee as price per unit in micro-lamports<br/>
+     * <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> - Total Priority Fee impact will be as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeParams')
+    solanaTxFeeParams?: keyof typeof SolanaTxFeeParamsMethod,
+    /**
+     * Solana's transaction prioritization fee parameter value<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>AUTO</u></b> then value is ignored<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> then string value represent Priority Fee as price per unit in micro-lamports<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
+    if (
+      !!solanaTxFeeParams &&
+      !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
+    ) {
+      throw new HttpException(
+        'Invalid solanaTxFeeParams',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const params = {
+      amount: amount.toString(),
+      accountAddress: ownerAddress,
+      token: tokenAddressObj,
+    };
+    if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
+      const solanaTxFeeParamsEnum =
+        SolanaTxFeeParamsMethod[
+          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+        ];
+      if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
+        params['txFeeParams'] = {
+          solana: SolanaTxFeeParamsMethod.AUTO,
+        };
+      } else {
+        params['txFeeParams'] = {
+          solana: {
+            [solanaTxFeeParamsEnum]: solanaTxFeeValue,
+          },
+        };
+      }
+    }
     try {
-      return await this.sdkService.withdraw({
-        amount: amount.toString(),
-        accountAddress: ownerAddress,
-        token: tokenAddressObj,
-      });
+      return await this.sdkService.withdraw(params);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -898,17 +1066,59 @@ export class RestController {
      * selected token on the source chain.
      */
     @Query('tokenAddress') tokenAddress: string,
+    /**
+     * Solana's transaction <a href="https://solana.com/docs/core/fees" target="_blank"> prioritization fee</a> parameters<br/>
+     * <b><u>AUTO</u></b> - Priority Fee will be calculated based on <a href="https://solana-labs.github.io/solana-web3.js/classes/Connection.html#getRecentPrioritizationFees" target="_blank">solana/web3.js:Connection.getRecentPrioritizationFees</a><br/>
+     * <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> - Add Priority Fee as price per unit in micro-lamports<br/>
+     * <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> - Total Priority Fee impact will be as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeParams')
+    solanaTxFeeParams?: keyof typeof SolanaTxFeeParamsMethod,
+    /**
+     * Solana's transaction prioritization fee parameter value<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>AUTO</u></b> then value is ignored<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>PRICE_PER_UNIT_IN_MICRO_LAMPORTS</u></b> then string value represent Priority Fee as price per unit in micro-lamports<br/>
+     * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
+     */
+    @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
+    if (
+      !!solanaTxFeeParams &&
+      !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
+    ) {
+      throw new HttpException(
+        'Invalid solanaTxFeeParams',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const params = {
+      accountAddress: ownerAddress,
+      token: tokenAddressObj,
+    };
+    if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
+      const solanaTxFeeParamsEnum =
+        SolanaTxFeeParamsMethod[
+          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+        ];
+      if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
+        params['txFeeParams'] = {
+          solana: SolanaTxFeeParamsMethod.AUTO,
+        };
+      } else {
+        params['txFeeParams'] = {
+          solana: {
+            [solanaTxFeeParamsEnum]: solanaTxFeeValue,
+          },
+        };
+      }
+    }
     try {
-      return await this.sdkService.claimRewards({
-        accountAddress: ownerAddress,
-        token: tokenAddressObj,
-      });
+      return await this.sdkService.claimRewards(params);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

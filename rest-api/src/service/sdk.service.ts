@@ -36,6 +36,12 @@ import { getLogger } from '../utils/logger-factory';
 import { ConfigService } from './config.service';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
 
+export enum SolanaTxFeeParamsMethod {
+  AUTO = 'AUTO',
+  PRICE_PER_UNIT_IN_MICRO_LAMPORTS = 'pricePerUnitInMicroLamports',
+  EXTRA_FEE_IN_LAMPORTS = 'extraFeeInLamports',
+}
+
 export interface BridgeAmounts {
   amountInFloat: string;
   amountReceivedInFloat: string;
