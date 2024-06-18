@@ -1,3 +1,10 @@
+## [3.15.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.0...v3.15.1) (2024-06-18)
+
+
+### Bug Fixes
+
+* add optional query solanaTxFeeParams and solanaTxFeeValue params ([0bb9bd8](https://github.com/allbridge-io/allbridge-core-rest-api/commit/0bb9bd817d40a2822d8249e19a15df4597110614))
+
 # [3.15.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.14.0...v3.15.0) (2024-06-17)
 
 
