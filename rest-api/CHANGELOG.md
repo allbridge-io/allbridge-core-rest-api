@@ -1,3 +1,10 @@
+## [3.15.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.1...v3.15.2) (2024-06-19)
+
+
+### Bug Fixes
+
+* SRB: update to "stellar-sdk": "11.3.0" ([c064beb](https://github.com/allbridge-io/allbridge-core-rest-api/commit/c064bebd4ce537b6855298d6cd2a94d3db7d40a6))
+
 ## [3.15.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.0...v3.15.1) (2024-06-18)
 
 
