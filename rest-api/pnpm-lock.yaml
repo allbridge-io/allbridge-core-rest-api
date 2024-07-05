@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@allbridge/bridge-core-sdk':
         specifier: '*'
-        version: 3.15.2(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)
+        version: 3.16.0(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)
       '@allbridge/logger':
         specifier: ^2.4.1
         version: 2.4.1(@nestjs/common@10.3.8(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
@@ -126,7 +126,7 @@ importers:
 
 packages:
 
-  '@allbridge/bridge-core-sdk@3.15.2':
+  '@allbridge/bridge-core-sdk@3.16.0':
     resolution: {integrity: sha512-U/aMopz3I+rq6Qtux1niZTWa/So7CM1wqkx+vSsLMLrczLlIKZCANHxKN0K2Kh5hRC+XeRwQz6pxqGxoanOqRg==}
     engines: {node: ^18.7.0 || >= 16, npm: ^8.16.0 || >= 8}
 
@@ -4540,7 +4540,7 @@ packages:
 
 snapshots:
 
-  '@allbridge/bridge-core-sdk@3.15.2(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)':
+  '@allbridge/bridge-core-sdk@3.16.0(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)':
     dependencies:
       '@project-serum/anchor': 0.25.0(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.3.11(@solana/web3.js@1.91.8(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(fastestsmallesttextencoderdecoder@1.0.22)(utf-8-validate@5.0.10)

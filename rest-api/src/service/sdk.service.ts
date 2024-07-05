@@ -77,7 +77,10 @@ export class SDKService {
       ConfigService.isProduction()
         ? {
             ...mainnet,
-            coreApiQueryParams,
+            coreApiQueryParams: coreApiQueryParams,
+            coreApiHeaders: ConfigService.getCoreApiHeaders(),
+            jupiterUrl: ConfigService.getJupiterUrl(),
+            tronJsonRpc: ConfigService.getTronJsonRpc(),
           }
         : testnet,
     );

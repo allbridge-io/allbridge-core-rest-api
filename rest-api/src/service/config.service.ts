@@ -1,5 +1,8 @@
+import { mainnet } from '@allbridge/bridge-core-sdk';
+import { VERSION } from '@allbridge/bridge-core-sdk/dist/src/version';
 import { LoggerCredential } from '@allbridge/logger';
 import { Injectable } from '@nestjs/common';
+import * as process from 'node:process';
 import { ConfigError } from '../error/errors';
 import * as dotenv from 'dotenv';
 
@@ -69,5 +72,25 @@ export class ConfigService {
 
   static getSystemPrecision() {
     return process.env.SYSTEM_PRECISION ? +process.env.SYSTEM_PRECISION : 9;
+  }
+
+  static getCoreApiHeaders() {
+    return process.env.HEADERS
+      ? Object.assign(JSON.parse(process.env.HEADERS), {
+          'x-Sdk-Agent': `AllbridgeCoreRestApi/${VERSION}`,
+        })
+      : { 'x-Sdk-Agent': `AllbridgeCoreRestApi/${VERSION}` };
+  }
+
+  static getJupiterUrl() {
+    return process.env.JUPITER_URL
+      ? process.env.JUPITER_URL
+      : mainnet.jupiterUrl;
+  }
+
+  static getTronJsonRpc() {
+    return process.env.TRON_JSON_RPC
+      ? process.env.TRON_JSON_RPC
+      : mainnet.tronJsonRpc;
   }
 }

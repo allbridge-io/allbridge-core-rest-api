@@ -108,7 +108,12 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://stellar-mainnet.rpcpool.com`
   - ...
 - `NETWORKS` - A list of supported networks. Possible values are `ETH`, `BSC`, `TRX`, `ARB`, `POL`, `AVA`, `OPT`, `BAS`, `CEL`, `SOL`, `SRB`, `STLR`. For Stellar network, you need to provide both `STLR` and `SRB` networks.
-
+- `HEADERS` - Headers for the API requests. For example:
+  - `{"Authorization": "Bearer YOUR-TOKEN"}`
+- `TRON_JSON_RPC` - The JSON RPC URL of the Tron node. For example:
+  - `https://api.trongrid.io/jsonrpc`
+- `JUPITER_URL` - The URL of the Jupiter API. For example:
+  - `https://quote-api.jup.ag/v6`
 
 ## How to get
 
