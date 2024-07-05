@@ -1,3 +1,10 @@
+# [3.16.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.2...v3.16.0) (2024-07-05)
+
+
+### Features
+
+* **REST:** update node 21.6.2 -> 22 ([7163f1c](https://github.com/allbridge-io/allbridge-core-rest-api/commit/7163f1c70fb5a3e3e4f0f99b8dc6a67135f50fda))
+
 ## [3.15.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.1...v3.15.2) (2024-06-19)
 
 
