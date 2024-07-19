@@ -1,10 +1,10 @@
-FROM node:22-alpine as build
+FROM node:22.4.0-alpine as build
 ARG SDK_VERSION=latest
 
 # Install python and build-base for node-gyp
 RUN apk update
 RUN apk add --no-cache python3 make g++ bash
-RUN apk add openssl=3.3.1-r1
+RUN apk add openssl=3.3.1-r3
 # Install pnpm globally
 RUN npm install -g pnpm
 
@@ -29,9 +29,9 @@ RUN pnpm build
 # Install only production dependencies
 RUN pnpm install --prod
 
-FROM node:22-alpine
+FROM node:22.4.0-alpine
 RUN apk update
-RUN apk add openssl=3.3.1-r1
+RUN apk add openssl=3.3.1-r3
 WORKDIR /app
 ENV NODE_ENV production
 COPY --from=build /app/node_modules ./node_modules
