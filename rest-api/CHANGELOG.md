@@ -1,3 +1,10 @@
+# [3.17.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.16.0...v3.17.0) (2024-07-19)
+
+
+### Features
+
+* **JUP:** jup exactOut add failback exactIn ([3378eb8](https://github.com/allbridge-io/allbridge-core-rest-api/commit/3378eb8f80b63bbe60684d3a01b25af3250fa83c))
+
 # [3.16.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.15.2...v3.16.0) (2024-07-05)
 
 
