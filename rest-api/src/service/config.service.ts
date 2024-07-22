@@ -50,18 +50,6 @@ export class ConfigService {
     return process.env.TELEGRAM_THREAD_ID ? process.env.TELEGRAM_THREAD_ID : '';
   }
 
-  static getEnvironment() {
-    return process.env.ENVIRONMENT || 'local';
-  }
-
-  static isProduction() {
-    return ConfigService.getEnvironment() === 'production';
-  }
-
-  static isStaging() {
-    return ConfigService.getEnvironment() === 'staging';
-  }
-
   static getRPCUrls(): { [name: string]: string } {
     const rpcUrls: any = {};
     ConfigService.getNetworks().forEach((chain) => {

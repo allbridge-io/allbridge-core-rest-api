@@ -27,7 +27,6 @@ import {
   TransferStatusResponse,
   UserBalanceInfo,
   mainnet,
-  testnet,
 } from '@allbridge/bridge-core-sdk';
 
 import { Injectable } from '@nestjs/common';
@@ -68,22 +67,12 @@ export class SDKService {
   private _chainDetailsMap?: ChainDetailsMap;
 
   constructor() {
-    let coreApiQueryParams;
-    if (ConfigService.isStaging()) {
-      coreApiQueryParams = { staging: 'true' };
-    }
-    this.sdk = new AllbridgeCoreSdk(
-      ConfigService.getRPCUrls(),
-      ConfigService.isProduction()
-        ? {
-            ...mainnet,
-            coreApiQueryParams: coreApiQueryParams,
-            coreApiHeaders: ConfigService.getCoreApiHeaders(),
-            jupiterUrl: ConfigService.getJupiterUrl(),
-            tronJsonRpc: ConfigService.getTronJsonRpc(),
-          }
-        : testnet,
-    );
+    this.sdk = new AllbridgeCoreSdk(ConfigService.getRPCUrls(), {
+      ...mainnet,
+      coreApiHeaders: ConfigService.getCoreApiHeaders(),
+      jupiterUrl: ConfigService.getJupiterUrl(),
+      tronJsonRpc: ConfigService.getTronJsonRpc(),
+    });
   }
 
   // Common

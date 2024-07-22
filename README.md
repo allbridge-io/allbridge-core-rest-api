@@ -52,7 +52,6 @@ The Allbridge Core REST API supports the following networks:
 
 The Allbridge Core REST API requires the following environment variables:
 
-- `ENVIRONMENT` - The environment in which the API is running. Possible values are `development` and `production`.
 - `ETH_NODE_URL` - The JSON RPC URL of the Ethereum node. For example:
   - `https://ethereum-rpc.publicnode.com`
   - `https://mainnet.infura.io/v3/YOUR-PROJECT-ID`
@@ -99,11 +98,11 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://solana-api.projectserum.com`
   - `https://rpc.ankr.com/solana`
   - ...
-- `SRB_NODE_URL` - The JSON RPC URL of the Soroban node. For example:
+- `SRB_NODE_URL` - The JSON RPC URL of the Soroban node. `STLR_NODE_URL` also required. For example:
   - `https://www.quicknode.com/stellar` (Soroban JSON RPC by QuickNode)
   - `https://www.blockdaemon.com/soroban` (Blockdaemon)
   - ...
-- `STLR_NODE_URL` - The JSON RPC URL of the Stellar node. For example:
+- `STLR_NODE_URL` - The JSON RPC URL of the Stellar node. `SRB_NODE_URL` also required. For example:
   - `https://horizon.stellar.org`
   - `https://stellar-mainnet.rpcpool.com`
   - ...
@@ -123,7 +122,6 @@ The easiest way to use the Allbridge Core REST API is to use the existing docker
 
 ```bash
 docker run -p 3000:3000 \
-    -e ENVIRONMENT="production" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
     -e TRX_NODE_URL="https://tron-rpc.publicnode.com" \
@@ -149,7 +147,6 @@ docker run -p 3000:3000 --env-file .env -d allbridge/io.allbridge.rest-api:lates
 ```bash
 docker build -t allbridge-core-rest-api .
 docker run -p 3000:3000 \
-    -e ENVIRONMENT="production" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
     -e TRX_NODE_URL="https://tron-rpc.publicnode.com" \
