@@ -106,7 +106,6 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://horizon.stellar.org`
   - `https://stellar-mainnet.rpcpool.com`
   - ...
-- `NETWORKS` - A list of supported networks. Possible values are `ETH`, `BSC`, `TRX`, `ARB`, `POL`, `AVA`, `OPT`, `BAS`, `CEL`, `SOL`, `SRB`, `STLR`. For Stellar network, you need to provide both `STLR` and `SRB` networks.
 - `HEADERS` - Headers for the API requests. For example:
   - `{"Authorization": "Bearer YOUR-TOKEN"}`
 - `TRON_JSON_RPC` - The JSON RPC URL of the Tron node. For example:
@@ -134,7 +133,6 @@ docker run -p 3000:3000 \
     -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
-    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\"]" \
     -d allbridge/io.allbridge.rest-api:latest    
 ```
 or use environment variables from the `.env` file:
@@ -159,7 +157,6 @@ docker run -p 3000:3000 \
     -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
-    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\"]" \
     -d allbridge-core-rest-api 
 ```
 

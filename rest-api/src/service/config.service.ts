@@ -1,4 +1,4 @@
-import { mainnet } from '@allbridge/bridge-core-sdk';
+import { ChainSymbol, mainnet } from '@allbridge/bridge-core-sdk';
 import { VERSION } from '@allbridge/bridge-core-sdk/dist/src/version';
 import { LoggerCredential } from '@allbridge/logger';
 import { Injectable } from '@nestjs/common';
@@ -14,10 +14,6 @@ const DEFAULT_PORT = 3000;
 export class ConfigService {
   static getPort(): number {
     return +(process.env.PORT || DEFAULT_PORT);
-  }
-
-  static getNetworks(): string[] {
-    return process.env.NETWORKS ? JSON.parse(process.env.NETWORKS) : [];
   }
 
   static getNetworkNodeUrl(chainSymbol: string): string {
@@ -52,8 +48,11 @@ export class ConfigService {
 
   static getRPCUrls(): { [name: string]: string } {
     const rpcUrls: any = {};
-    ConfigService.getNetworks().forEach((chain) => {
-      rpcUrls[chain] = ConfigService.getNetworkNodeUrl(chain);
+    const chainSymbols = Object.values(ChainSymbol);
+    chainSymbols.forEach((chain) => {
+      try {
+        rpcUrls[chain] = ConfigService.getNetworkNodeUrl(chain);
+      } catch (e) {}
     });
     return rpcUrls;
   }
