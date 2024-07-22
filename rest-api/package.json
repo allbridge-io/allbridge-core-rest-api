@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "tsoa spec && nest build",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "start": "nest start",
     "start:dev": "tsoa spec && nest start --watch",
     "start:debug": "nest start --debug --watch",
