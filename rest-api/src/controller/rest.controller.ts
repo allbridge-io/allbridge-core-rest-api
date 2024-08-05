@@ -51,9 +51,14 @@ export class RestController {
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/chains')
   @Tags('Tokens')
-  async chainDetailsMap(): Promise<ChainDetailsMap> {
+  async chainDetailsMap(
+    /**
+     * A string value which specifies ChainDetailsMap to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup. Defaults to 'swap'.
+     */
+    @Query('type') type?: 'swap' | 'pool',
+  ): Promise<ChainDetailsMap> {
     try {
-      return this.sdkService.chainDetailsMap();
+      return this.sdkService.chainDetailsMap(type);
     } catch (e) {
       httpException(e);
     }
@@ -65,9 +70,14 @@ export class RestController {
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/tokens')
   @Tags('Tokens')
-  async getTokens(): Promise<TokenWithChainDetails[]> {
+  async getTokens(
+    /**
+     * A string value which specifies a set of tokens to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup. Defaults to 'swap'.
+     */
+    @Query('type') type?: 'swap' | 'pool',
+  ): Promise<TokenWithChainDetails[]> {
     try {
-      return this.sdkService.getTokens();
+      return this.sdkService.getTokens(type);
     } catch (e) {
       httpException(e);
     }
