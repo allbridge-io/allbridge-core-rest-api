@@ -27,7 +27,6 @@ import {
   TransferStatusResponse,
   UserBalanceInfo,
   mainnet,
-  testnet,
 } from '@allbridge/bridge-core-sdk';
 
 import { Injectable } from '@nestjs/common';
@@ -68,32 +67,22 @@ export class SDKService {
   private _chainDetailsMap?: ChainDetailsMap;
 
   constructor() {
-    let coreApiQueryParams;
-    if (ConfigService.isStaging()) {
-      coreApiQueryParams = { staging: 'true' };
-    }
-    this.sdk = new AllbridgeCoreSdk(
-      ConfigService.getRPCUrls(),
-      ConfigService.isProduction()
-        ? {
-            ...mainnet,
-            coreApiQueryParams: coreApiQueryParams,
-            coreApiHeaders: ConfigService.getCoreApiHeaders(),
-            jupiterUrl: ConfigService.getJupiterUrl(),
-            tronJsonRpc: ConfigService.getTronJsonRpc(),
-          }
-        : testnet,
-    );
+    this.sdk = new AllbridgeCoreSdk(ConfigService.getRPCUrls(), {
+      ...mainnet,
+      coreApiHeaders: ConfigService.getCoreApiHeaders(),
+      jupiterUrl: ConfigService.getJupiterUrl(),
+      tronJsonRpc: ConfigService.getTronJsonRpc(),
+    });
   }
 
   // Common
-  async getTokens(): Promise<TokenWithChainDetails[]> {
-    return await this.sdk.tokens();
+  async getTokens(type?: 'swap' | 'pool'): Promise<TokenWithChainDetails[]> {
+    return await this.sdk.tokens(type);
   }
 
-  async chainDetailsMap(): Promise<ChainDetailsMap> {
+  async chainDetailsMap(type?: 'swap' | 'pool'): Promise<ChainDetailsMap> {
     if (!this._chainDetailsMap) {
-      this._chainDetailsMap = await this.sdk.chainDetailsMap();
+      this._chainDetailsMap = await this.sdk.chainDetailsMap(type);
     }
     return this._chainDetailsMap;
   }
@@ -158,14 +147,6 @@ export class SDKService {
     address: string,
   ): Promise<GasBalanceResponse> {
     return this.sdk.getGasBalance(chain, address);
-  }
-
-  async checkAddress(
-    chain: ChainSymbol,
-    address: string,
-    tokenAddress: string,
-  ): Promise<CheckAddressResponse> {
-    return this.sdk.checkAddress(chain, address, tokenAddress);
   }
 
   async checkBalanceLine(

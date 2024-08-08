@@ -32,6 +32,7 @@ import {
   SolanaTxFeeParamsMethod,
   SwapCalcInfo,
 } from '../service/sdk.service';
+import { httpException } from '../error/errors';
 
 type RawTransaction =
   | VersionedTransaction
@@ -50,11 +51,16 @@ export class RestController {
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/chains')
   @Tags('Tokens')
-  async chainDetailsMap(): Promise<ChainDetailsMap> {
+  async chainDetailsMap(
+    /**
+     * A string value which specifies ChainDetailsMap to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup. Defaults to 'swap'.
+     */
+    @Query('type') type?: 'swap' | 'pool',
+  ): Promise<ChainDetailsMap> {
     try {
-      return this.sdkService.chainDetailsMap();
+      return this.sdkService.chainDetailsMap(type);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -64,11 +70,16 @@ export class RestController {
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/tokens')
   @Tags('Tokens')
-  async getTokens(): Promise<TokenWithChainDetails[]> {
+  async getTokens(
+    /**
+     * A string value which specifies a set of tokens to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup. Defaults to 'swap'.
+     */
+    @Query('type') type?: 'swap' | 'pool',
+  ): Promise<TokenWithChainDetails[]> {
     try {
-      return this.sdkService.getTokens();
+      return this.sdkService.getTokens(type);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -103,7 +114,7 @@ export class RestController {
         amount: amount,
       });
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -212,7 +223,7 @@ export class RestController {
     try {
       return await this.sdkService.send(params);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -395,7 +406,7 @@ export class RestController {
     try {
       return await this.sdkService.send(sendParams);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -415,7 +426,7 @@ export class RestController {
         sender,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -459,7 +470,7 @@ export class RestController {
         messengerEnum,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -480,7 +491,7 @@ export class RestController {
     try {
       return await this.sdkService.getTransferStatus(chainEnum, txId);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -506,7 +517,7 @@ export class RestController {
         }),
       };
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -530,7 +541,7 @@ export class RestController {
         chainSymbol: chainSymbol,
       });
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -551,7 +562,7 @@ export class RestController {
         address,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -595,7 +606,7 @@ export class RestController {
         messengerEnum,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -616,7 +627,7 @@ export class RestController {
     try {
       return await this.sdkService.getGasBalance(chainSymbol, address);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -648,7 +659,7 @@ export class RestController {
         destinationTokenObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -686,7 +697,7 @@ export class RestController {
         destinationTokenObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -730,7 +741,7 @@ export class RestController {
         destinationTokenObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -774,7 +785,7 @@ export class RestController {
         destinationTokenObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -837,7 +848,7 @@ export class RestController {
         feeFloat,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -900,7 +911,7 @@ export class RestController {
         feeFloat,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -975,7 +986,7 @@ export class RestController {
     try {
       return await this.sdkService.deposit(params);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1050,7 +1061,7 @@ export class RestController {
     try {
       return await this.sdkService.withdraw(params);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1120,7 +1131,7 @@ export class RestController {
     try {
       return await this.sdkService.claimRewards(params);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1137,7 +1148,7 @@ export class RestController {
     try {
       return await this.sdkService.checkBalanceLine(address, token);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1184,7 +1195,7 @@ export class RestController {
         gasFeePaymentMethod: feePaymentMethodEnum,
       });
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1207,7 +1218,7 @@ export class RestController {
     try {
       return await this.sdkService.getPoolInfoFromServer(poolAddressObj);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1230,7 +1241,7 @@ export class RestController {
     try {
       return await this.sdkService.getPoolInfoFromBlockchain(poolAddressObj);
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1267,7 +1278,7 @@ export class RestController {
         gasFeePaymentMethod: feePaymentMethodEnum,
       });
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1294,7 +1305,7 @@ export class RestController {
         poolAddressObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1325,7 +1336,7 @@ export class RestController {
         tokenAddressObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 
@@ -1362,7 +1373,7 @@ export class RestController {
         tokenAddressObj,
       );
     } catch (e) {
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+      httpException(e);
     }
   }
 }
