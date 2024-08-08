@@ -21,8 +21,9 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
     - [Networks](#networks)
     - [Environment variables](#environment-variables)
 - [How to get](#how-to-get)
-    - [1. Use existing docker image](#1-use-existing-docker-image)
-    - [2. Build and run the docker image](#2-build-and-run-the-docker-image)
+    - [Run docker image](#run-docker-image)
+    - [Build and run the docker image](#build-and-run-the-docker-image)
+    - [Host on Heroku](#host-on-heroku)
 - [How to use](#how-to-use)
     - [Swagger](#swagger)
     - [Raw transactions](#raw-transactions)
@@ -115,7 +116,7 @@ The Allbridge Core REST API requires the following environment variables:
 
 ## How to get
 
-### 1. Use existing docker image
+### Run docker image
 
 The easiest way to use the Allbridge Core REST API is to use the existing docker image. You can pull the image from the Docker Hub and run it with the following command:
 
@@ -141,7 +142,7 @@ or use environment variables from the `.env` file:
 docker run -p 3000:3000 --env-file .env -d allbridge/io.allbridge.rest-api:latest
 ```
 
-### 2. Build and run the docker image
+### Build and run the docker image
 ```bash
 docker build -t allbridge-core-rest-api .
 docker run -p 3000:3000 \
@@ -159,6 +160,62 @@ docker run -p 3000:3000 \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
     -d allbridge-core-rest-api 
 ```
+
+### Host on Heroku
+
+If you cannot host Docker, you can use a separate hosting service like Heroku to deploy the REST API.
+
+For detailed instructions on using Heroku's container registry and runtime, see [the official guide](https://devcenter.heroku.com/articles/container-registry-and-runtime).
+
+Below is a step-by-step guide on how to do this.
+
+#### Step-by-Step Guide
+
+1. Sign up for Heroku
+   * [Heroku Sing Up](https://id.heroku.com/login)
+2. Install Heroku CLI
+   * Follow the instructions [here](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli)
+3. Login to Heroku CLI
+   * Run the command: `heroku login`
+   * If you encounter an 'IP address mismatch' error, disabling iCloud Private Relay may help. More details [here](https://help.heroku.com/CBF0T4AJ/can-t-login-to-heroku-using-cli-getting-ip-address-mismatch)
+4. Ensure Docker is Installed
+    * Verify Docker is working by running `docker ps`
+    * Ensure you are logged in to Heroku with `heroku login`
+5. Create a New Heroku App
+    * [Create a new app](https://dashboard.heroku.com/new-app) on the Heroku dashboard
+6. Set Heroku Stack to Container
+    * Run the command: `heroku stack:set container --app <app-name>`
+   
+##### Deploy and release REST-API container
+
+Repeat steps 7-11 to upgrade to a newer REST-API version
+
+7. Login to Heroku Container Registry
+   * Run `heroku container:login` or log in via Docker following [these instructions](https://devcenter.heroku.com/articles/container-registry-and-runtime#logging-in-to-the-registry)
+8. Pull the REST-API Locally
+   * Run the command: `docker pull --platform linux/amd64 allbridge/io.allbridge.rest-api:<version>`
+9. Tag the Docker Image
+   * Run the command: `docker tag allbridge/io.allbridge.rest-api:<version> registry.heroku.com/<app-name>/web`
+10. Push the Tagged Image to Heroku
+    * Run the command: `docker push registry.heroku.com/<app-name>/web`
+11. Release the Container on Heroku
+    * Run the command: `heroku container:release web --app <app-name>`
+
+##### One-Time Setup (Optional for Updates)
+
+12. Set Configuration Variables
+    * Run the commands, like: `heroku config:set ETH_NODE_URL=https://ethereum-rpc.publicnode.com --app <app-name>`
+    * Alternatively, you can set it via the Heroku Dashboard under the [app's settings](https://devcenter.heroku.com/articles/config-vars#using-the-heroku-dashboard)
+
+##### Final Steps
+
+13. Retrieve the Base URL
+    * Find the base URL in the domains section of your app's settings (`https://dashboard.heroku.com/apps/<app-name>/settings`) on the Heroku Dashboard
+    * Or click the button `Open App`
+14. Check API Availability
+    * Append `/api` to the base URL to check the availability of the Swagger
+
+You are now ready to use your rest-api app.
 
 ## How to use
 
