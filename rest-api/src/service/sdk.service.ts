@@ -4,7 +4,6 @@ import {
   AmountFormatted,
   ChainDetailsMap,
   ChainSymbol,
-  CheckAddressResponse,
   CheckAllowanceParams,
   ExtraGasMaxLimitResponse,
   GasBalanceResponse,
