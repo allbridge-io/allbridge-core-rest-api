@@ -1,3 +1,24 @@
 packages:
   - 'rest-api'
   - 'examples'
+catalog:
+  '@solana/web3.js': ^1.95.2
+  '@stellar/stellar-sdk': ^12.2.0
+  'axios': ^1.7.3
+  '@types/big.js': ^6.2.1
+  'big.js': ^6.2.1
+  'src': ^1.1.2
+  'tronweb': ^4.4.0
+  'web3': ^1.9.0
+  'web3-core': ^1.9.0
+  'web3-eth-contract': ^1.9.0
+  'web3-utils': ^1.9.0
+  '@typescript-eslint/eslint-plugin': ^6.21.0
+  '@typescript-eslint/parser': ^6.21.0
+  'bs58': ^5.0.0
+  'dotenv': ^16.4.5
+  'eslint': ^8.57.0
+  'eslint-config-prettier': ^9.1.0
+  'eslint-plugin-jest': ^27.9.0
+  'eslint-plugin-prettier': ^5.2.1
+  'prettier': ^3.3.3

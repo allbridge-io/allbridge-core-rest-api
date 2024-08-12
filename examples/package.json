@@ -56,27 +56,27 @@
     "run:liquidity-pool:trx:getLPamountOnDeposit": "ts-node src/usage/liquidity-pool/trx/get-lp-amount-on-deposit.ts"
   },
   "dependencies": {
-    "@solana/web3.js": "^1.95.2",
-    "@stellar/stellar-sdk": "^12.2.0",
-    "axios": "^1.7.3",
-    "big.js": "^6.2.1",
-    "src": "^1.1.2",
-    "tronweb": "^4.4.0",
-    "web3": "^1.10.4",
-    "web3-core": "^1.10.4",
-    "web3-eth-contract": "^1.10.4",
-    "web3-utils": "^1.10.4"
+    "@solana/web3.js": "catalog:",
+    "@stellar/stellar-sdk": "catalog:",
+    "axios": "catalog:",
+    "big.js": "catalog:",
+    "src": "catalog:",
+    "tronweb": "catalog:",
+    "web3": "catalog:",
+    "web3-core": "catalog:",
+    "web3-eth-contract": "catalog:",
+    "web3-utils": "catalog:"
   },
   "devDependencies": {
-    "@types/big.js": "^6.2.2",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
-    "bs58": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^8.10.0",
-    "eslint-plugin-jest": "^27.9.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "prettier": "^2.8.8"
+    "@types/big.js": "catalog:",
+    "@typescript-eslint/eslint-plugin": "catalog:",
+    "@typescript-eslint/parser": "catalog:",
+    "bs58": "catalog:",
+    "dotenv": "catalog:",
+    "eslint": "catalog:",
+    "eslint-config-prettier": "catalog:",
+    "eslint-plugin-jest": "catalog:",
+    "eslint-plugin-prettier": "catalog:",
+    "prettier": "catalog:"
   }
 }
