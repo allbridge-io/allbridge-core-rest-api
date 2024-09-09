@@ -709,7 +709,7 @@ export class RestController {
   @Tags('Transfers')
   async swapDetails(
     /**
-     * Amount to be received: Integer value according to the destination token precision
+     * Amount to be sent: Integer value according to the source token precision
      */
     @Query('amount') amount: string,
     /**

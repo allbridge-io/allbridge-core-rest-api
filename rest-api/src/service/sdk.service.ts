@@ -46,10 +46,28 @@ export interface BridgeAmounts {
   amountReceivedInFloat: string;
 }
 
+/**
+ * Response containing the fee and amount adjustments in Token for the bridge transaction.
+ */
 export interface SwapCalcInfo {
+  /**
+   * Paid for the swap liquidity on the source Chain
+   */
   sourceLiquidityFee: string;
+
+  /**
+   * Amount adjustment on the swap from the source Token
+   */
   sourceSwap: string;
+
+  /**
+   * Paid for the swap liquidity on the destination Chain
+   */
   destinationLiquidityFee: string;
+
+  /**
+   * Amount adjustment on the swap to the destination Token
+   */
   destinationSwap: string;
 }
 
