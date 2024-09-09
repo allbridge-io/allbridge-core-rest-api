@@ -33,6 +33,8 @@ import {
   SwapCalcInfo,
 } from '../service/sdk.service';
 import { httpException } from '../error/errors';
+import Big from 'big.js';
+import { convertIntAmountToFloat } from '../utils/calculation';
 
 type RawTransaction =
   | VersionedTransaction
@@ -172,13 +174,13 @@ export class RestController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const floatAmount = parseFloat(amount) / 10 ** sourceTokenObj.decimals;
-    if (isNaN(floatAmount)) {
-      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
-    }
-    const minimumReceiveAmountFloat =
-      parseFloat(minimumReceiveAmount) / 10 ** destinationTokenObj.decimals;
-    if (isNaN(minimumReceiveAmountFloat)) {
+    let minimumReceiveAmountFloat: string;
+    try {
+      minimumReceiveAmountFloat = convertIntAmountToFloat(
+        minimumReceiveAmount,
+        destinationTokenObj.decimals,
+      ).toFixed();
+    } catch (e) {
       throw new HttpException(
         'Invalid minimumReceiveAmount',
         HttpStatus.BAD_REQUEST,
@@ -194,11 +196,11 @@ export class RestController {
       );
     }
     const params = {
-      amount: floatAmount.toString(),
+      amount: convertGt0IntAmountToFloat(amount, sourceTokenObj.decimals),
       destinationToken: destinationTokenObj,
       fromAccountAddress: sender,
       minimumReceiveAmount: minimumReceiveAmount
-        ? minimumReceiveAmountFloat.toString()
+        ? minimumReceiveAmountFloat
         : undefined,
       sourceToken: sourceTokenObj,
       toAccountAddress: recipient,
@@ -360,10 +362,6 @@ export class RestController {
     }
     const feePaymentMethodEnum =
       FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
-    const amountFloat = parseFloat(amount) / 10 ** sourceTokenObj.decimals;
-    if (isNaN(amountFloat) || amountFloat <= 0) {
-      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
-    }
     if (
       !!solanaTxFeeParams &&
       !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
@@ -374,7 +372,7 @@ export class RestController {
       );
     }
     const sendParams = {
-      amount: amountFloat.toString(),
+      amount: convertGt0IntAmountToFloat(amount, sourceTokenObj.decimals),
       destinationToken: destinationTokenObj,
       fromAccountAddress: sender,
       sourceToken: sourceTokenObj,
@@ -833,14 +831,14 @@ export class RestController {
     }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
     const feeFloat = relayerFeeInStables
-      ? (
-          parseFloat(relayerFeeInStables) /
-          10 ** sourceTokenObj.decimals
-        ).toString()
+      ? convertIntAmountToFloat(
+          relayerFeeInStables,
+          sourceTokenObj.decimals,
+        ).toFixed()
       : undefined;
     try {
       return await this.sdkService.getAmountToBeReceived(
-        amount,
+        convertGt0IntAmountToFloat(amount, sourceTokenObj.decimals),
         sourceTokenObj,
         destinationTokenObj,
         messengerEnum,
@@ -896,14 +894,14 @@ export class RestController {
     }
     const messengerEnum = Messenger[messenger as keyof typeof Messenger];
     const feeFloat = relayerFeeInStables
-      ? (
-          parseFloat(relayerFeeInStables) /
-          10 ** sourceTokenObj.decimals
-        ).toString()
+      ? convertIntAmountToFloat(
+          relayerFeeInStables,
+          sourceTokenObj.decimals,
+        ).toFixed()
       : undefined;
     try {
       return await this.sdkService.getAmountToSend(
-        amount,
+        convertGt0IntAmountToFloat(amount, destinationTokenObj.decimals),
         sourceTokenObj,
         destinationTokenObj,
         messengerEnum,
@@ -962,7 +960,7 @@ export class RestController {
       );
     }
     const params = {
-      amount: amount.toString(),
+      amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
       accountAddress: ownerAddress,
       token: tokenAddressObj,
     };
@@ -1037,7 +1035,7 @@ export class RestController {
       );
     }
     const params = {
-      amount: amount.toString(),
+      amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
       accountAddress: ownerAddress,
       token: tokenAddressObj,
     };
@@ -1183,13 +1181,9 @@ export class RestController {
     }
     const feePaymentMethodEnum =
       FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
-    const floatAmount = parseFloat(amount) / 10 ** tokenAddressObj.decimals;
-    if (isNaN(floatAmount) || floatAmount <= 0) {
-      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
-    }
     try {
       return await this.sdkService.checkAllowance({
-        amount: floatAmount.toString(),
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
         owner: ownerAddress,
         token: tokenAddressObj,
         gasFeePaymentMethod: feePaymentMethodEnum,
@@ -1332,7 +1326,7 @@ export class RestController {
     }
     try {
       return await this.sdkService.getAmountToBeDeposited(
-        amount,
+        convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
         tokenAddressObj,
       );
     } catch (e) {
@@ -1362,13 +1356,9 @@ export class RestController {
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
-    const floatAmount = parseFloat(amount) / 10 ** tokenAddressObj.decimals;
-    if (isNaN(floatAmount) || floatAmount <= 0) {
-      throw new HttpException('Invalid amount', HttpStatus.BAD_REQUEST);
-    }
     try {
       return await this.sdkService.getAmountToBeWithdrawn(
-        floatAmount.toString(),
+        convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
         ownerAddress,
         tokenAddressObj,
       );
@@ -1376,4 +1366,21 @@ export class RestController {
       httpException(e);
     }
   }
+}
+
+export function convertGt0IntAmountToFloat(
+  amount: string,
+  decimals: number,
+  exceptionMsg: string = 'Invalid amount',
+): string {
+  let amountFloatBig: Big;
+  try {
+    amountFloatBig = convertIntAmountToFloat(amount, decimals);
+  } catch (e) {
+    throw new HttpException(exceptionMsg, HttpStatus.BAD_REQUEST);
+  }
+  if (amountFloatBig.lte(0)) {
+    throw new HttpException(exceptionMsg, HttpStatus.BAD_REQUEST);
+  }
+  return amountFloatBig.toFixed();
 }
