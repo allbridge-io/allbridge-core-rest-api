@@ -1,3 +1,10 @@
+# [3.18.0-beta.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0-beta.1...v3.18.0-beta.2) (2024-09-09)
+
+
+### Features
+
+* sdk release 3.18.0.beta6 ([1ac9832](https://github.com/allbridge-io/allbridge-core-rest-api/commit/1ac98326e13d7ba2fcf1c599992457047a235beb))
+
 # [3.18.0-beta.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.17.0...v3.18.0-beta.1) (2024-08-08)
 
 
