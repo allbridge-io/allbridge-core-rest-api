@@ -269,7 +269,7 @@ export class SDKService {
   }
 
   async getAmountToBeReceived(
-    amount: string,
+    amountFloat: string,
     sourceToken: TokenWithChainDetails,
     destinationToken: TokenWithChainDetails,
     messenger: Messenger,
@@ -281,13 +281,13 @@ export class SDKService {
     }
     try {
       const amountToSendFloat = stableFeeInFloat
-        ? Big(amount)
+        ? Big(amountFloat)
             .minus(stableFeeInFloat)
             .round(sourceToken.decimals)
             .toFixed()
-        : amount;
+        : amountFloat;
       if (Big(amountToSendFloat).lte(0)) {
-        return { amountInFloat: amount, amountReceivedInFloat: '' };
+        return { amountInFloat: amountFloat, amountReceivedInFloat: '' };
       }
       let amountReceived: string;
       if (
@@ -308,16 +308,19 @@ export class SDKService {
           messenger,
         );
       }
-      return { amountInFloat: amount, amountReceivedInFloat: amountReceived };
+      return {
+        amountInFloat: amountFloat,
+        amountReceivedInFloat: amountReceived,
+      };
     } catch (e: any) {
       const errorCode = e.errorCode;
       console.error('errorCode', errorCode);
-      return { amountInFloat: amount, amountReceivedInFloat: '' };
+      return { amountInFloat: amountFloat, amountReceivedInFloat: '' };
     }
   }
 
   async getAmountToSend(
-    amountReceived: string,
+    amountReceivedFloat: string,
     sourceToken: TokenWithChainDetails,
     destinationToken: TokenWithChainDetails,
     messenger?: Messenger,
@@ -329,7 +332,7 @@ export class SDKService {
     }
     let amount;
     try {
-      const roundedAmountReceived = Big(amountReceived)
+      const roundedAmountReceived = Big(amountReceivedFloat)
         .round(destinationToken.decimals)
         .toFixed();
       if (
@@ -353,7 +356,7 @@ export class SDKService {
     } catch (e: any) {
       const errorCode = e.errorCode;
       console.error('errorCode', errorCode);
-      return { amountInFloat: '', amountReceivedInFloat: amountReceived };
+      return { amountInFloat: '', amountReceivedInFloat: amountReceivedFloat };
     }
     const amountInFloat = stableFeeInFloat
       ? Big(amount).plus(stableFeeInFloat)
@@ -362,7 +365,7 @@ export class SDKService {
       amountInFloat: amountInFloat
         .round(sourceToken.decimals, Big.roundUp)
         .toFixed(),
-      amountReceivedInFloat: amountReceived,
+      amountReceivedInFloat: amountReceivedFloat,
     };
   }
 
