@@ -1,3 +1,23 @@
+# [3.18.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.17.0...v3.18.0) (2024-10-01)
+
+
+### Bug Fixes
+
+* **ENVIRONMENT:** remove ENVIRONMENT ([8d7e927](https://github.com/allbridge-io/allbridge-core-rest-api/commit/8d7e927b3c0e4f94bdcfacba55098326d5be9812))
+* **Error:** add ConfigError: Requires SRB_NODE_URL and STLR_NODE_URL both ([bdbbaf8](https://github.com/allbridge-io/allbridge-core-rest-api/commit/bdbbaf8a899ac841503aaa82157a1805cedc3a25))
+* **Error:** return errorCode in sdkError case ([3595b2b](https://github.com/allbridge-io/allbridge-core-rest-api/commit/3595b2b23b433ee2f0e17323bdd87905a5f59369))
+* **NETWORKS:** remove NETWORKS ([66b7dc8](https://github.com/allbridge-io/allbridge-core-rest-api/commit/66b7dc8da0755b9dfef1359f299befc3e82c3efe))
+
+
+### Features
+
+* add optional token type ([af0ee28](https://github.com/allbridge-io/allbridge-core-rest-api/commit/af0ee287795655160a24d01320c0586dee904ec6))
+* **README:** add `Host on Heroku` ([274d3ac](https://github.com/allbridge-io/allbridge-core-rest-api/commit/274d3acccaab509dd791c9af5f7c337f5fa89998))
+* **README:** update ([0ee3013](https://github.com/allbridge-io/allbridge-core-rest-api/commit/0ee301326af571a4e7d96dfa33196ba834c675e3))
+* sdk release 3.18.0 ([2a8fe86](https://github.com/allbridge-io/allbridge-core-rest-api/commit/2a8fe86af3397f85502e3f57a8a3aa17a961d147))
+* sdk release 3.18.0.beta3 ([76739eb](https://github.com/allbridge-io/allbridge-core-rest-api/commit/76739eb7601d94e23d3c0cf0d51add3c981e8c54))
+* sdk release 3.18.0.beta6 ([1ac9832](https://github.com/allbridge-io/allbridge-core-rest-api/commit/1ac98326e13d7ba2fcf1c599992457047a235beb))
+
 # [3.18.0-beta.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0-beta.1...v3.18.0-beta.2) (2024-09-09)
 
 
