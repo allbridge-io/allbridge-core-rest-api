@@ -1,6 +1,7 @@
 packages:
   - 'rest-api'
   - 'examples'
+
 catalog:
   '@solana/web3.js': ^1.95.2
   '@stellar/stellar-sdk': ^12.2.0
