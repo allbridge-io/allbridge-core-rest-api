@@ -1,3 +1,10 @@
+# [3.19.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.19.0-alpha.1) (2025-01-15)
+
+
+### Features
+
+* **TransferStatusResponse:** add responseTime ([57d7ba7](https://github.com/allbridge-io/allbridge-core-rest-api/commit/57d7ba72ddb60fa9c48a434a82bf7b8dc1fce0ac))
+
 # [3.18.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.17.0...v3.18.0) (2024-10-01)
 
 
