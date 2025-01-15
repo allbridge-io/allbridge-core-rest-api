@@ -29,10 +29,9 @@ import {
 } from '@allbridge/bridge-core-sdk';
 
 import { Injectable } from '@nestjs/common';
-import Big from 'big.js';
-import { getLogger } from '../utils/logger-factory';
-import { ConfigService } from './config.service';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
+import { Big } from 'big.js';
+import { ConfigService } from './config.service';
 
 export enum SolanaTxFeeParamsMethod {
   AUTO = 'AUTO',
@@ -80,7 +79,6 @@ export interface TransferAmountData {
 @Injectable()
 export class SDKService {
   sdk: AllbridgeCoreSdk;
-  logger = getLogger(`SDKService`);
   private _chainDetailsMap?: ChainDetailsMap;
 
   constructor() {
@@ -406,7 +404,7 @@ export class SDKService {
     chainSymbol: ChainSymbol,
     txId: string,
   ): Promise<TransferStatusResponse> {
-    return this.sdk.getTransferStatus(chainSymbol as ChainSymbol, txId);
+    return this.sdk.getTransferStatus(chainSymbol, txId);
   }
 
   async getTokenByAddress(tokenAddress: string) {

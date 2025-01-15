@@ -1,21 +1,36 @@
 {
+  "include": ["./src/**/*.ts"],
+  "exclude": [
+    "./src/**/__tests__",
+    "node_modules"
+  ],
   "compilerOptions": {
+    "lib": [
+      "es2022"
+    ],
     "module": "commonjs",
+    "target": "es2022",
+    "outDir": "dist",
+
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "removeComments": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "noUncheckedIndexedAccess": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
-    "outDir": "./dist",
+    "inlineSources": true,
+    "strictFunctionTypes": true,
     "baseUrl": "./",
     "incremental": true,
-    "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   }
 }

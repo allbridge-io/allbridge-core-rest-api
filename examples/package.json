@@ -64,8 +64,7 @@
     "tronweb": "catalog:",
     "web3": "catalog:",
     "web3-core": "catalog:",
-    "web3-eth-contract": "catalog:",
-    "web3-utils": "catalog:"
+    "web3-eth-contract": "catalog:"
   },
   "devDependencies": {
     "@types/big.js": "catalog:",
@@ -75,7 +74,6 @@
     "dotenv": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-jest": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "prettier": "catalog:"
   }

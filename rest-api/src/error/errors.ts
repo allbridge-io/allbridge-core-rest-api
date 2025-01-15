@@ -1,7 +1,7 @@
 /*eslint @typescript-eslint/no-useless-constructor: "off"*/
 
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { SdkRootError } from '@allbridge/bridge-core-sdk';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export abstract class RestSDKError extends Error {
   protected constructor(message?: string) {
