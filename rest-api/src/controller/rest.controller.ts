@@ -3,6 +3,7 @@ import {
   AmountFormatted,
   ChainDetailsMap,
   ChainSymbol,
+  EssentialWeb3Transaction,
   ExtraGasMaxLimitResponse,
   FeePaymentMethod,
   GasBalanceResponse,
@@ -24,21 +25,20 @@ import {
 } from '@nestjs/common';
 import { VersionedTransaction } from '@solana/web3.js';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon/horizon_api';
+import { Big } from 'big.js';
 import { Example, Response, Route, Tags } from 'tsoa';
-import { TransactionConfig } from 'web3-core';
+import { httpException } from '../error/errors';
 import {
   BridgeAmounts,
   SDKService,
   SolanaTxFeeParamsMethod,
   SwapCalcInfo,
 } from '../service/sdk.service';
-import { httpException } from '../error/errors';
-import Big from 'big.js';
 import { convertIntAmountToFloat } from '../utils/calculation';
 
 type RawTransaction =
   | VersionedTransaction
-  | TransactionConfig
+  | EssentialWeb3Transaction
   | object
   | string;
 
@@ -180,7 +180,7 @@ export class RestController {
         minimumReceiveAmount,
         destinationTokenObj.decimals,
       ).toFixed();
-    } catch (e) {
+    } catch (ignoreError) {
       throw new HttpException(
         'Invalid minimumReceiveAmount',
         HttpStatus.BAD_REQUEST,
@@ -208,7 +208,7 @@ export class RestController {
     if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
       const solanaTxFeeParamsEnum =
         SolanaTxFeeParamsMethod[
-          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+          solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
         params['txFeeParams'] = {
@@ -235,7 +235,7 @@ export class RestController {
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/bridge')
   @Tags('Transfers', 'Raw Transactions')
-  @Example<TransactionConfig>(
+  @Example<EssentialWeb3Transaction>(
     {
       from: '0x0000000000000000000000000000000000000000',
       to: '0x0000000000000000000000000000000000000000',
@@ -352,7 +352,7 @@ export class RestController {
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
-    const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+    const messengerEnum = Messenger[messenger];
 
     if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
       throw new HttpException(
@@ -361,7 +361,7 @@ export class RestController {
       );
     }
     const feePaymentMethodEnum =
-      FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
+      FeePaymentMethod[feePaymentMethod];
     if (
       !!solanaTxFeeParams &&
       !Object.keys(SolanaTxFeeParamsMethod).includes(solanaTxFeeParams)
@@ -387,7 +387,7 @@ export class RestController {
     if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
       const solanaTxFeeParamsEnum =
         SolanaTxFeeParamsMethod[
-          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+          solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
         sendParams['txFeeParams'] = {
@@ -460,7 +460,7 @@ export class RestController {
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
-    const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+    const messengerEnum = Messenger[messenger];
     try {
       return this.sdkService.getTransferTime(
         sourceTokenObj,
@@ -485,7 +485,7 @@ export class RestController {
     if (!Object.keys(ChainSymbol).includes(chain)) {
       throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
     }
-    const chainEnum = ChainSymbol[chain as keyof typeof ChainSymbol];
+    const chainEnum = ChainSymbol[chain];
     try {
       return await this.sdkService.getTransferStatus(chainEnum, txId);
     } catch (e) {
@@ -532,7 +532,7 @@ export class RestController {
     if (!Object.keys(ChainSymbol).includes(chain)) {
       throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
     }
-    const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
+    const chainSymbol = ChainSymbol[chain];
     try {
       return await this.sdkService.getNativeTokenBalance({
         account: address,
@@ -553,7 +553,7 @@ export class RestController {
     if (!Object.keys(ChainSymbol).includes(chain)) {
       throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
     }
-    const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
+    const chainSymbol = ChainSymbol[chain];
     try {
       return await this.sdkService.getTokenByChainAndAddress(
         chainSymbol,
@@ -596,7 +596,7 @@ export class RestController {
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
-    const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+    const messengerEnum = Messenger[messenger];
     try {
       return await this.sdkService.getGasFeeOptions(
         sourceTokenObj,
@@ -621,7 +621,7 @@ export class RestController {
     if (!Object.keys(ChainSymbol).includes(chain)) {
       throw new HttpException('Invalid chain', HttpStatus.BAD_REQUEST);
     }
-    const chainSymbol = ChainSymbol[chain as keyof typeof ChainSymbol];
+    const chainSymbol = ChainSymbol[chain];
     try {
       return await this.sdkService.getGasBalance(chainSymbol, address);
     } catch (e) {
@@ -829,7 +829,7 @@ export class RestController {
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
-    const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+    const messengerEnum = Messenger[messenger];
     const feeFloat = relayerFeeInStables
       ? convertIntAmountToFloat(
           relayerFeeInStables,
@@ -892,7 +892,7 @@ export class RestController {
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
-    const messengerEnum = Messenger[messenger as keyof typeof Messenger];
+    const messengerEnum = Messenger[messenger];
     const feeFloat = relayerFeeInStables
       ? convertIntAmountToFloat(
           relayerFeeInStables,
@@ -967,7 +967,7 @@ export class RestController {
     if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
       const solanaTxFeeParamsEnum =
         SolanaTxFeeParamsMethod[
-          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+          solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
         params['txFeeParams'] = {
@@ -1042,7 +1042,7 @@ export class RestController {
     if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
       const solanaTxFeeParamsEnum =
         SolanaTxFeeParamsMethod[
-          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+          solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
         params['txFeeParams'] = {
@@ -1112,7 +1112,7 @@ export class RestController {
     if (!!solanaTxFeeParams && solanaTxFeeParams.length > 0) {
       const solanaTxFeeParamsEnum =
         SolanaTxFeeParamsMethod[
-          solanaTxFeeParams as keyof typeof SolanaTxFeeParamsMethod
+          solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
         params['txFeeParams'] = {
@@ -1180,7 +1180,7 @@ export class RestController {
       );
     }
     const feePaymentMethodEnum =
-      FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
+      FeePaymentMethod[feePaymentMethod];
     try {
       return await this.sdkService.checkAllowance({
         amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
@@ -1264,7 +1264,7 @@ export class RestController {
       );
     }
     const feePaymentMethodEnum =
-      FeePaymentMethod[feePaymentMethod as keyof typeof FeePaymentMethod];
+      FeePaymentMethod[feePaymentMethod];
     try {
       return await this.sdkService.getPoolAllowance({
         owner: ownerAddress,
@@ -1376,7 +1376,7 @@ export function convertGt0IntAmountToFloat(
   let amountFloatBig: Big;
   try {
     amountFloatBig = convertIntAmountToFloat(amount, decimals);
-  } catch (e) {
+  } catch (ignoreError) {
     throw new HttpException(exceptionMsg, HttpStatus.BAD_REQUEST);
   }
   if (amountFloatBig.lte(0)) {

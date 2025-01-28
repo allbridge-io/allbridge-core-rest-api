@@ -60,22 +60,21 @@
     "@stellar/stellar-sdk": "catalog:",
     "axios": "catalog:",
     "big.js": "catalog:",
-    "src": "catalog:",
     "tronweb": "catalog:",
     "web3": "catalog:",
-    "web3-core": "catalog:",
     "web3-eth-contract": "catalog:",
-    "web3-utils": "catalog:"
+    "web3-types": "catalog:"
   },
   "devDependencies": {
+    "@allbridge/bridge-core-sdk": "3.20.0-alpha.3",
     "@types/big.js": "catalog:",
+    "@types/node": "^22.10.6",
     "@typescript-eslint/eslint-plugin": "catalog:",
     "@typescript-eslint/parser": "catalog:",
     "bs58": "catalog:",
     "dotenv": "catalog:",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
-    "eslint-plugin-jest": "catalog:",
     "eslint-plugin-prettier": "catalog:",
     "prettier": "catalog:"
   }

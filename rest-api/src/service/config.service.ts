@@ -1,10 +1,10 @@
+import * as process from 'node:process';
 import { ChainSymbol, mainnet, NodeRpcUrls } from '@allbridge/bridge-core-sdk';
 import { VERSION } from '@allbridge/bridge-core-sdk/dist/src/version';
 import { Logger, LoggerCredential } from '@allbridge/logger';
 import { Injectable } from '@nestjs/common';
-import * as process from 'node:process';
-import { ConfigError } from '../error/errors';
 import * as dotenv from 'dotenv';
+import { ConfigError } from '../error/errors';
 import { getLogger as buildLogger } from '../utils/logger-factory';
 
 dotenv.config();
@@ -12,6 +12,7 @@ dotenv.config();
 const DEFAULT_PORT = 3000;
 
 @Injectable()
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ConfigService {
   private static logger: Logger;
 
@@ -66,7 +67,7 @@ export class ConfigService {
         ConfigService.getLogger().log(
           `${chain} RPC Url loaded with ${rpcUrls[chain]}`,
         );
-      } catch (e) {}
+      } catch (ignoreError) { /* empty */ }
     });
     if (!this.checkSRBandSTLRRpcUrlsBothPresence(rpcUrls)) {
       throw new ConfigError(`Requires SRB_NODE_URL and STLR_NODE_URL both`);
@@ -104,5 +105,11 @@ export class ConfigService {
     return process.env.TRON_JSON_RPC
       ? process.env.TRON_JSON_RPC
       : mainnet.tronJsonRpc;
+  }
+
+  static getJupiterMaxAccounts() {
+    return process.env.JUPITER_MAX_ACCOUNTS
+      ? +process.env.JUPITER_MAX_ACCOUNTS
+      : mainnet.jupiterMaxAccounts;
   }
 }

@@ -1,10 +1,10 @@
+import { EssentialWeb3Transaction } from '@allbridge/bridge-core-sdk';
 import Web3 from 'web3';
 import * as dotenv from 'dotenv';
 import axios from 'axios';
 import { getEnvVar } from '../../../utils/env';
 import { sendRawTransaction } from '../../../utils/web3';
 import { ensure } from '../../../utils/utils';
-import { TransactionConfig } from 'web3-core';
 
 dotenv.config({ path: '.env' });
 const main = async () => {
@@ -61,7 +61,7 @@ const main = async () => {
   );
   const txReceipt = await sendRawTransaction(
     web3,
-    rawTransactionTransfer.data as TransactionConfig,
+    rawTransactionTransfer.data as EssentialWeb3Transaction,
   );
   console.log('tx id:', txReceipt.transactionHash);
 };

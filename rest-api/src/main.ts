@@ -1,10 +1,10 @@
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 import { contextMiddleware, LoggingInterceptor } from '@allbridge/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import safeStringify from 'fast-safe-stringify';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import { AppModule } from './app.module';
 import { ConfigService } from './service/config.service';
 import { getLogger } from './utils/logger-factory';

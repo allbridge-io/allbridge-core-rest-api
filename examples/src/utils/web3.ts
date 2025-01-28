@@ -1,9 +1,9 @@
 import Web3 from 'web3';
-import { Account, TransactionConfig } from 'web3-core';
+import { EssentialWeb3Transaction } from '@allbridge/bridge-core-sdk';
 
 export async function sendRawTransaction(
   web3: Web3,
-  rawTransaction: TransactionConfig,
+  rawTransaction: EssentialWeb3Transaction,
 ) {
   if (rawTransaction.from === undefined) {
     throw Error('rawTransaction.from is undefined');
