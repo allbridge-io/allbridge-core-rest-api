@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: 3.20.0-alpha.3
-        version: 3.20.0-alpha.3(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+        specifier: 3.20.0
+        version: 3.20.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@solana/web3.js':
         specifier: 'catalog:'
         version: 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -27,8 +27,8 @@ packages:
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
 
-  '@allbridge/bridge-core-sdk@3.20.0-alpha.3':
-    resolution: {integrity: sha512-quHl6a6SkqmXlZqe10Z+oY1tb+G5Ym1chbnk5tnghRrabaQZA/Z3f5HVU+GdWqlYcapv7RxTfW0uKHKcjUdU1w==}
+  '@allbridge/bridge-core-sdk@3.20.0':
+    resolution: {integrity: sha512-dhQRD8+UE6GXSroZMAGSqQXmgt3biwrMN1YPWj2qNbpRz2S62ly0knaexXCaDq2KzO4FQ+X/ZjvB7wG1Qn4JeA==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
   '@babel/runtime@7.26.7':
@@ -164,8 +164,8 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/node@22.10.10':
-    resolution: {integrity: sha512-X47y/mPNzxviAGY5TcYPtYL8JsY3kAq2n8fMmKoRCxq/c4v4pyGNCzM2R6+M5/umG4ZfHuT+sgqDYqWc9rJ6ww==}
+  '@types/node@22.12.0':
+    resolution: {integrity: sha512-Fll2FZ1riMjNmlmJOdAyY5pUbkftXslB5DgEzlIuNaiWhXd00FhWxVC/r4yV/4wBb9JfImTu+jiSvXTkJ7F/gA==}
 
   '@types/node@22.7.5':
     resolution: {integrity: sha512-jML7s2NAzMWc//QSJ1a3prpk78cOPchGvXJsC3C6R6PSMoooztvRVQEz89gmBTBY1SPMaqo5teB4uNHPdetShQ==}
@@ -785,7 +785,7 @@ snapshots:
 
   '@adraffy/ens-normalize@1.11.0': {}
 
-  '@allbridge/bridge-core-sdk@3.20.0-alpha.3(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
+  '@allbridge/bridge-core-sdk@3.20.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.3.11(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
@@ -1023,11 +1023,11 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 22.10.10
+      '@types/node': 22.12.0
 
   '@types/node@12.20.55': {}
 
-  '@types/node@22.10.10':
+  '@types/node@22.12.0':
     dependencies:
       undici-types: 6.20.0
 
@@ -1039,15 +1039,15 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 22.10.10
+      '@types/node': 22.12.0
 
   '@types/ws@8.5.14':
     dependencies:
-      '@types/node': 22.10.10
+      '@types/node': 22.12.0
 
   '@types/ws@8.5.3':
     dependencies:
-      '@types/node': 22.10.10
+      '@types/node': 22.12.0
 
   JSONStream@1.3.5:
     dependencies:

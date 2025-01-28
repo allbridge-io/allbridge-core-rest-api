@@ -127,8 +127,8 @@ importers:
   rest-api:
     dependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: 3.20.0-alpha.3
-        version: 3.20.0-alpha.3(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+        specifier: 3.20.0
+        version: 3.20.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@allbridge/logger':
         specifier: ^2.4.1
         version: 2.4.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
@@ -282,6 +282,10 @@ packages:
 
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
+
+  '@allbridge/bridge-core-sdk@3.20.0':
+    resolution: {integrity: sha512-dhQRD8+UE6GXSroZMAGSqQXmgt3biwrMN1YPWj2qNbpRz2S62ly0knaexXCaDq2KzO4FQ+X/ZjvB7wG1Qn4JeA==}
+    engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
   '@allbridge/bridge-core-sdk@3.20.0-alpha.3':
     resolution: {integrity: sha512-quHl6a6SkqmXlZqe10Z+oY1tb+G5Ym1chbnk5tnghRrabaQZA/Z3f5HVU+GdWqlYcapv7RxTfW0uKHKcjUdU1w==}
@@ -5263,6 +5267,32 @@ snapshots:
   '@adraffy/ens-normalize@1.10.1': {}
 
   '@adraffy/ens-normalize@1.11.0': {}
+
+  '@allbridge/bridge-core-sdk@3.20.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.3.11(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@stellar/stellar-sdk': 13.1.0
+      assert: 2.1.0
+      axios: 1.7.9
+      big.js: 6.2.2
+      bn.js: 5.2.1
+      querystring: 0.2.1
+      randombytes: 2.1.0
+      timed-cache: 2.0.0
+      tronweb: 6.0.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      web3: 4.16.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      web3-eth-contract: 4.7.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      web3-types: 1.10.0
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - fastestsmallesttextencoderdecoder
+      - typescript
+      - utf-8-validate
+      - zod
 
   '@allbridge/bridge-core-sdk@3.20.0-alpha.3(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
