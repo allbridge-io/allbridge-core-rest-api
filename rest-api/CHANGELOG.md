@@ -1,3 +1,10 @@
+# [3.20.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.19.0-alpha.1...v3.20.0-alpha.1) (2025-01-28)
+
+
+### Features
+
+* **AllbridgeCoreSdkOptions:** add optional jupiterMaxAccounts parameter ([e2a5b20](https://github.com/allbridge-io/allbridge-core-rest-api/commit/e2a5b2013d0a1a0f8eb709acc65c78942479f01b))
+
 # [3.19.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.19.0-alpha.1) (2025-01-15)
 
 
