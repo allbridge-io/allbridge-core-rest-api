@@ -9,10 +9,10 @@ catalog:
   'axios': ^1.7.9
   '@types/big.js': ^6.2.2
   'big.js': ^6.2.2
-  'src': ^1.1.2
-  'tronweb': ^6.0.0
+  'tronweb': ^6.0.1
   'web3': ^4.16.0
   'web3-core': ^4.7.1
+  'web3-types': ^1.10.0
   'web3-eth-contract': ^4.7.2
   '@typescript-eslint/eslint-plugin': ^8.18.1
   '@typescript-eslint/parser': ^8.18.1

@@ -106,4 +106,10 @@ export class ConfigService {
       ? process.env.TRON_JSON_RPC
       : mainnet.tronJsonRpc;
   }
+
+  static getJupiterMaxAccounts() {
+    return process.env.JUPITER_MAX_ACCOUNTS
+      ? +process.env.JUPITER_MAX_ACCOUNTS
+      : mainnet.jupiterMaxAccounts;
+  }
 }

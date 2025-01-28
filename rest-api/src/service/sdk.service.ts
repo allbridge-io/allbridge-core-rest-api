@@ -86,6 +86,7 @@ export class SDKService {
       ...mainnet,
       coreApiHeaders: ConfigService.getCoreApiHeaders(),
       jupiterUrl: ConfigService.getJupiterUrl(),
+      jupiterMaxAccounts: ConfigService.getJupiterMaxAccounts(),
       tronJsonRpc: ConfigService.getTronJsonRpc(),
     });
   }
