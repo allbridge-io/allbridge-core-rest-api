@@ -1,18 +1,18 @@
-# [3.19.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.19.0) (2025-01-28)
+# [3.20.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.20.0) (2025-01-28)
 
 
 ### Features
 
 * SDK version update 3.20.0 ([dfb52cc](https://github.com/allbridge-io/allbridge-core-rest-api/commit/dfb52cc0b7691c6d5a33953620fc13c546bcb693))
 
-# [3.20.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.19.0-alpha.1...v3.20.0-alpha.1) (2025-01-28)
+# [3.20.0-alpha.3](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.20.0-alpha.3) (2025-01-28)
 
 
 ### Features
 
 * **AllbridgeCoreSdkOptions:** add optional jupiterMaxAccounts parameter ([e2a5b20](https://github.com/allbridge-io/allbridge-core-rest-api/commit/e2a5b2013d0a1a0f8eb709acc65c78942479f01b))
 
-# [3.19.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.19.0-alpha.1) (2025-01-15)
+# [3.20.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.19.0-alpha.1) (2025-01-15)
 
 
 ### Features
