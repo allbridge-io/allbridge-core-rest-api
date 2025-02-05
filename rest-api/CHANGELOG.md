@@ -1,3 +1,10 @@
+## [3.20.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.0...v3.20.1) (2025-02-05)
+
+
+### Bug Fixes
+
+* **EVM:** Introduce Pool and Bridge approvals methods ([38be1a8](https://github.com/allbridge-io/allbridge-core-rest-api/commit/38be1a84b6990b62eced95301b883a70d87e2c8c))
+
 # [3.20.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.18.0...v3.20.0) (2025-01-28)
 
 
