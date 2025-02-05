@@ -232,45 +232,58 @@ You are now ready to use your rest-api app.
 After running the docker image, you can access the swagger documentation at `http://localhost:3000/api`. The swagger documentation provides a detailed description of the available endpoints and their parameters.
 
 ### Raw transactions
-| `GET` Endpoint  | Description                                                                                |
-|-----------------|--------------------------------------------------------------------------------------------|
-| `/raw/approve`  | Creates a Raw Transaction for approving tokens usage by the bridge                         |
-| `/raw/swap`     | Creates a Raw Transaction for initiating the swap of tokens on one chain                   |
-| `/raw/bridge`   | Creates a Raw Transaction for initiating the transfer of tokens from one chain to another. |
-| `/raw/deposit`  | Creates a Raw Transaction for depositing tokens to Liquidity pool                          |
-| `/raw/withdraw` | Creates a Raw Transaction for withdrawing tokens from Liquidity pool                       |
-| `/raw/claim`    | Creates a Raw Transaction for claiming rewards from Liquidity pool                         |
+| `GET` Endpoint          | Description                                                                                |
+|-------------------------|--------------------------------------------------------------------------------------------|
+| `/raw/pool/approve`     | Creates a Raw Transaction for approving tokens usage by the pool                           |
+| `/raw/bridge/approve`   | Creates a Raw Transaction for approving tokens usage by the bridge                         |
+| `/raw/swap`             | Creates a Raw Transaction for initiating the swap of tokens on one chain                   |
+| `/raw/bridge`           | Creates a Raw Transaction for initiating the transfer of tokens from one chain to another. |
+| `/raw/stellar/restore`  | Simulate and check if restore needed for Stellar transaction                               |
+| `/raw/deposit`          | Creates a Raw Transaction for depositing tokens to Liquidity pool                          |
+| `/raw/withdraw`         | Creates a Raw Transaction for withdrawing tokens from Liquidity pool                       |
+| `/raw/claim`            | Creates a Raw Transaction for claiming rewards from Liquidity pool                         |
 
 ### Tokens
-| `GET` Endpoint          | Description                                                                   |
-|-------------------------|-------------------------------------------------------------------------------|
-| `/tokens`               | Returns a list of supported tokens                                            |
-| `/chains`               | Returns ChainDetailsMap containing a list of supported tokens groped by chain |
-| `/token/balance`        | Get token balance                                                             |
-| `/token/native/balance` | Get native (gas) token balance                                                |
-| `/token/details`        | Get token details                                                             |
-| `/gas/fee`              | Fetches possible ways to pay the transfer gas fee                             |
-| `/gas/balance`          | Get gas balance                                                               |
-| `/gas/extra/limits`     | Get possible limit of extra gas amount                                        |
+| `GET` Endpoint               | Description                                                                   |
+|------------------------------|-------------------------------------------------------------------------------|
+| `/tokens`                    | Returns a list of supported tokens                                            |
+| `/chains`                    | Returns ChainDetailsMap containing a list of supported tokens groped by chain |
+| `/token/balance`             | Get token balance                                                             |
+| `/token/native/balance`      | Get native (gas) token balance                                                |
+| `/token/details`             | Get token details                                                             |
+| `/gas/fee`                   | Fetches possible ways to pay the transfer gas fee                             |
+| `/gas/balance`               | Get gas balance                                                               |
+| `/gas/extra/limits`          | Get possible limit of extra gas amount                                        |
+| `/check/stellar/balanceline` | Get Balance Line information if exists                                        |
 
 ### Pools
-| `GET` Endpoint                   | Description                                                   |
-|----------------------------------|---------------------------------------------------------------|
-| `/check/allowance`               | Check if the amount of approved tokens is enough              |
-| `/pool/info/server`              | Gets information about the pool-info by token from server     |
-| `/pool/info/blockchain`          | Gets information about the pool-info by token from blockchain |
-| `/pool/allowance`                | Get amount of tokens approved for poolInfo                    |
-| `/liquidity/details`             | Get user balance info on liquidity pool                       |
-| `/liquidity/deposit/calculate`   | Calculates the amount of LP tokens that will be deposited     |
-| `/liquidity/withdrawn/calculate` | Calculates the amount of tokens will be withdrawn             |
+| `GET` Endpoint                   | Description                                                          |
+|----------------------------------|----------------------------------------------------------------------|
+| `/raw/pool/approve`              | Creates a Raw Transaction for approving tokens usage by the pool     |
+| `/raw/deposit`                   | Creates a Raw Transaction for depositing tokens to Liquidity pool    |
+| `/raw/withdraw`                  | Creates a Raw Transaction for withdrawing tokens from Liquidity pool |
+| `/raw/claim`                     | Creates a Raw Transaction for claiming rewards from Liquidity pool   |
+| `/check/allowance`               | Check if the amount of approved tokens is enough                     |
+| `/pool/info/server`              | Gets information about the pool-info by token from server            |
+| `/pool/info/blockchain`          | Gets information about the pool-info by token from blockchain        |
+| `/pool/allowance`                | Get amount of tokens approved for poolInfo                           |
+| `/liquidity/details`             | Get user balance info on liquidity pool                              |
+| `/liquidity/deposit/calculate`   | Calculates the amount of LP tokens that will be deposited            |
+| `/liquidity/withdrawn/calculate` | Calculates the amount of tokens will be withdrawn                    |
 
 ### Transfers
-| `GET` Endpoint              | Description                                                                                                                                                                     |
-|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `/transfer/time`            | Gets the average time in ms to complete a transfer for given tokens and messenger                                                                                               |
-| `/transfer/status`          | Fetches information about tokens transfer by chosen chainSymbol and transaction Id from the Allbridge Core API                                                                  |
-| `/pending/info`             | Returns information about pending transactions for the same destination chain and the amount of tokens can be received as a result of transfer considering pending transactions |
-| `/swap/details`             | Show swap amount changes (fee and amount adjustment) during send through pools                                                                                                  |
-| `/bridge/details`           | Show bridge amount changes (fee and amount adjustment) during send through pools on source and destination chains                                                               |
-| `/bridge/receive/calculate` | Calculates the amount of tokens to be received as a result of transfer                                                                                                          |
-| `/bridge/send/calculate`    | Calculates the amount of tokens to send based on requested tokens amount be received as a result of transfer                                                                    |
+| `GET` Endpoint               | Description                                                                                                                                                                     |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `/raw/bridge/approve`        | Creates a Raw Transaction for approving tokens usage by the bridge                                                                                                              |
+| `/raw/swap`                  | Creates a Raw Transaction for initiating the swap of tokens on one chain                                                                                                        |
+| `/raw/bridge`                | Creates a Raw Transaction for initiating the transfer of tokens from one chain to another.                                                                                      |
+| `/raw/stellar/restore`       | Simulate and check if restore needed for Stellar transaction.                                                                                                                   |
+| `/transfer/time`             | Gets the average time in ms to complete a transfer for given tokens and messenger                                                                                               |
+| `/transfer/status`           | Fetches information about tokens transfer by chosen chainSymbol and transaction Id from the Allbridge Core API                                                                  |
+| `/pending/info`              | Returns information about pending transactions for the same destination chain and the amount of tokens can be received as a result of transfer considering pending transactions |
+| `/swap/details`              | Show swap amount changes (fee and amount adjustment) during send through pools                                                                                                  |
+| `/bridge/details`            | Show bridge amount changes (fee and amount adjustment) during send through pools on source and destination chains                                                               |
+| `/bridge/receive/calculate`  | Calculates the amount of tokens to be received as a result of transfer                                                                                                          |
+| `/bridge/send/calculate`     | Calculates the amount of tokens to send based on requested tokens amount be received as a result of transfer                                                                    |
+| `/check/stellar/balanceline` | Get Balance Line information if exists                                                                                                                                          |
+| `/check/allowance`           | Check if the amount of approved tokens is enough                                                                                                                                |

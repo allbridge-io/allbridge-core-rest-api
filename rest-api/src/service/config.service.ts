@@ -90,9 +90,9 @@ export class ConfigService {
   static getCoreApiHeaders() {
     return process.env.HEADERS
       ? Object.assign(JSON.parse(process.env.HEADERS), {
-          'x-Sdk-Agent': `AllbridgeCoreRestApi/${VERSION}`,
+          'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}`,
         })
-      : { 'x-Sdk-Agent': `AllbridgeCoreRestApi/${VERSION}` };
+      : { 'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}` };
   }
 
   static getJupiterUrl() {

@@ -86,12 +86,12 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for approving tokens usage by the bridge
+   * Creates a Raw Transaction for approving tokens usage by the pool
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
-  @Get('/raw/approve')
-  @Tags('Tokens', 'Pool', 'Transfers', 'Raw Transactions')
-  async approve(
+  @Get('/raw/pool/approve')
+  @Tags('Pool', 'Raw Transactions')
+  async poolApprove(
     @Query('ownerAddress') ownerAddress: string,
     /**
      * selected token on the source chain.
@@ -110,10 +110,54 @@ export class RestController {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await this.sdkService.approve({
+      return await this.sdkService.poolApprove({
         token: tokenAddressObj,
         owner: ownerAddress,
         amount: amount,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Creates a Raw Transaction for approving tokens usage by the bridge
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/bridge/approve')
+  @Tags('Transfers', 'Raw Transactions')
+  async bridgeApprove(
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    /**
+     * The integer amount of tokens to approve.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>The maximum amount by default.</b>
+     */
+    @Query('amount') amount?: string,
+    /**
+     * The Messengers for different routes to approve.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * If <i>ALLBRIDGE</i> or <i>WORMHOLE</i> then Allbridge Contract is a <b>spender</b><br/>
+     * If <i>CCTP</i> then CCTP Contract is a <b>spender</b><br/><br/>
+     */
+    @Query('messenger') messenger?: keyof typeof Messenger,
+  ): Promise<RawTransaction> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    const messengerEnum = Messenger[messenger] || undefined;
+    try {
+      return await this.sdkService.bridgeApprove({
+        token: tokenAddressObj,
+        owner: ownerAddress,
+        amount: amount,
+        messenger: messengerEnum
       });
     } catch (e) {
       httpException(e);

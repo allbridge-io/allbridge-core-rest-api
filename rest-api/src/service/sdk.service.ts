@@ -14,6 +14,7 @@ import {
   LiquidityPoolsApproveParams,
   LiquidityPoolsParams,
   LiquidityPoolsParamsWithAmount,
+  BridgeApproveParams,
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
@@ -232,8 +233,12 @@ export class SDKService {
     return this.sdk.pool.getUserBalanceInfo(account, token);
   }
 
-  async approve(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
+  async poolApprove(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
     return this.sdk.pool.rawTxBuilder.approve(params);
+  }
+
+  async bridgeApprove(params: BridgeApproveParams): Promise<RawTransaction> {
+    return this.sdk.bridge.rawTxBuilder.approve(params);
   }
 
   async deposit(
