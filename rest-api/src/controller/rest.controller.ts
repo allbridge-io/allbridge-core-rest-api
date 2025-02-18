@@ -48,7 +48,7 @@ export class RestController {
   constructor(private readonly sdkService: SDKService) {}
 
   /**
-   * Returns ChainDetailsMap containing a list of supported tokens groped by chain.
+   * Returns a ChainDetailsMap containing a list of supported tokens grouped by chain.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/chains')
@@ -86,7 +86,67 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for approving tokens usage by the pool
+   * Creates a Raw Transaction for approving token usage (default: transfer; optional: pool).
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/approve')
+  @Tags('Pool', 'Transfers', 'Raw Transactions')
+  async approve(
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * Selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    /**
+     * The integer amount of tokens to approve.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>The maximum amount by default.</b>
+     */
+    @Query('amount') amount?: string,
+    /**
+     * The type of approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: bridge</b><br/>
+     * Allowed values: `bridge`, `pool`
+     */
+    @Query('type') type: 'bridge' | 'pool' = 'bridge',
+    /**
+     * The Messengers for different routes to approve.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * If <i>ALLBRIDGE</i> or <i>WORMHOLE</i> then Allbridge Contract is a <b>spender</b><br/>
+     * If <i>CCTP</i> then CCTP Contract is a <b>spender</b><br/><br/>
+     */
+    @Query('messenger') messenger?: keyof typeof Messenger,
+  ): Promise<RawTransaction> {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      if (type === 'pool') {
+        return await this.sdkService.poolApprove({
+          token: tokenAddressObj,
+          owner: ownerAddress,
+          amount: amount,
+        });
+      }
+      const messengerEnum = Messenger[messenger] || undefined;
+      return await this.sdkService.bridgeApprove({
+        token: tokenAddressObj,
+        owner: ownerAddress,
+        amount: amount,
+        messenger: messengerEnum,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+
+  /**
+   * Creates a Raw Transaction for approving token usage by the pool.
+   *
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/pool/approve')
@@ -121,7 +181,7 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for approving tokens usage by the bridge
+   * Creates a Raw Transaction for approving token usage by the bridge
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/bridge/approve')
@@ -157,7 +217,7 @@ export class RestController {
         token: tokenAddressObj,
         owner: ownerAddress,
         amount: amount,
-        messenger: messengerEnum
+        messenger: messengerEnum,
       });
     } catch (e) {
       httpException(e);
@@ -165,7 +225,7 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for initiating the swap of tokens on one chain
+   * Creates a Raw Transaction for initiating a swap of tokens on one chain.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/swap')
@@ -216,6 +276,12 @@ export class RestController {
       throw new HttpException(
         'Destination token not found',
         HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (sourceTokenObj.chainSymbol != destinationTokenObj.chainSymbol) {
+      throw new HttpException(
+        'For cross-chain swaps, please use the /raw/bridge endpoint.',
+        HttpStatus.BAD_REQUEST
       );
     }
     let minimumReceiveAmountFloat: string;
@@ -274,7 +340,7 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for initiating the transfer of tokens from one chain to another. <br/>
+   * Creates a Raw Transaction for initiating the transfer of tokens from one chain to another.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/bridge')
@@ -392,7 +458,12 @@ export class RestController {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    if (sourceTokenObj.chainSymbol == destinationTokenObj.chainSymbol) {
+      throw new HttpException(
+        'Invalid endpoint: for single-chain swaps, please use /raw/swap.',
+        HttpStatus.BAD_REQUEST
+      );
+    }
     if (!Object.keys(Messenger).includes(messenger)) {
       throw new HttpException('Invalid messenger', HttpStatus.BAD_REQUEST);
     }
@@ -415,7 +486,7 @@ export class RestController {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const sendParams = {
+    const params = {
       amount: convertGt0IntAmountToFloat(amount, sourceTokenObj.decimals),
       destinationToken: destinationTokenObj,
       fromAccountAddress: sender,
@@ -434,11 +505,11 @@ export class RestController {
           solanaTxFeeParams
         ];
       if (solanaTxFeeParamsEnum == SolanaTxFeeParamsMethod.AUTO) {
-        sendParams['txFeeParams'] = {
+        params['txFeeParams'] = {
           solana: SolanaTxFeeParamsMethod.AUTO,
         };
       } else {
-        sendParams['txFeeParams'] = {
+        params['txFeeParams'] = {
           solana: {
             [solanaTxFeeParamsEnum]: solanaTxFeeValue,
           },
@@ -446,14 +517,17 @@ export class RestController {
       }
     }
     try {
-      return await this.sdkService.send(sendParams);
+      return await this.sdkService.send(params);
     } catch (e) {
       httpException(e);
     }
   }
 
   /**
-   * Simulate and check if restore needed for Stellar transaction <br/>
+   * Simulate and check if restore is needed for a Stellar transaction.
+   *
+   * @param xdrTx - The XDR transaction string.
+   * @param sender - The sender's address.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/stellar/restore/')
@@ -473,7 +547,7 @@ export class RestController {
   }
 
   /**
-   * Gets the average time in ms to complete a transfer for given tokens and messenger.
+   * Gets the average time in milliseconds to complete a transfer for the given tokens and messenger.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/transfer/time')
@@ -517,7 +591,7 @@ export class RestController {
   }
 
   /**
-   * Fetches information about tokens transfer by chosen chainSymbol and transaction Id from the Allbridge Core API.
+   * Fetches information about a token transfer using the chain symbol and transaction ID.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/transfer/status')
@@ -538,7 +612,7 @@ export class RestController {
   }
 
   /**
-   * Get token balance
+   * Retrieves the balance of a specified token for an account.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/balance')
@@ -564,7 +638,7 @@ export class RestController {
   }
 
   /**
-   * Get native (gas) token balance
+   * Retrieves the native (gas) token balance for a specified account on a given chain.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/native/balance')
@@ -587,6 +661,9 @@ export class RestController {
     }
   }
 
+  /**
+  * Retrieves token details by chain and address.
+  */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/token/details')
   @Tags('Tokens')
@@ -653,7 +730,7 @@ export class RestController {
   }
 
   /**
-   * Get gas balance
+   * Retrieves the gas balance for a specified account on a given chain.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/gas/balance')
@@ -674,7 +751,7 @@ export class RestController {
   }
 
   /**
-   * Get possible limit of extra gas amount.
+   * Retrieves the maximum limit of extra gas amount.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/gas/extra/limits')
@@ -706,7 +783,8 @@ export class RestController {
   }
 
   /**
-   * Returns information about pending transactions for the same destination chain and the amount of tokens can be received as a result of transfer considering pending transactions.
+   * Returns information about pending transactions for the same destination chain <br/>
+   * and the amount of tokens that can be received as a result of transfer considering pending transactions.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pending/info')
@@ -744,7 +822,7 @@ export class RestController {
   }
 
   /**
-   * Show swap amount changes (fee and amount adjustment) during send through pools
+   * Shows swap amount changes (fee and amount adjustments) during sending via pools.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/swap/details')
@@ -895,7 +973,7 @@ export class RestController {
   }
 
   /**
-   * Calculates the amount of tokens to send based on requested tokens amount be received as a result of transfer.
+   * Calculates the amount of tokens to send based on the requested amount to be received.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/bridge/send/calculate')
@@ -958,7 +1036,120 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for depositing tokens to Liquidity pool
+   * Retrieves the amount of tokens approved for the bridge.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/bridge/allowance')
+  @Tags('Transfers', 'Tokens')
+  async getBridgeAllowance(
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+  ): Promise<string> {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
+    try {
+      return await this.sdkService.getBridgeAllowance({
+        owner: ownerAddress,
+        token: tokenAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Checks if the approved token amount is sufficient for a transfer or pool operation.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/check/allowance')
+  @Tags('Transfers', 'Tokens', 'Pool')
+  async checkAllowance(
+    /**
+     * Amount: Integer value according to the token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * Selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    /**
+     * The type of approval to check.<br/>
+     * Allowed values: `bridge`, `pool`<br/>
+     * <b>Default: `bridge`</b>
+     */
+    @Query('type') type: 'bridge' | 'pool' = 'bridge',
+    @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+  ): Promise<boolean> {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
+
+    try {
+      const params = {
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        owner: ownerAddress,
+        token: tokenAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      };
+
+      return type === 'pool'
+        ? await this.sdkService.checkPoolAllowance(params)
+        : await this.sdkService.checkBridgeAllowance(params);
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+
+  /**
+   * Checks if the approved token amount is sufficient for a bridge transfer.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/check/bridge/allowance')
+  @Tags('Transfers', 'Tokens')
+  async checkBridgeAllowance(
+    /**
+     * Amount: Integer value according to the token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+  ): Promise<boolean> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
+    try {
+      return await this.sdkService.checkBridgeAllowance({
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        owner: ownerAddress,
+        token: tokenAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Creates a Raw Transaction for depositing tokens into a liquidity pool.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/deposit')
@@ -1033,7 +1224,7 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for withdrawing tokens from Liquidity pool
+   * Creates a Raw Transaction for withdrawing tokens from a liquidity pool.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/withdraw')
@@ -1108,7 +1299,7 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for claiming rewards from Liquidity pool
+   * Creates a Raw Transaction for claiming rewards from a liquidity pool.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/claim')
@@ -1178,6 +1369,42 @@ export class RestController {
   }
 
   /**
+   * Check if the amount of approved tokens is enough for liquidity deposit
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/check/pool/allowance')
+  @Tags('Tokens', 'Pool')
+  async checkPoolAllowance(
+    /**
+     * Amount: Integer value according to the token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+  ): Promise<boolean> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
+    try {
+      return await this.sdkService.checkPoolAllowance({
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        owner: ownerAddress,
+        token: tokenAddressObj,
+        gasFeePaymentMethod: feePaymentMethodEnum,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
    * Get Balance Line information if exists
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
@@ -1195,49 +1422,6 @@ export class RestController {
   }
 
   /**
-   * Check if the amount of approved tokens is enough
-   */
-  @Response<HttpExceptionBody>(400, 'Bad request')
-  @Get('/check/allowance')
-  @Tags('Pool', 'Transfers')
-  async checkAllowance(
-    /**
-     * Amount: Integer value according to the token precision
-     */
-    @Query('amount') amount: string,
-    @Query('ownerAddress') ownerAddress: string,
-    /**
-     * selected token on the source chain.
-     */
-    @Query('tokenAddress') tokenAddress: string,
-    @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
-  ): Promise<boolean> {
-    const tokenAddressObj =
-      await this.sdkService.getTokenByAddress(tokenAddress);
-    if (!tokenAddressObj) {
-      throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
-    }
-    if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
-      throw new HttpException(
-        'Invalid feePaymentMethod',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const feePaymentMethodEnum =
-      FeePaymentMethod[feePaymentMethod];
-    try {
-      return await this.sdkService.checkAllowance({
-        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
-        owner: ownerAddress,
-        token: tokenAddressObj,
-        gasFeePaymentMethod: feePaymentMethodEnum,
-      });
-    } catch (e) {
-      httpException(e);
-    }
-  }
-
-  /**
    * Gets information about the pool-info by token from server
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
@@ -1247,14 +1431,14 @@ export class RestController {
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
   ): Promise<PoolInfo> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    if (!poolAddressObj) {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await this.sdkService.getPoolInfoFromServer(poolAddressObj);
+      return await this.sdkService.getPoolInfoFromServer(tokenAddressObj);
     } catch (e) {
       httpException(e);
     }
@@ -1270,49 +1454,42 @@ export class RestController {
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
   ): Promise<Required<PoolInfo>> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    if (!poolAddressObj) {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await this.sdkService.getPoolInfoFromBlockchain(poolAddressObj);
+      return await this.sdkService.getPoolInfoFromBlockchain(tokenAddressObj);
     } catch (e) {
       httpException(e);
     }
   }
 
   /**
-   * Get amount of tokens approved for poolInfo
+   * Get amount of tokens approved for pool
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/pool/allowance')
-  @Tags('Pool')
+  @Tags('Pool', 'Tokens')
   async getPoolAllowance(
     @Query('ownerAddress') ownerAddress: string,
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
   ): Promise<string> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    if (!poolAddressObj) {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
-    if (!Object.keys(FeePaymentMethod).includes(feePaymentMethod)) {
-      throw new HttpException(
-        'Invalid feePaymentMethod',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const feePaymentMethodEnum =
-      FeePaymentMethod[feePaymentMethod];
+    const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
     try {
       return await this.sdkService.getPoolAllowance({
         owner: ownerAddress,
-        token: poolAddressObj,
+        token: tokenAddressObj,
         gasFeePaymentMethod: feePaymentMethodEnum,
       });
     } catch (e) {
@@ -1331,16 +1508,16 @@ export class RestController {
     /**
      * selected token on the source chain.
      */
-    @Query('poolAddress') poolAddress: string,
+    @Query('tokenAddress') tokenAddress: string,
   ): Promise<UserBalanceInfo> {
-    const poolAddressObj = await this.sdkService.getTokenByAddress(poolAddress);
-    if (!poolAddressObj) {
+    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
     try {
       return await this.sdkService.getUserPoolInfo(
         ownerAddress,
-        poolAddressObj,
+        tokenAddressObj,
       );
     } catch (e) {
       httpException(e);
@@ -1348,7 +1525,7 @@ export class RestController {
   }
 
   /**
-   * Calculates the amount of LP tokens that will be deposited
+   * Calculates the amount of LP tokens that will be deposited.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/liquidity/deposit/calculate')
@@ -1379,7 +1556,7 @@ export class RestController {
   }
 
   /**
-   * Calculates the amount of tokens will be withdrawn
+   * Calculates the amount of tokens that will be withdrawn.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/liquidity/withdrawn/calculate')
@@ -1412,6 +1589,16 @@ export class RestController {
   }
 }
 
+/**
+ * Utility function that converts an integer amount (as a string) to a floating-point string,
+ * ensuring the amount is greater than zero. Throws an HTTP exception if the conversion fails
+ * or the amount is zero or less.
+ *
+ * @param amount - The integer amount as a string.
+ * @param decimals - The number of decimals for the token.
+ * @param exceptionMsg - Optional message to include in the error (default: 'Invalid amount').
+ * @returns The converted floating-point amount as a string.
+ */
 export function convertGt0IntAmountToFloat(
   amount: string,
   decimals: number,

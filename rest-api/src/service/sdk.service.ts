@@ -2,8 +2,10 @@ import {
   AllbridgeCoreSdk,
   AmountFormat,
   AmountFormatted,
+  BridgeApproveParams,
   ChainDetailsMap,
   ChainSymbol,
+  ChainType,
   CheckAllowanceParams,
   ExtraGasMaxLimitResponse,
   GasBalanceResponse,
@@ -14,7 +16,7 @@ import {
   LiquidityPoolsApproveParams,
   LiquidityPoolsParams,
   LiquidityPoolsParamsWithAmount,
-  BridgeApproveParams,
+  mainnet,
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
@@ -26,13 +28,13 @@ import {
   TokenWithChainDetails,
   TransferStatusResponse,
   UserBalanceInfo,
-  mainnet,
 } from '@allbridge/bridge-core-sdk';
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
 import { Big } from 'big.js';
 import { ConfigService } from './config.service';
+import { httpException } from 'src/error/errors';
 
 export enum SolanaTxFeeParamsMethod {
   AUTO = 'AUTO',
@@ -85,10 +87,34 @@ export class SDKService {
   constructor() {
     this.sdk = new AllbridgeCoreSdk(ConfigService.getRPCUrls(), {
       ...mainnet,
+      coreApiUrl: ConfigService.getCoreApiUrl(),
+      coreApiQueryParams: ConfigService.getCoreApiQueryParams(),
       coreApiHeaders: ConfigService.getCoreApiHeaders(),
       jupiterUrl: ConfigService.getJupiterUrl(),
       jupiterMaxAccounts: ConfigService.getJupiterMaxAccounts(),
+      wormholeMessengerProgramId: ConfigService.getWormholeMessengerProgramId(),
+      solanaLookUpTable: ConfigService.getSolanaLookUpTable(),
+      sorobanNetworkPassphrase: ConfigService.getSorobanNetworkPassphrase(),
       tronJsonRpc: ConfigService.getTronJsonRpc(),
+      cctpParams: ConfigService.getCctpParams(),
+      cachePoolInfoChainSec: ConfigService.getCachePoolInfoChainSec(),
+      additionalChainsProperties: ConfigService.getAdditionalChainsProperties(),
+    });
+
+    console.log({
+      ...mainnet,
+      coreApiUrl: ConfigService.getCoreApiUrl(),
+      coreApiQueryParams: ConfigService.getCoreApiQueryParams(),
+      coreApiHeaders: ConfigService.getCoreApiHeaders(),
+      jupiterUrl: ConfigService.getJupiterUrl(),
+      jupiterMaxAccounts: ConfigService.getJupiterMaxAccounts(),
+      wormholeMessengerProgramId: ConfigService.getWormholeMessengerProgramId(),
+      solanaLookUpTable: ConfigService.getSolanaLookUpTable(),
+      sorobanNetworkPassphrase: ConfigService.getSorobanNetworkPassphrase(),
+      tronJsonRpc: ConfigService.getTronJsonRpc(),
+      cctpParams: ConfigService.getCctpParams(),
+      cachePoolInfoChainSec: ConfigService.getCachePoolInfoChainSec(),
+      additionalChainsProperties: ConfigService.getAdditionalChainsProperties(),
     });
   }
 
@@ -219,11 +245,31 @@ export class SDKService {
   }
 
   async getPoolAllowance(params: GetAllowanceParams): Promise<string> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
     return this.sdk.pool.getAllowance(params);
   }
 
-  async checkAllowance(params: CheckAllowanceParams): Promise<boolean> {
+  async checkPoolAllowance(params: CheckAllowanceParams): Promise<boolean> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
     return this.sdk.pool.checkAllowance(params);
+  }
+
+  async getBridgeAllowance(params: GetAllowanceParams): Promise<string> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
+    return this.sdk.bridge.getAllowance(params);
+  }
+
+  async checkBridgeAllowance(params: CheckAllowanceParams): Promise<boolean> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
+    return this.sdk.bridge.checkAllowance(params);
   }
 
   async getUserPoolInfo(
@@ -234,10 +280,16 @@ export class SDKService {
   }
 
   async poolApprove(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
     return this.sdk.pool.rawTxBuilder.approve(params);
   }
 
   async bridgeApprove(params: BridgeApproveParams): Promise<RawTransaction> {
+    if (params.token.chainType !== ChainType.EVM) {
+      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    }
     return this.sdk.bridge.rawTxBuilder.approve(params);
   }
 
@@ -319,6 +371,7 @@ export class SDKService {
     } catch (e: any) {
       const errorCode = e.errorCode;
       console.error('errorCode', errorCode);
+      console.error(`Error in getAmountToBeReceived: ${e.message}`, e);
       return { amountInFloat: amountFloat, amountReceivedInFloat: '' };
     }
   }
@@ -360,6 +413,7 @@ export class SDKService {
     } catch (e: any) {
       const errorCode = e.errorCode;
       console.error('errorCode', errorCode);
+      console.error(`Error in getAmountToSend: ${e.message}`, e);
       return { amountInFloat: '', amountReceivedInFloat: amountReceivedFloat };
     }
     const amountInFloat = stableFeeInFloat

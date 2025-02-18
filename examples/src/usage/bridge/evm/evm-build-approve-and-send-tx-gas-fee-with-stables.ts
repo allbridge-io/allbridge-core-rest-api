@@ -1,4 +1,3 @@
-import { EssentialWeb3Transaction } from '@allbridge/bridge-core-sdk';
 import Web3 from 'web3';
 import * as dotenv from 'dotenv';
 import axios from 'axios';
@@ -53,7 +52,7 @@ const main = async () => {
   );
   const approveTxReceipt = await sendRawTransaction(
     web3,
-    rawTransactionApprove.data as EssentialWeb3Transaction,
+    rawTransactionApprove.data,
   );
   console.log('approve tx id:', approveTxReceipt.transactionHash);
 
@@ -79,7 +78,7 @@ const main = async () => {
 
   const txReceipt = await sendRawTransaction(
     web3,
-    rawTransactionTransfer.data as EssentialWeb3Transaction,
+    rawTransactionTransfer.data,
   );
   console.log('tx id:', txReceipt.transactionHash);
 };

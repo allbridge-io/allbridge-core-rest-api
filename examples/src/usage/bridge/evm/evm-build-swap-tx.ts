@@ -1,4 +1,3 @@
-import { EssentialWeb3Transaction } from '@allbridge/bridge-core-sdk';
 import Web3 from 'web3';
 import * as dotenv from 'dotenv';
 import axios from 'axios';
@@ -21,7 +20,8 @@ const main = async () => {
   );
   web3.eth.accounts.wallet.add(account);
 
-  const chains = (await axios.get(`${baseUrl}/chains`)).data;
+    console.log(`Fetching supported chains...`);
+    const chains = (await axios.get(`${baseUrl}/chains`)).data;
 
   const sourceChain = chains['ETH'];
   const sourceTokenInfo = ensure(
@@ -37,15 +37,18 @@ const main = async () => {
 
   const amount = parseFloat('1.01') * 10 ** sourceTokenInfo.decimals;
 
-  const minimumReceiveAmount = (
-    await axios.get(
-      `${baseUrl}/bridge/receive/calculate` +
-        `?sourceToken=${sourceTokenInfo.tokenAddress}` +
-        `&destinationToken=${destinationTokenInfo.tokenAddress}` +
-        `&amount=${amount}` +
-        `&messenger=ALLBRIDGE`,
-    )
-  ).data;
+  console.log(`Calculating minimum receive amount...`);
+  const response = await axios.get(
+    `${baseUrl}/bridge/receive/calculate` +
+      `?sourceToken=${sourceTokenInfo.tokenAddress}` +
+      `&destinationToken=${destinationTokenInfo.tokenAddress}` +
+      `&amount=${amount}` +
+      `&messenger=ALLBRIDGE`,
+  );
+  const minimumReceiveAmount = parseFloat(response.data.amountReceivedInFloat);
+  if (isNaN(minimumReceiveAmount)) {
+    throw new Error('Invalid minimum receive amount received from API');
+  }
   // initiate transfer
   const rawTransactionTransfer = await axios.get(
     `${baseUrl}/raw/swap?amount=${amount}` +
@@ -53,7 +56,7 @@ const main = async () => {
       `&recipient=${toAddress}` +
       `&sourceToken=${sourceTokenInfo.tokenAddress}` +
       `&destinationToken=${destinationTokenInfo.tokenAddress}` +
-      `&minimumReceiveAmount=${parseFloat(minimumReceiveAmount.amountReceivedInFloat) * 10 ** sourceTokenInfo.decimals}`,
+      `&minimumReceiveAmount=${minimumReceiveAmount * 10 ** sourceTokenInfo.decimals}`,
   );
 
   console.log(
@@ -61,7 +64,7 @@ const main = async () => {
   );
   const txReceipt = await sendRawTransaction(
     web3,
-    rawTransactionTransfer.data as EssentialWeb3Transaction,
+    rawTransactionTransfer.data,
   );
   console.log('tx id:', txReceipt.transactionHash);
 };

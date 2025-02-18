@@ -5,6 +5,7 @@ shared-workspace-lockfile: true
 
 catalog:
   '@solana/web3.js': ^1.98.0
+  '@mysten/sui': ^1.21.2
   '@stellar/stellar-sdk': ^13.1.0
   'axios': ^1.7.9
   '@types/big.js': ^6.2.2

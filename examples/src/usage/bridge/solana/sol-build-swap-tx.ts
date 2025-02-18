@@ -12,7 +12,7 @@ const main = async () => {
   // sender address
   const fromAddress = getEnvVar('SOL_ACCOUNT_ADDRESS');
   const privateKey = getEnvVar('SOL_PRIVATE_KEY');
-  const toAddress = getEnvVar('ETH_ACCOUNT_ADDRESS');
+  const toAddress = getEnvVar('SOL_ACCOUNT_ADDRESS');
   const solNodeRPCUrl = getEnvVar('SOL_PROVIDER_URL');
 
   // Fetch supported chains
@@ -24,22 +24,33 @@ const main = async () => {
     sourceChain.tokens.find((tokenInfo: { symbol: string; }) => tokenInfo.symbol === 'USDC')
   );
 
-  const destinationChain = chains['ETH'];
+  const destinationChain = chains['SOL'];
   const destinationTokenInfo = ensure(
     destinationChain.tokens.find((tokenInfo: { symbol: string; }) => tokenInfo.symbol === 'USDT')
   );
 
-  const transferViaMessenger = async (messenger: string, amountStr: string) => {
+  const getMinimumReceiveAmount = async (amountInt: number, sourceToken: any, destinationToken: any) => {
+    const response = await axios.get(
+      `${baseUrl}/swap/details` +
+      `?sourceToken=${sourceToken}` +
+      `&destinationToken=${destinationToken}` +
+      `&amount=${amountInt}`
+    );
+    return parseFloat(response.data.amountReceivedInFloat) * 10 ** destinationTokenInfo.decimals;
+  };
+
+  const swapTokens = async (messenger: string, amountStr: string) => {
     const amountInt = parseFloat(amountStr) * 10 ** sourceTokenInfo.decimals;
-    console.log(`Requesting raw transaction from API using ${messenger}...`);
+    const minimumReceiveAmount = await getMinimumReceiveAmount(amountInt, sourceTokenInfo.tokenAddress, destinationTokenInfo.tokenAddress);
+
+    console.log(`Requesting raw swap transaction from API using ${messenger}...`);
     const rawTransactionTransfer = await axios.get(
-      `${baseUrl}/raw/bridge?amount=${amountInt}` +
-        `&sender=${fromAddress}` +
-        `&recipient=${toAddress}` +
-        `&sourceToken=${sourceTokenInfo.tokenAddress}` +
-        `&destinationToken=${destinationTokenInfo.tokenAddress}` +
-        `&messenger=${messenger}` +
-        `&feePaymentMethod=WITH_NATIVE_CURRENCY`
+      `${baseUrl}/raw/swap?amount=${amountInt}` +
+      `&sender=${fromAddress}` +
+      `&recipient=${toAddress}` +
+      `&sourceToken=${sourceTokenInfo.tokenAddress}` +
+      `&destinationToken=${destinationTokenInfo.tokenAddress}` +
+      `&minimumReceiveAmount=${minimumReceiveAmount}`
     );
 
     const rawTxHex = rawTransactionTransfer.data;
@@ -57,10 +68,10 @@ const main = async () => {
     console.log(`Transaction submitted: https://explorer.solana.com/tx/${txid}`);
   };
 
-  await transferViaMessenger('WORMHOLE', '0.2');
-  await transferViaMessenger('ALLBRIDGE', '0.3');
+  await swapTokens('WORMHOLE', '10');
+  await swapTokens('ALLBRIDGE', '10');
 };
 
 main()
-  .then(() => console.log('Done'))
-  .catch((e) => console.error(e));
+.then(() => console.log('Done'))
+.catch((e) => console.error(e));

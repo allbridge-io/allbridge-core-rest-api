@@ -95,6 +95,18 @@ export class ConfigService {
       : { 'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}` };
   }
 
+  static getCoreApiQueryParams() {
+    return process.env.CORE_API_QUERY_PARAMS
+      ? JSON.parse(process.env.CORE_API_QUERY_PARAMS)
+      : mainnet.coreApiQueryParams;
+  }
+
+  static getCoreApiUrl() {
+    return process.env.CORE_API_URL
+      ? process.env.CORE_API_URL
+      : mainnet.coreApiUrl;
+  }
+
   static getJupiterUrl() {
     return process.env.JUPITER_URL
       ? process.env.JUPITER_URL
@@ -111,5 +123,41 @@ export class ConfigService {
     return process.env.JUPITER_MAX_ACCOUNTS
       ? +process.env.JUPITER_MAX_ACCOUNTS
       : mainnet.jupiterMaxAccounts;
+  }
+
+  static getWormholeMessengerProgramId() {
+    return process.env.WORMHOLE_MESSENGER_PROGRAM_ID
+      ? process.env.WORMHOLE_MESSENGER_PROGRAM_ID
+      : mainnet.wormholeMessengerProgramId;
+  }
+
+  static getSolanaLookUpTable() {
+    return process.env.SOLANA_LOOK_UP_TABLE
+      ? process.env.SOALNA_LOOK_UP_TABLE
+      : mainnet.solanaLookUpTable;
+  }
+
+  static getSorobanNetworkPassphrase() {
+    return process.env.SOROBAN_NETWORK_PASSPHRASE
+      ? process.env.SOROBAN_NETWORK_PASSPHRASE
+      : mainnet.sorobanNetworkPassphrase;
+  }
+
+  static getCachePoolInfoChainSec() {
+    return process.env.CACHE_POOL_INFO_CHAIN_SEC
+      ? +process.env.CACHE_POOL_INFO_CHAIN_SEC
+      : mainnet.cachePoolInfoChainSec;
+  }
+
+  static getCctpParams() {
+    return process.env.CCTP_PARAMS
+      ? JSON.parse(process.env.CCTP_PARAMS)
+      : mainnet.cctpParams;
+  }
+
+  static getAdditionalChainsProperties() {
+    return process.env.ADDITIONAL_CHAINS_PROPERTIES
+      ? JSON.parse(process.env.ADDITIONAL_CHAINS_PROPERTIES)
+      : mainnet.additionalChainsProperties;
   }
 }
