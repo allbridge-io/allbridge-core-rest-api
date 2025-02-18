@@ -1,3 +1,10 @@
+# [3.21.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.1...v3.21.0) (2025-02-18)
+
+
+### Features
+
+* Sui support added ([7788003](https://github.com/allbridge-io/allbridge-core-rest-api/commit/77880033fbb0f8b9b02920e6f12f7170b9246641))
+
 ## [3.20.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.0...v3.20.1) (2025-02-05)
 
 
