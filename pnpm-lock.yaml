@@ -133,8 +133,8 @@ importers:
   rest-api:
     dependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: 3.21.0
-        version: 3.21.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+        specifier: 3.21.1-alpha.1
+        version: 3.21.1-alpha.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
       '@allbridge/logger':
         specifier: ^2.4.1
         version: 2.4.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
@@ -305,6 +305,10 @@ packages:
 
   '@allbridge/bridge-core-sdk@3.21.0':
     resolution: {integrity: sha512-up0Kssu6h6NpC/pss15bqLun6Dphtp2RgQ69DgGEhMKORn0518WczMXpDZl44t4J7C+oXH9gJqj2JEKVll2ujg==}
+    engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
+
+  '@allbridge/bridge-core-sdk@3.21.1-alpha.1':
+    resolution: {integrity: sha512-4FOol1JA3aS1VlGWijcyenOLmbpfcIpkIM9IygOQsRJnQAuvgnNyC49n507ny1OsIfGSOJqV0Yw6z43jDQQBMA==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
   '@allbridge/logger@2.4.1':
@@ -3524,6 +3528,9 @@ packages:
       node-notifier:
         optional: true
 
+  jose@5.10.0:
+    resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
+
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
@@ -5400,6 +5407,35 @@ snapshots:
       - utf-8-validate
       - zod
 
+  '@allbridge/bridge-core-sdk@3.21.1-alpha.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@mysten/sui': 1.18.0(typescript@5.7.3)
+      '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@solana/spl-token': 0.3.11(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
+      '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      '@stellar/stellar-sdk': 13.1.0
+      assert: 2.1.0
+      axios: 1.7.9
+      big.js: 6.2.2
+      bn.js: 5.2.1
+      querystring: 0.2.1
+      randombytes: 2.1.0
+      timed-cache: 2.0.0
+      tronweb: 6.0.1(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      web3: 4.16.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      web3-eth-contract: 4.7.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      web3-types: 1.10.0
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - bufferutil
+      - debug
+      - encoding
+      - fastestsmallesttextencoderdecoder
+      - typescript
+      - utf-8-validate
+      - zod
+
   '@allbridge/logger@2.4.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))':
     dependencies:
       '@google-cloud/logging-winston': 6.0.0(winston@3.17.0)
@@ -6206,7 +6242,7 @@ snapshots:
       bech32: 2.0.0
       gql.tada: 1.8.10(graphql@16.10.0)(typescript@5.7.3)
       graphql: 16.10.0
-      jose: 5.9.6
+      jose: 5.10.0
       poseidon-lite: 0.2.1
       valibot: 0.36.0
     transitivePeerDependencies:
@@ -9637,6 +9673,8 @@ snapshots:
       - babel-plugin-macros
       - supports-color
       - ts-node
+
+  jose@5.10.0: {}
 
   jose@5.9.6: {}
 
