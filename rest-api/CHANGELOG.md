@@ -1,3 +1,11 @@
+# [3.21.0-alpha.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.1...v3.21.0-alpha.1) (2025-02-21)
+
+
+### Features
+
+* Sui support added ([7788003](https://github.com/allbridge-io/allbridge-core-rest-api/commit/77880033fbb0f8b9b02920e6f12f7170b9246641))
+* TransferStatusResponse: add originSourceTokenAddress?: and originDestinationTokenAddress?: string; ([d6b2307](https://github.com/allbridge-io/allbridge-core-rest-api/commit/d6b23076486cc8f25536949ea0185370e3d1138d))
+
 ## [3.20.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.0...v3.20.1) (2025-02-05)
 
 
