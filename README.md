@@ -100,11 +100,13 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://base-mainnet.infura.io/v3/YOUR-PROJECT-ID`
   - ...
 - `CEL_NODE_URL` - The JSON RPC URL of the Celo node. For example:
+  - `https://celo-rpc.publicnode.com`   
   - `https://rpc.ankr.com/celo`
   - `https://forno.celo.org`
   - `https://celo-mainnet.infura.io/v3/YOUR-PROJECT-ID`
   - ...
 - `SOL_NODE_URL` - The JSON RPC URL of the Solana node. For example:
+  - `https://solana-rpc.publicnode.com` 
   - `https://api.mainnet-beta.solana.com`
   - `https://solana-api.projectserum.com`
   - `https://rpc.ankr.com/solana`
@@ -144,8 +146,8 @@ docker run -p 3000:3000 \
     -e AVA_NODE_URL="https://avalanche-c-chain-rpc.publicnode.com" \
     -e OPT_NODE_URL="https://optimism-rpc.publicnode.com" \
     -e BAS_NODE_URL="https://base-rpc.publicnode.com" \
-    -e CEL_NODE_URL="https://rpc.ankr.com/celo" \
-    -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
+    -e CEL_NODE_URL="https://celo-rpc.publicnode.com" \
+    -e SOL_NODE_URL="https://solana-rpc.publicnode.com" \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
@@ -169,8 +171,8 @@ docker run -p 3000:3000 \
     -e AVA_NODE_URL="https://avalanche-c-chain-rpc.publicnode.com" \
     -e OPT_NODE_URL="https://optimism-rpc.publicnode.com" \
     -e BAS_NODE_URL="https://base-rpc.publicnode.com" \
-    -e CEL_NODE_URL="https://rpc.ankr.com/celo" \
-    -e SOL_NODE_URL="https://api.mainnet-beta.solana.com" \
+    -e CEL_NODE_URL="https://celo-rpc.publicnode.com" \
+    -e SOL_NODE_URL="https://solana-rpc.publicnode.com" \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
