@@ -3,8 +3,8 @@ import { getEnvVar } from "./env";
 import { Ed25519Keypair } from "@mysten/sui/keypairs/ed25519";
 import { Transaction } from "@mysten/sui/transactions";
 
-export async function sendSuiRawTransaction(xdr: string): Promise<SuiTransactionBlockResponse> {
-  const tx = Transaction.from(xdr);
+export async function sendSuiRawTransaction(xdr: object): Promise<SuiTransactionBlockResponse> {
+  const tx = Transaction.from(JSON.stringify(xdr));
 
   const client = new SuiClient({
     url: getEnvVar("SUI_PROVIDER_URL"),
