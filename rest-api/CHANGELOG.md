@@ -1,3 +1,10 @@
+## [3.21.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.21.0...v3.21.1) (2025-03-20)
+
+
+### Bug Fixes
+
+* **SUI/example:** sendSuiTransaction example ([9913164](https://github.com/allbridge-io/allbridge-core-rest-api/commit/9913164eb74042228a5a058ebbde88ee265ff39f))
+
 # [3.21.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.20.1...v3.21.0) (2025-02-18)
 
 
