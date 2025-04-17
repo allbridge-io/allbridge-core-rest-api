@@ -1,3 +1,11 @@
+# [3.22.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.21.1...v3.22.0) (2025-04-17)
+
+
+### Features
+
+* **CCTP_V2:** add cctp v2 support ([3867c84](https://github.com/allbridge-io/allbridge-core-rest-api/commit/3867c8403bed4b4028794d5fa32f550d3f0bf155))
+* TransferStatusResponse: add originSourceTokenAddress?: and originDestinationTokenAddress?: string; ([6c2378f](https://github.com/allbridge-io/allbridge-core-rest-api/commit/6c2378fa89e4a284af54c0c351d15c68e0acb2b6))
+
 ## [3.21.1](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.21.0...v3.21.1) (2025-03-20)
 
 
