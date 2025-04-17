@@ -91,22 +91,7 @@ export class SDKService {
       coreApiQueryParams: ConfigService.getCoreApiQueryParams(),
       coreApiHeaders: ConfigService.getCoreApiHeaders(),
       jupiterUrl: ConfigService.getJupiterUrl(),
-      jupiterMaxAccounts: ConfigService.getJupiterMaxAccounts(),
-      wormholeMessengerProgramId: ConfigService.getWormholeMessengerProgramId(),
-      solanaLookUpTable: ConfigService.getSolanaLookUpTable(),
-      sorobanNetworkPassphrase: ConfigService.getSorobanNetworkPassphrase(),
-      tronJsonRpc: ConfigService.getTronJsonRpc(),
-      cctpParams: ConfigService.getCctpParams(),
-      cachePoolInfoChainSec: ConfigService.getCachePoolInfoChainSec(),
-      additionalChainsProperties: ConfigService.getAdditionalChainsProperties(),
-    });
-
-    console.log({
-      ...mainnet,
-      coreApiUrl: ConfigService.getCoreApiUrl(),
-      coreApiQueryParams: ConfigService.getCoreApiQueryParams(),
-      coreApiHeaders: ConfigService.getCoreApiHeaders(),
-      jupiterUrl: ConfigService.getJupiterUrl(),
+      jupiterApiKeyHeader: ConfigService.getJupiterApiKeyHeader(),
       jupiterMaxAccounts: ConfigService.getJupiterMaxAccounts(),
       wormholeMessengerProgramId: ConfigService.getWormholeMessengerProgramId(),
       solanaLookUpTable: ConfigService.getSolanaLookUpTable(),
@@ -159,7 +144,8 @@ export class SDKService {
     const tokens = await this.sdk.tokensByChain(chainSymbol);
     return tokens.find(
       (token) =>
-        token.tokenAddress.toUpperCase() === tokenAddress.toUpperCase(),
+        token.tokenAddress.toUpperCase() === tokenAddress.toUpperCase()
+        || token.poolAddress.toUpperCase() === tokenAddress.toUpperCase(),
     );
   }
 
@@ -215,8 +201,8 @@ export class SDKService {
 
   // Bridge
   async send(params: SwapParams | SendParams): Promise<RawTransaction> {
-    console.debug(params);
     const rawTx = await this.sdk.bridge.rawTxBuilder.send(params);
+    console.log('rawTx', rawTx);
     if (params.sourceToken.chainSymbol === ChainSymbol.SOL) {
       return Buffer.from(
         (
@@ -245,29 +231,29 @@ export class SDKService {
   }
 
   async getPoolAllowance(params: GetAllowanceParams): Promise<string> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.pool.getAllowance(params);
   }
 
   async checkPoolAllowance(params: CheckAllowanceParams): Promise<boolean> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.pool.checkAllowance(params);
   }
 
   async getBridgeAllowance(params: GetAllowanceParams): Promise<string> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.bridge.getAllowance(params);
   }
 
   async checkBridgeAllowance(params: CheckAllowanceParams): Promise<boolean> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.bridge.checkAllowance(params);
   }
@@ -280,15 +266,15 @@ export class SDKService {
   }
 
   async poolApprove(params: LiquidityPoolsApproveParams): Promise<RawTransaction> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.pool.rawTxBuilder.approve(params);
   }
 
   async bridgeApprove(params: BridgeApproveParams): Promise<RawTransaction> {
-    if (params.token.chainType !== ChainType.EVM) {
-      throw new HttpException("This operation is only available for EVM-based blockchains.", HttpStatus.BAD_REQUEST);
+    if (params.token.chainType !== ChainType.EVM && params.token.chainType !== ChainType.TRX) {
+      throw new HttpException('This operation is only available for EVM-based blockchains.', HttpStatus.BAD_REQUEST);
     }
     return this.sdk.bridge.rawTxBuilder.approve(params);
   }
@@ -338,9 +324,9 @@ export class SDKService {
     try {
       const amountToSendFloat = stableFeeInFloat
         ? Big(amountFloat)
-            .minus(stableFeeInFloat)
-            .round(sourceToken.decimals)
-            .toFixed()
+        .minus(stableFeeInFloat)
+        .round(sourceToken.decimals)
+        .toFixed()
         : amountFloat;
       if (Big(amountToSendFloat).lte(0)) {
         return { amountInFloat: amountFloat, amountReceivedInFloat: '' };
@@ -390,8 +376,8 @@ export class SDKService {
     let amount;
     try {
       const roundedAmountReceived = Big(amountReceivedFloat)
-        .round(destinationToken.decimals)
-        .toFixed();
+      .round(destinationToken.decimals)
+      .toFixed();
       if (
         refreshingPool &&
         sourceToken.chainSymbol === destinationToken.chainSymbol
@@ -421,8 +407,8 @@ export class SDKService {
       : Big(amount);
     return {
       amountInFloat: amountInFloat
-        .round(sourceToken.decimals, Big.roundUp)
-        .toFixed(),
+      .round(sourceToken.decimals, Big.roundUp)
+      .toFixed(),
       amountReceivedInFloat: amountReceivedFloat,
     };
   }
@@ -471,7 +457,8 @@ export class SDKService {
     const tokens = await this.getTokens();
     return tokens.find(
       (token) =>
-        token.tokenAddress.toUpperCase() === tokenAddress.toUpperCase(),
+        token.tokenAddress.toUpperCase() === tokenAddress.toUpperCase()
+        || token.poolAddress.toUpperCase() === tokenAddress.toUpperCase(),
     );
   }
 

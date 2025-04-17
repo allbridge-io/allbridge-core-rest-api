@@ -13,8 +13,10 @@ import {
   PoolInfo,
   TokenWithChainDetails,
   TransferStatusResponse,
-  UserBalanceInfo,
 } from '@allbridge/bridge-core-sdk';
+import {
+  UserBalanceInfoDTO
+} from '@allbridge/bridge-core-sdk/dist/src/services/liquidity-pool/models/pool.model';
 import {
   Controller,
   Get,
@@ -1509,16 +1511,21 @@ export class RestController {
      * selected token on the source chain.
      */
     @Query('tokenAddress') tokenAddress: string,
-  ): Promise<UserBalanceInfo> {
+  ): Promise<UserBalanceInfoDTO> {
     const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await this.sdkService.getUserPoolInfo(
+      const resp = await this.sdkService.getUserPoolInfo(
         ownerAddress,
         tokenAddressObj,
       );
+      const poolInfo = await this.sdkService.getPoolInfoFromServer(tokenAddressObj);
+      return {
+        lpAmount: resp.lpAmount,
+        rewardDebt: resp.earned(poolInfo, tokenAddressObj.decimals)
+      };
     } catch (e) {
       httpException(e);
     }

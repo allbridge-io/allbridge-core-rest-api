@@ -43,7 +43,7 @@ export class ConfigService {
   static getLoggerCredential(): LoggerCredential {
     return process.env.LOGGER_CREDENTIAL
       ? JSON.parse(process.env.LOGGER_CREDENTIAL)
-      : [];
+      : {} as LoggerCredential;
   }
 
   static getTelegramApiKey(): string {
@@ -60,8 +60,8 @@ export class ConfigService {
 
   static getRPCUrls(): NodeRpcUrls {
     const rpcUrls: NodeRpcUrls = {};
-    const chainSymbols = Object.values(ChainSymbol);
-    chainSymbols.forEach((chain) => {
+    const networks = this.getNetworks() || Object.values(ChainSymbol);
+    networks.forEach((chain) => {
       try {
         rpcUrls[chain] = ConfigService.getNetworkNodeUrl(chain);
         ConfigService.getLogger().log(
@@ -85,6 +85,10 @@ export class ConfigService {
 
   static getSystemPrecision() {
     return process.env.SYSTEM_PRECISION ? +process.env.SYSTEM_PRECISION : 9;
+  }
+
+  static getNetworks(): string[] {
+    return process.env.NETWORKS ? JSON.parse(process.env.NETWORKS) : [];
   }
 
   static getCoreApiHeaders() {
@@ -113,6 +117,12 @@ export class ConfigService {
       : mainnet.jupiterUrl;
   }
 
+  static getJupiterApiKeyHeader() {
+    return process.env.JUPITER_API_KEY_HEADER
+      ? process.env.JUPITER_API_KEY_HEADER
+      : mainnet.jupiterApiKeyHeader;
+  }
+
   static getTronJsonRpc() {
     return process.env.TRON_JSON_RPC
       ? process.env.TRON_JSON_RPC
@@ -133,7 +143,7 @@ export class ConfigService {
 
   static getSolanaLookUpTable() {
     return process.env.SOLANA_LOOK_UP_TABLE
-      ? process.env.SOALNA_LOOK_UP_TABLE
+      ? process.env.SOLANA_LOOK_UP_TABLE
       : mainnet.solanaLookUpTable;
   }
 

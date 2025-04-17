@@ -13,9 +13,9 @@ RUN npm install -g pnpm@latest
 WORKDIR /app
 ENV NODE_ENV=production
 COPY pnpm-workspace.yaml ./
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+#COPY pnpm-lock.yaml ./
 COPY rest-api/package.json ./rest-api/
+COPY rest-api/pnpm-lock.yaml ./rest-api/
 WORKDIR /app/rest-api
 # If the SDK_VERSION build argument is provided, update the package.json
 # Otherwise, keep the default value
@@ -35,7 +35,7 @@ RUN pnpm build
 # Install only production dependencies
 RUN pnpm install --prod --force
 RUN pnpm audit --fix
-RUN pnpm install --prod --force --shamefully-hoist
+RUN pnpm install --prod --force
 
 FROM node:22.12-alpine
 RUN apk update
