@@ -11,6 +11,7 @@ import {
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
+  RawSuiTransaction,
   TokenWithChainDetails,
   TransferStatusResponse,
 } from '@allbridge/bridge-core-sdk';
@@ -119,6 +120,13 @@ export class RestController {
      * If <i>CCTP</i> then CCTP Contract is a <b>spender</b><br/><br/>
      */
     @Query('messenger') messenger?: keyof typeof Messenger,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<RawTransaction> {
     const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
@@ -134,6 +142,10 @@ export class RestController {
         });
       }
       const messengerEnum = Messenger[messenger] || undefined;
+
+      if (contractAddress !== undefined) {
+        tokenAddressObj.bridgeAddress = contractAddress;
+      }
       return await this.sdkService.bridgeApprove({
         token: tokenAddressObj,
         owner: ownerAddress,
@@ -207,11 +219,21 @@ export class RestController {
      * If <i>CCTP</i> then CCTP Contract is a <b>spender</b><br/><br/>
      */
     @Query('messenger') messenger?: keyof typeof Messenger,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<RawTransaction> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      tokenAddressObj.bridgeAddress = contractAddress;
     }
     const messengerEnum = Messenger[messenger] || undefined;
     try {
@@ -267,10 +289,20 @@ export class RestController {
      * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
      */
     @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
       throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      sourceTokenObj.bridgeAddress = contractAddress;
     }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
@@ -447,10 +479,20 @@ export class RestController {
      * If <i>solanaTxFeeParams</i> is <b><u>EXTRA_FEE_IN_LAMPORTS</u></b> then string value represent Total Priority Fee as extraFeeInLamports param<br/>
      */
     @Query('solanaTxFeeValue') solanaTxFeeValue?: string,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
       throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      sourceTokenObj.bridgeAddress = contractAddress;
     }
     const destinationTokenObj =
       await this.sdkService.getTokenByAddress(destinationToken);
@@ -1050,10 +1092,20 @@ export class RestController {
      */
     @Query('tokenAddress') tokenAddress: string,
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<string> {
     const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      tokenAddressObj.bridgeAddress = contractAddress;
     }
     const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
     try {
@@ -1090,10 +1142,20 @@ export class RestController {
      */
     @Query('type') type: 'bridge' | 'pool' = 'bridge',
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<boolean> {
     const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      tokenAddressObj.bridgeAddress = contractAddress;
     }
     const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
 
@@ -1131,11 +1193,21 @@ export class RestController {
      */
     @Query('tokenAddress') tokenAddress: string,
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
+    /**
+     * The spender contract address for the approval.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>Default: Allbridge Contract</b><br/>
+     * If specified, the approval will be made for the specified contract address.<br/>
+     */
+    @Query('contractAddress') contractAddress?: string,
   ): Promise<boolean> {
     const tokenAddressObj =
       await this.sdkService.getTokenByAddress(tokenAddress);
     if (!tokenAddressObj) {
       throw new HttpException('Pool not found', HttpStatus.BAD_REQUEST);
+    }
+    if (contractAddress !== undefined) {
+      tokenAddressObj.bridgeAddress = contractAddress;
     }
     const feePaymentMethodEnum = FeePaymentMethod[feePaymentMethod] ?? FeePaymentMethod.WITH_NATIVE_CURRENCY;
     try {
@@ -1145,6 +1217,35 @@ export class RestController {
         token: tokenAddressObj,
         gasFeePaymentMethod: feePaymentMethodEnum,
       });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Merge SUI bridge transactions into a single transaction.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/bridge/sui/merge')
+  @Tags('Transfers')
+  async mergeBridgeSuiTransactions(
+    /**
+     * Bridge transaction
+     * The transaction to be merged with other transactions.<br/>
+     * <i><u>Required.</u></i><br/>
+     * The transaction should be a valid SUI transaction JSON stringified object.<br/>
+     */
+    @Query('tx') tx: RawSuiTransaction,
+    /**
+     * Another transaction to merge with the main transaction.<br/>
+     *
+     * <i><u>Required.</u></i><br/>
+     * The transaction should be a valid SUI transaction JSON stringified object.<br/>
+     */
+    @Query('otherTx') otherTx: RawSuiTransaction,
+  ): Promise<RawSuiTransaction> {
+    try {
+      return await this.sdkService.mergeSuiTransactions(tx, otherTx);
     } catch (e) {
       httpException(e);
     }

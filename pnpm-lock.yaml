@@ -94,8 +94,8 @@ importers:
         version: 1.10.0
     devDependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: 3.21.0
-        version: 3.21.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+        specifier: 3.23.0
+        version: 3.23.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@types/big.js':
         specifier: 'catalog:'
         version: 6.2.2
@@ -133,8 +133,8 @@ importers:
   rest-api:
     dependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: 3.22.0
-        version: 3.22.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)
+        specifier: 3.23.0
+        version: 3.23.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       '@allbridge/logger':
         specifier: ^2.4.1
         version: 2.4.1(@nestjs/common@10.4.15(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))
@@ -291,8 +291,22 @@ packages:
       graphql:
         optional: true
 
+  '@0no-co/graphql.web@1.1.2':
+    resolution: {integrity: sha512-N2NGsU5FLBhT8NZ+3l2YrzZSHITjNXNuDhC4iDiikv0IujaJ0Xc6xIxQZ/Ek3Cb+rgPjnLHYyJm11tInuJn+cw==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+    peerDependenciesMeta:
+      graphql:
+        optional: true
+
   '@0no-co/graphqlsp@1.12.16':
     resolution: {integrity: sha512-B5pyYVH93Etv7xjT6IfB7QtMBdaaC07yjbhN6v8H7KgFStMkPvi+oWYBTibMFRMY89qwc9H8YixXg8SXDVgYWw==}
+    peerDependencies:
+      graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+      typescript: ^5.0.0
+
+  '@0no-co/graphqlsp@1.14.0':
+    resolution: {integrity: sha512-rgOJ0Bj9UFBmE7BfUGhsqYPYqPwCk1MCggoYN4NUSdX6gpqatNuzHNB2wHcAd9xdY55jHNRhHy5NsgwY6EGgmg==}
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
@@ -303,12 +317,12 @@ packages:
   '@adraffy/ens-normalize@1.11.0':
     resolution: {integrity: sha512-/3DDPKHqqIqxUULp8yP4zODUY1i+2xvVWsv8A79xGWdCAG+8sb0hRh0Rk2QyOJUnnbyPUAZYcpBuRe3nS2OIUg==}
 
-  '@allbridge/bridge-core-sdk@3.21.0':
+  '@allbridge/bridge-core-sdk@3.23.0':
     resolution: {integrity: sha512-up0Kssu6h6NpC/pss15bqLun6Dphtp2RgQ69DgGEhMKORn0518WczMXpDZl44t4J7C+oXH9gJqj2JEKVll2ujg==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
-  '@allbridge/bridge-core-sdk@3.22.0':
-    resolution: {integrity: sha512-EFkXAfGvruFeYSBtKZ93ixI4ujjtF2JAiReXWkywnYzg08U6rHPW37gcSuGE/FFfkAozd0lf7tZTdLmv6Nm7Mw==}
+  '@allbridge/bridge-core-sdk@3.23.0':
+    resolution: {integrity: sha512-RRGaLztdXzSpkKrpECaKacXjTep7GfMHfv1Eq4zDWhrDs/7ifJCJDZBYEmRnVqhKWM9w9gBNMyL8hShApbPlCw==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
   '@allbridge/logger@2.4.1':
@@ -485,12 +499,12 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime@7.26.7':
-    resolution: {integrity: sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==}
+  '@babel/runtime@7.26.10':
+    resolution: {integrity: sha512-2WJMeRQPHKSPemqk/awGrAiuFfzBmOIPXKizAsVhWH9YJqLZ0H+HS4c8loHGgW6utJ3E/ejXQUsiGaQy2NZ9Fw==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/runtime@7.27.0':
-    resolution: {integrity: sha512-VtPOkrdPHZsKc/clNqyi9WUA8TINkZ4cGk63UUE3u4pmB2k+ZMQRDuIOagv8UVd6j7k0T3+RRIb7beKTebNbcw==}
+  '@babel/runtime@7.26.7':
+    resolution: {integrity: sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.25.9':
@@ -984,8 +998,8 @@ packages:
     resolution: {integrity: sha512-warwspo+UYUPep0Q+vtdVB4Ugn8GGQj8iyB3gnRWsztmUHTI3S1nhdiWNsPUGL0vud7JlRRk1XEu7Lq1KGTnMQ==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@noble/curves@1.8.2':
-    resolution: {integrity: sha512-vnI7V6lFNe0tLAuJMu+2sX+FcL14TaCWy1qiczg1VwRmPrpQCdq5ESXQMqUc2tluRNf6irBXrWbl1mGN8uaU/g==}
+  '@noble/curves@1.9.2':
+    resolution: {integrity: sha512-HxngEd2XUcg9xi20JkwlLCtYwfoFw4JGkuZpT+WlsPD4gB/cxkvTD8fSsoAnphGZhFdZYKeQIPCuFlWPm1uE0g==}
     engines: {node: ^14.21.3 || >=16}
 
   '@noble/hashes@1.3.2':
@@ -1000,8 +1014,8 @@ packages:
     resolution: {integrity: sha512-B8XBPsn4vT/KJAGqDzbwztd+6Yte3P4V7iafm24bxgDe/mlRuK6xmWPuCNrKt2vDafZ8MfJLlchDG/vYafQEjQ==}
     engines: {node: ^14.21.3 || >=16}
 
-  '@noble/hashes@1.7.2':
-    resolution: {integrity: sha512-biZ0NUSxyjLLqo6KxEJ1b+C2NAx0wtDoFvCaXHGgUkeHzf3Xc1xKumFKREuT7f7DARNZ/slvYUwFG6B0f2b6hQ==}
+  '@noble/hashes@1.8.0':
+    resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -1146,17 +1160,26 @@ packages:
   '@scure/base@1.2.4':
     resolution: {integrity: sha512-5Yy9czTO47mqz+/J8GM6GIId4umdCk1wc1q8rKERQulIoc8VP9pzDcghv10Tl2E7R96ZUx/PhND3ESYUQX8NuQ==}
 
+  '@scure/base@1.2.6':
+    resolution: {integrity: sha512-g/nm5FgUa//MCj1gV09zTJTaM6KBAHqLN907YVQqf7zC49+DcO4B1so4ZX07Ef10Twr6nuqYEH9GEggFXA4Fmg==}
+
   '@scure/bip32@1.4.0':
     resolution: {integrity: sha512-sVUpc0Vq3tXCkDGYVWGIZTRfnvu8LoTDaev7vbwh0omSvVORONr960MQWdKqJDCReIEmTj3PAr73O3aoxz7OPg==}
 
   '@scure/bip32@1.6.2':
     resolution: {integrity: sha512-t96EPDMbtGgtb7onKKqxRLfE5g05k7uHnHRM2xdE6BP/ZmxaLtPek4J4KfVn/90IQNrU1IOAqMgiDtUdtbe3nw==}
 
+  '@scure/bip32@1.7.0':
+    resolution: {integrity: sha512-E4FFX/N3f4B80AKWp5dP6ow+flD1LQZo/w8UnLGYZO674jS6YnYeepycOOksv+vLPSpgN35wgKgy+ybfTb2SMw==}
+
   '@scure/bip39@1.3.0':
     resolution: {integrity: sha512-disdg7gHuTDZtY+ZdkmLpPCk7fxZSu3gBiEGuoC1XYxv9cGx3Z6cpTggCgW6odSOOIXCiDjuGejW+aJKCY/pIQ==}
 
   '@scure/bip39@1.5.4':
     resolution: {integrity: sha512-TFM4ni0vKvCfBpohoh+/lY05i9gRbSwXWngAsF4CABQxoaOHijxuaZ2R6cStDQ5CHtHO9aGJTr4ksVJASRRyMA==}
+
+  '@scure/bip39@1.6.0':
+    resolution: {integrity: sha512-+lF0BbLiJNwVlev4eKelw1WWLaiKXw7sSl8T6FvBlWkdX+94aGJ4o8XjUdlyhTCjd8c+B3KT3JfS8P0bLRNU6A==}
 
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
@@ -1805,11 +1828,14 @@ packages:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
     engines: {node: '>= 0.4'}
 
+  axios@1.10.0:
+    resolution: {integrity: sha512-/1xYAC4MP/HEG+3duIhFr4ZQXR4sQXOIe+o6sdqzeykGLx6Upp/1p8MHqhINOvGeP7xyNHe7tsiJByc4SSVUxw==}
+
   axios@1.7.9:
     resolution: {integrity: sha512-LhLcE7Hbiryz8oMDdDptSrWowmB4Bl6RCt6sIJKpRB4XtVf0iEgewX3au/pJqm+Py1kCASkb/FFKjxQaLtxJvw==}
 
-  axios@1.8.4:
-    resolution: {integrity: sha512-eBSYY4Y68NNlHbHBMdeDmKNtDgXWhQsJcGqzO3iLUM0GraQFSS9cVgPX5I9b3lbdFKyYoAEGAZF1DwhTaljNAw==}
+  axios@1.8.3:
+    resolution: {integrity: sha512-iP4DebzoNlP/YN2dpwCgb8zoCmhtkajzS48JvwmkSkXvPI3DHc7m+XYL5tGnSlJtR6nImXZmdCuN5aP8dh1d8A==}
 
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
@@ -1868,8 +1894,8 @@ packages:
   bignumber.js@9.1.2:
     resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
 
-  bignumber.js@9.2.1:
-    resolution: {integrity: sha512-+NzaKgOUvInq9TIUZ1+DRspzf/HApkCwD4btfuasFTdrfnOxqx853TgDpMolp+uv4RpRp7bPcEU2zKr9+fRmyw==}
+  bignumber.js@9.3.0:
+    resolution: {integrity: sha512-EM7aMFTXbptt/wZdMlBv2t8IViwQL+h6SLHosp8Yf0dqJMTnY6iL32opnAB6kAdL0SZPuvcAzFr31o0c/R3/RA==}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -1883,6 +1909,9 @@ packages:
 
   bn.js@5.2.1:
     resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
+
+  bn.js@5.2.2:
+    resolution: {integrity: sha512-v2YAxEmKaBLahNwE1mjp4WON6huMNeuDvagFZW+ASCuA/ku0bXR9hSMw0XpiqMoA3+rmnyck/tPRSFQkoC9Cuw==}
 
   body-parser@1.20.3:
     resolution: {integrity: sha512-7rAxByjUMqQ3/bHJy7D6OGXvx/MMc4IqBn/X0fcM1QUcAItpZrBEYhWGem+tzXH90c+G01ypMcYJBO9Y30203g==}
@@ -2830,8 +2859,8 @@ packages:
     resolution: {integrity: sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==}
     engines: {node: '>= 6'}
 
-  form-data@4.0.2:
-    resolution: {integrity: sha512-hGfm/slu0ZabnNt4oaRZ6uREyfCj6P4fT/n6A1rGV+Z0VdGXjfOhVUpkn6qVQONHGIFwmveGXyDs75+nr6FM8w==}
+  form-data@4.0.3:
+    resolution: {integrity: sha512-qsITQPfmvMOSAdeyZ+12I1c+CKSstAFAwu+97zrnWAbIr5u8wfsExUzCesVLC8NgHuRUqNN4Zy6UPWUTRGslcA==}
     engines: {node: '>= 6'}
 
   formdata-polyfill@4.0.10:
@@ -3006,6 +3035,12 @@ packages:
     peerDependencies:
       typescript: ^5.0.0
 
+  gql.tada@1.8.11:
+    resolution: {integrity: sha512-b94SV2ki1yZWm/MGzWIaWxuPJUMAYjlQllwoD9b8/GCVXKax1HS9xPfLq/p47UmAnUY3X8qDF0JdMEIr0EKmOA==}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+
   graceful-fs@4.2.10:
     resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
 
@@ -3017,6 +3052,10 @@ packages:
 
   graphql@16.10.0:
     resolution: {integrity: sha512-AjqGKbDGUFRKIRCP9tCKiIGHyriz2oHEbPIbEtcSLSs4YjReZOIPQQWek4+6hjw62H9QShXHyaGivGiYVLeYFQ==}
+    engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
+
+  graphql@16.11.0:
+    resolution: {integrity: sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   gtoken@7.1.0:
@@ -3865,6 +3904,7 @@ packages:
   multer@1.4.4-lts.1:
     resolution: {integrity: sha512-WeSGziVj6+Z2/MwQo3GvqzgR+9Uc+qt8SwHKh3gvNPiISKfsMfG4SvCOFYlxxgkXt7yIV2i1yczehm0EOKIxIg==}
     engines: {node: '>= 6.0.0'}
+    deprecated: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
 
   mute-stream@0.0.8:
     resolution: {integrity: sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA==}
@@ -4530,6 +4570,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.7.2:
+    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@0.19.0:
     resolution: {integrity: sha512-dW41u5VfLXu8SJh5bwRmyYUbAoSB3c9uQh6L8h/KtsFREPWpbX1lrljJo186Jc4nmci/sGUZ9a0a0J2zgfq2hw==}
     engines: {node: '>= 0.8.0'}
@@ -4772,6 +4817,7 @@ packages:
   supertest@6.3.4:
     resolution: {integrity: sha512-erY3HFDG0dPnhw4U+udPfrzXa4xhSG+n4rxfRuZWCUvjFWwKl+OxWf/7zk50s84/fAAs7vf5QAb9uRa0cCykxw==}
     engines: {node: '>=6.4.0'}
+    deprecated: Please upgrade to supertest v7.1.3+, see release notes at https://github.com/forwardemail/supertest/releases/tag/v7.1.3 - maintenance is supported by Forward Email @ https://forwardemail.net
 
   supports-color@5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}
@@ -4907,8 +4953,8 @@ packages:
   tronweb@6.0.1:
     resolution: {integrity: sha512-/WR4g9s21JAMdKS/s6yaQwrLVQTwSiLyOa8SAO2cAvASDfXJR8cFgsukPpHpyrkiHweC05PukSavshbIhB0cPw==}
 
-  tronweb@6.0.2:
-    resolution: {integrity: sha512-I8MfenbmGTbDYhr/d/SMH1QGMv2ISHro23hL8TGoDjt2oYMcekFX76rjnEBdfe/P/roqwrZs1nGRdeftn3iZQw==}
+  tronweb@6.0.3:
+    resolution: {integrity: sha512-5FKHuGiSqleQ2ASxio7h9URsJ5w8nCjfI0hZawTWefbgeVM1r0sZ7qfGMWl3xjKTLvILrnocwB97TQYBnL0Faw==}
 
   ts-api-utils@2.0.0:
     resolution: {integrity: sha512-xCt/TOAc+EOHS1XPnijD3/yzpH6qg2xppZO1YDqGoVsNXfQfzHpOdNuXwrwOU8u4ITXJyDCTyt8w5g1sZv9ynQ==}
@@ -5146,10 +5192,6 @@ packages:
 
   validator@13.12.0:
     resolution: {integrity: sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==}
-    engines: {node: '>= 0.10'}
-
-  validator@13.15.0:
-    resolution: {integrity: sha512-36B2ryl4+oL5QxZ3AzD0t5SsMNGvTtQHpjgFO5tbNxfXbMFkY822ktCDe1MnlqV3301QQI9SLHDNJokDI+Z9pA==}
     engines: {node: '>= 0.10'}
 
   vary@1.1.2:
@@ -5414,17 +5456,31 @@ snapshots:
     optionalDependencies:
       graphql: 16.10.0
 
+  '@0no-co/graphql.web@1.1.1(graphql@16.11.0)':
+    optionalDependencies:
+      graphql: 16.11.0
+
+  '@0no-co/graphql.web@1.1.2(graphql@16.11.0)':
+    optionalDependencies:
+      graphql: 16.11.0
+
   '@0no-co/graphqlsp@1.12.16(graphql@16.10.0)(typescript@5.7.3)':
     dependencies:
       '@gql.tada/internal': 1.0.8(graphql@16.10.0)(typescript@5.7.3)
       graphql: 16.10.0
       typescript: 5.7.3
 
+  '@0no-co/graphqlsp@1.14.0(graphql@16.11.0)(typescript@5.7.3)':
+    dependencies:
+      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.7.3)
+      graphql: 16.11.0
+      typescript: 5.7.3
+
   '@adraffy/ens-normalize@1.10.1': {}
 
   '@adraffy/ens-normalize@1.11.0': {}
 
-  '@allbridge/bridge-core-sdk@3.21.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
+  '@allbridge/bridge-core-sdk@3.23.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@mysten/sui': 1.18.0(typescript@5.7.3)
       '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -5453,7 +5509,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@allbridge/bridge-core-sdk@3.22.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)':
+  '@allbridge/bridge-core-sdk@3.23.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)':
     dependencies:
       '@mysten/sui': 1.18.0(typescript@5.7.3)
       '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -5461,14 +5517,15 @@ snapshots:
       '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@stellar/stellar-sdk': 13.1.0
       assert: 2.1.0
-      axios: 1.8.4
+      axios: 1.10.0
       big.js: 6.2.2
-      bn.js: 5.2.1
+      bn.js: 5.2.2
       querystring: 0.2.1
       randombytes: 2.1.0
       timed-cache: 2.0.0
-      tronweb: 6.0.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      tronweb: 6.0.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       web3: 4.16.0(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
+      web3-eth-abi: 4.4.1(typescript@5.7.3)(zod@3.24.1)
       web3-eth-contract: 4.7.2(bufferutil@4.0.9)(typescript@5.7.3)(utf-8-validate@5.0.10)(zod@3.24.1)
       web3-types: 1.10.0
     transitivePeerDependencies:
@@ -5693,11 +5750,11 @@ snapshots:
       '@babel/core': 7.26.7
       '@babel/helper-plugin-utils': 7.26.5
 
-  '@babel/runtime@7.26.7':
+  '@babel/runtime@7.26.10':
     dependencies:
       regenerator-runtime: 0.14.1
 
-  '@babel/runtime@7.27.0':
+  '@babel/runtime@7.26.7':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -5855,15 +5912,32 @@ snapshots:
       graphql: 16.10.0
       typescript: 5.7.3
 
+  '@gql.tada/cli-utils@1.6.3(@0no-co/graphqlsp@1.14.0(graphql@16.11.0)(typescript@5.7.3))(graphql@16.11.0)(typescript@5.7.3)':
+    dependencies:
+      '@0no-co/graphqlsp': 1.14.0(graphql@16.11.0)(typescript@5.7.3)
+      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.7.3)
+      graphql: 16.11.0
+      typescript: 5.7.3
+
   '@gql.tada/internal@1.0.8(graphql@16.10.0)(typescript@5.7.3)':
     dependencies:
       '@0no-co/graphql.web': 1.1.1(graphql@16.10.0)
       graphql: 16.10.0
       typescript: 5.7.3
 
+  '@gql.tada/internal@1.0.8(graphql@16.11.0)(typescript@5.7.3)':
+    dependencies:
+      '@0no-co/graphql.web': 1.1.1(graphql@16.11.0)
+      graphql: 16.11.0
+      typescript: 5.7.3
+
   '@graphql-typed-document-node/core@3.2.0(graphql@16.10.0)':
     dependencies:
       graphql: 16.10.0
+
+  '@graphql-typed-document-node/core@3.2.0(graphql@16.11.0)':
+    dependencies:
+      graphql: 16.11.0
 
   '@grpc/grpc-js@1.12.5':
     dependencies:
@@ -6281,17 +6355,17 @@ snapshots:
 
   '@mysten/sui@1.18.0(typescript@5.7.3)':
     dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.10.0)
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.11.0)
       '@mysten/bcs': 1.2.0
-      '@noble/curves': 1.8.2
-      '@noble/hashes': 1.7.2
-      '@scure/bip32': 1.6.2
-      '@scure/bip39': 1.5.4
+      '@noble/curves': 1.9.2
+      '@noble/hashes': 1.8.0
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
       '@simplewebauthn/typescript-types': 7.4.0
       '@suchipi/femver': 1.0.0
       bech32: 2.0.0
-      gql.tada: 1.8.10(graphql@16.10.0)(typescript@5.7.3)
-      graphql: 16.10.0
+      gql.tada: 1.8.11(graphql@16.11.0)(typescript@5.7.3)
+      graphql: 16.11.0
       jose: 5.10.0
       poseidon-lite: 0.2.1
       valibot: 0.36.0
@@ -6450,9 +6524,9 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.1
 
-  '@noble/curves@1.8.2':
+  '@noble/curves@1.9.2':
     dependencies:
-      '@noble/hashes': 1.7.2
+      '@noble/hashes': 1.8.0
 
   '@noble/hashes@1.3.2': {}
 
@@ -6460,7 +6534,7 @@ snapshots:
 
   '@noble/hashes@1.7.1': {}
 
-  '@noble/hashes@1.7.2': {}
+  '@noble/hashes@1.8.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -6567,7 +6641,7 @@ snapshots:
       '@project-serum/borsh': 0.2.5(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       base64-js: 1.5.1
-      bn.js: 5.2.1
+      bn.js: 5.2.2
       bs58: 4.0.1
       buffer-layout: 1.2.2
       camelcase: 5.3.1
@@ -6587,7 +6661,7 @@ snapshots:
   '@project-serum/borsh@0.2.5(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      bn.js: 5.2.1
+      bn.js: 5.2.2
       buffer-layout: 1.2.2
 
   '@protobufjs/aspromise@1.1.2': {}
@@ -6619,6 +6693,8 @@ snapshots:
 
   '@scure/base@1.2.4': {}
 
+  '@scure/base@1.2.6': {}
+
   '@scure/bip32@1.4.0':
     dependencies:
       '@noble/curves': 1.4.2
@@ -6631,6 +6707,12 @@ snapshots:
       '@noble/hashes': 1.7.1
       '@scure/base': 1.2.4
 
+  '@scure/bip32@1.7.0':
+    dependencies:
+      '@noble/curves': 1.9.2
+      '@noble/hashes': 1.8.0
+      '@scure/base': 1.2.6
+
   '@scure/bip39@1.3.0':
     dependencies:
       '@noble/hashes': 1.4.0
@@ -6640,6 +6722,11 @@ snapshots:
     dependencies:
       '@noble/hashes': 1.7.1
       '@scure/base': 1.2.4
+
+  '@scure/bip39@1.6.0':
+    dependencies:
+      '@noble/hashes': 1.8.0
+      '@scure/base': 1.2.6
 
   '@sec-ant/readable-stream@0.4.1': {}
 
@@ -6795,7 +6882,7 @@ snapshots:
       '@solana/buffer-layout': 4.0.1
       '@solana/web3.js': 1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       bigint-buffer: 1.1.5
-      bignumber.js: 9.2.1
+      bignumber.js: 9.3.0
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -7548,6 +7635,14 @@ snapshots:
     dependencies:
       possible-typed-array-names: 1.0.0
 
+  axios@1.10.0:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.3
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
+
   axios@1.7.9:
     dependencies:
       follow-redirects: 1.15.9
@@ -7556,10 +7651,10 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  axios@1.8.4:
+  axios@1.8.3:
     dependencies:
       follow-redirects: 1.15.9
-      form-data: 4.0.2
+      form-data: 4.0.3
       proxy-from-env: 1.1.0
     transitivePeerDependencies:
       - debug
@@ -7643,7 +7738,7 @@ snapshots:
 
   bignumber.js@9.1.2: {}
 
-  bignumber.js@9.2.1: {}
+  bignumber.js@9.3.0: {}
 
   binary-extensions@2.3.0: {}
 
@@ -7658,6 +7753,8 @@ snapshots:
       readable-stream: 3.6.2
 
   bn.js@5.2.1: {}
+
+  bn.js@5.2.2: {}
 
   body-parser@1.20.3:
     dependencies:
@@ -8755,11 +8852,12 @@ snapshots:
       combined-stream: 1.0.8
       mime-types: 2.1.35
 
-  form-data@4.0.2:
+  form-data@4.0.3:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
+      hasown: 2.0.2
       mime-types: 2.1.35
 
   formdata-polyfill@4.0.10:
@@ -8998,6 +9096,18 @@ snapshots:
       - '@gql.tada/vue-support'
       - graphql
 
+  gql.tada@1.8.11(graphql@16.11.0)(typescript@5.7.3):
+    dependencies:
+      '@0no-co/graphql.web': 1.1.2(graphql@16.11.0)
+      '@0no-co/graphqlsp': 1.14.0(graphql@16.11.0)(typescript@5.7.3)
+      '@gql.tada/cli-utils': 1.6.3(@0no-co/graphqlsp@1.14.0(graphql@16.11.0)(typescript@5.7.3))(graphql@16.11.0)(typescript@5.7.3)
+      '@gql.tada/internal': 1.0.8(graphql@16.11.0)(typescript@5.7.3)
+      typescript: 5.7.3
+    transitivePeerDependencies:
+      - '@gql.tada/svelte-support'
+      - '@gql.tada/vue-support'
+      - graphql
+
   graceful-fs@4.2.10: {}
 
   graceful-fs@4.2.11: {}
@@ -9005,6 +9115,8 @@ snapshots:
   graphemer@1.4.0: {}
 
   graphql@16.10.0: {}
+
+  graphql@16.11.0: {}
 
   gtoken@7.1.0:
     dependencies:
@@ -9398,7 +9510,7 @@ snapshots:
       '@babel/parser': 7.26.7
       '@istanbuljs/schema': 0.1.3
       istanbul-lib-coverage: 3.2.2
-      semver: 7.7.1
+      semver: 7.7.2
     transitivePeerDependencies:
       - supports-color
 
@@ -9792,7 +9904,7 @@ snapshots:
 
   json-bigint@1.0.0:
     dependencies:
-      bignumber.js: 9.2.1
+      bignumber.js: 9.3.0
 
   json-buffer@3.0.1: {}
 
@@ -9932,7 +10044,7 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.7.1
+      semver: 7.7.2
 
   make-error@1.3.6: {}
 
@@ -10651,6 +10763,8 @@ snapshots:
 
   semver@7.7.1: {}
 
+  semver@7.7.2: {}
+
   send@0.19.0:
     dependencies:
       debug: 2.6.9
@@ -11078,17 +11192,17 @@ snapshots:
       - debug
       - utf-8-validate
 
-  tronweb@6.0.2(bufferutil@4.0.9)(utf-8-validate@5.0.10):
+  tronweb@6.0.3(bufferutil@4.0.9)(utf-8-validate@5.0.10):
     dependencies:
-      '@babel/runtime': 7.27.0
-      axios: 1.8.4
-      bignumber.js: 9.2.1
+      '@babel/runtime': 7.26.10
+      axios: 1.8.3
+      bignumber.js: 9.1.2
       ethereum-cryptography: 2.2.1
       ethers: 6.13.5(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      eventemitter3: 3.1.2
+      eventemitter3: 5.0.1
       google-protobuf: 3.21.4
-      semver: 5.7.2
-      validator: 13.15.0
+      semver: 7.7.1
+      validator: 13.12.0
     transitivePeerDependencies:
       - bufferutil
       - debug
@@ -11323,8 +11437,6 @@ snapshots:
       spdx-expression-parse: 3.0.1
 
   validator@13.12.0: {}
-
-  validator@13.15.0: {}
 
   vary@1.1.2: {}
 

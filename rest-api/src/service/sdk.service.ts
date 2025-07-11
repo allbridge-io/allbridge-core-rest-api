@@ -22,6 +22,7 @@ import {
   PoolInfo,
   RawBridgeSolanaTransaction,
   RawPoolSolanaTransaction,
+  RawSuiTransaction,
   RawTransaction,
   SendParams,
   SwapParams,
@@ -34,7 +35,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
 import { Big } from 'big.js';
 import { ConfigService } from './config.service';
-import { httpException } from 'src/error/errors';
 
 export enum SolanaTxFeeParamsMethod {
   AUTO = 'AUTO',
@@ -453,7 +453,7 @@ export class SDKService {
     return this.sdk.getTransferStatus(chainSymbol, txId);
   }
 
-  async getTokenByAddress(tokenAddress: string) {
+  async getTokenByAddress(tokenAddress: string): Promise<TokenWithChainDetails | undefined> {
     const tokens = await this.getTokens();
     return tokens.find(
       (token) =>
@@ -465,5 +465,9 @@ export class SDKService {
   async getAllTokensAddresses(): Promise<string[]> {
     const tokens = await this.getTokens();
     return tokens.map((token) => token.tokenAddress);
+  }
+
+  async mergeSuiTransactions(bridgeTransaction: RawSuiTransaction, anotherTransaction: RawSuiTransaction): Promise<RawSuiTransaction> {
+    return this.sdk.utils.sui.merge(bridgeTransaction, anotherTransaction);
   }
 }
