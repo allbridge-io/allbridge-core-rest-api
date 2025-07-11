@@ -1,3 +1,10 @@
+# [3.23.0](https://github.com/allbridge-public/allbridge-core-rest-api/compare/v3.22.0...v3.23.0) (2025-07-11)
+
+
+### Features
+
+* SDK version update 3.23.0 ([d989491](https://github.com/allbridge-public/allbridge-core-rest-api/commit/d9894913c7dd170edf1fdceea739456f1510a56c))
+
 # [3.22.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.21.1...v3.22.0) (2025-04-17)
 
 
