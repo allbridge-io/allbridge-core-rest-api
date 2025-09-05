@@ -1,3 +1,16 @@
+# [3.23.0](https://github.com/allbridge-public/allbridge-core-rest-api/compare/v3.22.0...v3.23.0) (2025-09-05)
+
+
+### Features
+
+* actualise pnpm-lock.yaml file ([12ec87c](https://github.com/allbridge-public/allbridge-core-rest-api/commit/12ec87c28d3718ee9df11f5fe5cefbcfaba598d9))
+* actualise SDK version 3.24.0 ([e73d09d](https://github.com/allbridge-public/allbridge-core-rest-api/commit/e73d09d15e9cbfe75436b74749b4487c6d1cf2b5))
+* actualize pnpm-lock.yaml file ([f4084f3](https://github.com/allbridge-public/allbridge-core-rest-api/commit/f4084f31f78b36837191a5ce9d665f28a5c0d637))
+* actualize pnpm-lock.yaml file ([fb67079](https://github.com/allbridge-public/allbridge-core-rest-api/commit/fb67079954d484824e6d1d70e9b2a386f4e53717))
+* SDK version update 3.23.0 ([d989491](https://github.com/allbridge-public/allbridge-core-rest-api/commit/d9894913c7dd170edf1fdceea739456f1510a56c))
+* update package version to 3.24.0 ([1975b3d](https://github.com/allbridge-public/allbridge-core-rest-api/commit/1975b3da9be3d1156aee2855d9844016d6538ea4))
+* update pnpm commands to filter for rest-api ([a136ddc](https://github.com/allbridge-public/allbridge-core-rest-api/commit/a136ddcfa3ed371d96c76e213c8517503f654412))
+
 # [3.22.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.21.1...v3.22.0) (2025-04-17)
 
 
