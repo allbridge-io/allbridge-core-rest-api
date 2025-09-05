@@ -22,7 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@allbridge/bridge-core-sdk": "latest",
+    "@allbridge/bridge-core-sdk": "3.24.0",
     "@allbridge/logger": "latest",
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
