@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm --filter rest-api install
 
       - name: Get Docker version
         run: |
@@ -51,10 +51,10 @@ jobs:
           echo "VERSION=$version" >> $GITHUB_ENV
 
       - name: Build
-        run: pnpm run build
+        run: pnpm --filter rest-api build
 
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ env.VERSION }}
-        run: pnpm run semantic-release
+        run: pnpm --filter rest-api semantic-release
