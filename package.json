@@ -1,5 +1,6 @@
 {
   "name": "workspace-root",
+  "version": "3.24.0",
   "private": true,
   "pnpm": {
     "shared-workspace-lockfile": true,
