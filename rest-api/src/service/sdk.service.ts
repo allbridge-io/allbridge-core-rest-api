@@ -466,8 +466,4 @@ export class SDKService {
     const tokens = await this.getTokens();
     return tokens.map((token) => token.tokenAddress);
   }
-
-  async mergeSuiTransactions(bridgeTransaction: RawSuiTransaction, anotherTransaction: RawSuiTransaction): Promise<RawSuiTransaction> {
-    return this.sdk.utils.sui.merge(bridgeTransaction, anotherTransaction);
-  }
 }

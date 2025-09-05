@@ -58,6 +58,9 @@ The Allbridge Core REST API supports the following networks:
 - Celo (CEL)
 - Solana (SOL)
 - Stellar (STLR) & Soroban (SRB)
+- Sui (SUI)
+- Sonic (SNC)
+- Unichain (UNI)
 
 ### Environment variables
 
@@ -123,6 +126,14 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://sui-rpc.publicnode.com`
   - `https://sui-mainnet-endpoint.blockvision.org`
   - ...
+- `SNC_NODE_URL` - The JSON RPC URL of the Sonic node. For example:
+  - `https://sonic-rpc.publicnode.com:443`
+  - `https://rpc.soniclabs.com`
+  - ...
+- `UNI_NODE_URL` - The JSON RPC URL of the Unichain node. For example:
+  - `https://unichain-rpc.publicnode.com`
+  - `https://unichain.therpc.io`
+  - ...
 - `HEADERS` - Headers for the API requests. For example:
   - `{"Authorization": "Bearer YOUR-TOKEN"}`
 - `TRON_JSON_RPC` - The JSON RPC URL of the Tron node. For example:
@@ -151,6 +162,8 @@ docker run -p 3000:3000 \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
+    -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
+    -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
     -d allbridge/io.allbridge.rest-api:latest    
 ```
 or use environment variables from the `.env` file:
@@ -176,6 +189,8 @@ docker run -p 3000:3000 \
     -e SRB_NODE_URL="...soroban rpc node..." \
     -e STLR_NODE_URL="https://horizon.stellar.org" \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
+    -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
+    -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
     -d allbridge-core-rest-api 
 ```
 ### Host on Digital Ocean

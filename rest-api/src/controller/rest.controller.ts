@@ -1223,35 +1223,6 @@ export class RestController {
   }
 
   /**
-   * Merge SUI bridge transactions into a single transaction.
-   */
-  @Response<HttpExceptionBody>(400, 'Bad request')
-  @Get('/bridge/sui/merge')
-  @Tags('Transfers')
-  async mergeBridgeSuiTransactions(
-    /**
-     * Bridge transaction
-     * The transaction to be merged with other transactions.<br/>
-     * <i><u>Required.</u></i><br/>
-     * The transaction should be a valid SUI transaction JSON stringified object.<br/>
-     */
-    @Query('tx') tx: RawSuiTransaction,
-    /**
-     * Another transaction to merge with the main transaction.<br/>
-     *
-     * <i><u>Required.</u></i><br/>
-     * The transaction should be a valid SUI transaction JSON stringified object.<br/>
-     */
-    @Query('otherTx') otherTx: RawSuiTransaction,
-  ): Promise<RawSuiTransaction> {
-    try {
-      return await this.sdkService.mergeSuiTransactions(tx, otherTx);
-    } catch (e) {
-      httpException(e);
-    }
-  }
-
-  /**
    * Creates a Raw Transaction for depositing tokens into a liquidity pool.
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
