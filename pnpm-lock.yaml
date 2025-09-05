@@ -136,8 +136,8 @@ importers:
   rest-api:
     dependencies:
       '@allbridge/bridge-core-sdk':
-        specifier: latest
-        version: 3.25.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: 3.24.0
+        version: 3.24.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@allbridge/logger':
         specifier: latest
         version: 2.4.1(@nestjs/common@11.1.6(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.2.2)(rxjs@7.8.2))
@@ -310,8 +310,8 @@ packages:
     resolution: {integrity: sha512-up0Kssu6h6NpC/pss15bqLun6Dphtp2RgQ69DgGEhMKORn0518WczMXpDZl44t4J7C+oXH9gJqj2JEKVll2ujg==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
-  '@allbridge/bridge-core-sdk@3.25.0':
-    resolution: {integrity: sha512-vQNjZzIv2DIrPX90oCKN1vY9YC/D+lQwAOvARXllrAOCgtKBM5DRffFLsnO3Y2zkpfqZ/ao28/YukXsxYuLnrQ==}
+  '@allbridge/bridge-core-sdk@3.24.0':
+    resolution: {integrity: sha512-xlAsRizWi5VDgMiXAVplbs8ZfeQEjm9dmWLEGqIhdTZw/yKdEys2XShHCwvPqZyWvO+jCdMi3mkmLtBjmunHhQ==}
     engines: {node: ^22.4.0 || >= 20, npm: ^10.8.1 || >= 10}
 
   '@allbridge/logger@2.4.1':
@@ -1496,17 +1496,9 @@ packages:
     resolution: {integrity: sha512-90EArG+eCCEzDGj3OJNoCtwpWDwxjv+rs/RNPhvg4bulpjN/CSRj+Ys/SalRcfM4/WRC5/qAfjzmJBAuquWhkA==}
     engines: {node: '>=18.0.0'}
 
-  '@stellar/stellar-base@14.0.0':
-    resolution: {integrity: sha512-CM84WNbj1GoB4FSWof4In60I6+m5ja0jbUFGKFmpYxabbgiU3Nmf29k9ZM9rkFwdyApgG2kFrB5WEwwoOHSmVA==}
-    engines: {node: '>=20.0.0'}
-
   '@stellar/stellar-sdk@13.3.0':
     resolution: {integrity: sha512-8+GHcZLp+mdin8gSjcgfb/Lb6sSMYRX6Nf/0LcSJxvjLQR0XHpjGzOiRbYb2jSXo51EnA6kAV5j+4Pzh5OUKUg==}
     engines: {node: '>=18.0.0'}
-
-  '@stellar/stellar-sdk@14.1.1':
-    resolution: {integrity: sha512-yu9E9fENEOgt26U/YaApQUUn6TRRhnEzzEOey3y43Nf4l08nbUmlzWYLMl9lcEzEilM68D3ENnEWxBuPylKLQQ==}
-    engines: {node: '>=20.0.0'}
 
   '@suchipi/femver@1.0.0':
     resolution: {integrity: sha512-bprE8+K5V+DPX7q2e2K57ImqNBdfGHDIWaGI5xHxZoxbKOuQZn4wzPiUxOAHnsUr3w3xHrWXwN7gnG/iIuEMIg==}
@@ -5863,13 +5855,13 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@allbridge/bridge-core-sdk@3.25.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@allbridge/bridge-core-sdk@3.24.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       '@mysten/sui': 1.18.0(typescript@5.9.2)
       '@project-serum/anchor': 0.25.0(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.3.11(@solana/web3.js@1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.2)(utf-8-validate@5.0.10)
       '@solana/web3.js': 1.98.4(bufferutil@4.0.9)(typescript@5.9.2)(utf-8-validate@5.0.10)
-      '@stellar/stellar-sdk': 14.1.1
+      '@stellar/stellar-sdk': 13.3.0
       assert: 2.1.0
       axios: 1.11.0
       big.js: 6.2.2
@@ -7504,31 +7496,9 @@ snapshots:
     optionalDependencies:
       sodium-native: 4.3.3
 
-  '@stellar/stellar-base@14.0.0':
-    dependencies:
-      '@noble/curves': 1.9.7
-      '@stellar/js-xdr': 3.1.2
-      base32.js: 0.1.0
-      bignumber.js: 9.3.1
-      buffer: 6.0.3
-      sha.js: 2.4.12
-
   '@stellar/stellar-sdk@13.3.0':
     dependencies:
       '@stellar/stellar-base': 13.1.0
-      axios: 1.11.0
-      bignumber.js: 9.3.1
-      eventsource: 2.0.2
-      feaxios: 0.0.23
-      randombytes: 2.1.0
-      toml: 3.0.0
-      urijs: 1.19.11
-    transitivePeerDependencies:
-      - debug
-
-  '@stellar/stellar-sdk@14.1.1':
-    dependencies:
-      '@stellar/stellar-base': 14.0.0
       axios: 1.11.0
       bignumber.js: 9.3.1
       eventsource: 2.0.2
