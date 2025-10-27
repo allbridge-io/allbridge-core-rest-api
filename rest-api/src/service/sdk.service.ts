@@ -7,6 +7,7 @@ import {
   ChainSymbol,
   ChainType,
   CheckAllowanceParams,
+  CYDToken,
   ExtraGasMaxLimitResponse,
   GasBalanceResponse,
   GasFeeOptions,
@@ -27,13 +28,30 @@ import {
   SendParams,
   SwapParams,
   TokenWithChainDetails,
+  TokenWithChainDetailsYield,
   TransferStatusResponse,
   UserBalanceInfo,
+  YieldCheckAllowanceParams,
+  YieldGetAllowanceParams,
+  YieldGetEstimatedAmountOnDepositParams,
+  YieldGetWithdrawProportionAmountParams,
+  YieldWithdrawAmount,
 } from '@allbridge/bridge-core-sdk';
+import { YieldBalanceParams } from '@allbridge/bridge-core-sdk/dist/src/services/yield/models';
+import {
+  YieldApproveParams, YieldDepositParams, YieldWithdrawParams,
+} from '@allbridge/bridge-core-sdk/dist/src/services/yield/models/yield.model';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import solanaWeb3, { PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
+import { SuiClient } from '@mysten/sui/client';
+import { Transaction as SuiTransaction } from '@mysten/sui/transactions';
+import { toBase64 } from '@mysten/bcs';
+
 import { Big } from 'big.js';
+import * as console from 'node:console';
+import { sponsorWrapRawTx } from 'src/utils/solana';
 import { ConfigService } from './config.service';
 
 export enum SolanaTxFeeParamsMethod {
@@ -200,15 +218,22 @@ export class SDKService {
   }
 
   // Bridge
-  async send(params: SwapParams | SendParams): Promise<RawTransaction> {
+  async send(params: SwapParams | SendParams, outputFormat: 'json' | 'base64' = 'json'): Promise<RawTransaction> {
     const rawTx = await this.sdk.bridge.rawTxBuilder.send(params);
-    console.log('rawTx', rawTx);
     if (params.sourceToken.chainSymbol === ChainSymbol.SOL) {
       return Buffer.from(
         (
           rawTx as RawBridgeSolanaTransaction | RawPoolSolanaTransaction
         ).serialize(),
       ).toString('hex');
+    }
+    if (params.sourceToken.chainSymbol === ChainSymbol.SUI && outputFormat === 'base64') {
+      const suiClient = new SuiClient({
+        url: ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()),
+      });
+      const tx = SuiTransaction.from(rawTx as RawSuiTransaction);
+      const bytes = await tx.build({ client: suiClient });
+      return toBase64(bytes);
     }
     return rawTx;
   }
@@ -465,5 +490,87 @@ export class SDKService {
   async getAllTokensAddresses(): Promise<string[]> {
     const tokens = await this.getTokens();
     return tokens.map((token) => token.tokenAddress);
+  }
+
+  async getTokenByAddressAndType(
+    tokenAddress: string,
+    type: 'bridge' | 'pool' | 'yield' = 'bridge',
+  ): Promise<TokenWithChainDetails | TokenWithChainDetailsYield | undefined> {
+    if (type === 'yield') {
+      return await this.getCYDTokenByYieldAddress(tokenAddress);
+    }
+    return await this.getTokenByAddress(tokenAddress);
+  }
+
+  // Yield
+  async getCYDTokens(): Promise<CYDToken[]> {
+    return this.sdk.yield.getCYDTokens();
+  }
+
+  async getYieldAllowance(params: YieldGetAllowanceParams): Promise<string> {
+    return this.sdk.yield.getAllowance(params);
+  }
+
+  async checkYieldAllowance(params: YieldCheckAllowanceParams): Promise<boolean> {
+    return this.sdk.yield.checkAllowance(params);
+  }
+
+  async getCYDTokenByYieldAddress(yieldAddress: string): Promise<CYDToken | undefined> {
+    const cydTokens = await this.getCYDTokens();
+    return cydTokens.find(
+      (token) =>
+        token.yieldAddress.toUpperCase() === yieldAddress.toUpperCase()
+    );
+  }
+
+  async getTokenWithYieldByAddress(tokenAddress: string): Promise<TokenWithChainDetailsYield | undefined> {
+    const cydTokens = await this.getCYDTokens();
+    return cydTokens.flatMap(t => t.tokens).find(
+      (token) =>
+        token.tokenAddress.toUpperCase() === tokenAddress.toUpperCase()
+        || token.poolAddress.toUpperCase() === tokenAddress.toUpperCase(),
+    );
+  }
+
+  async getCYDTokenBalance(params: YieldBalanceParams): Promise<string> {
+    return await this.sdk.yield.balanceOf(params);
+  }
+
+  async getYieldEstimatedAmountOnDeposit(params: YieldGetEstimatedAmountOnDepositParams): Promise<string> {
+    return await this.sdk.yield.getEstimatedAmountOnDeposit(params);
+  }
+
+  async getYieldWithdrawAmounts(params: YieldGetWithdrawProportionAmountParams): Promise<YieldWithdrawAmount[]> {
+    return await this.sdk.yield.getWithdrawAmounts(params);
+  }
+
+  async yieldApprove(params: YieldApproveParams): Promise<RawTransaction> {
+    return await this.sdk.yield.rawTxBuilder.approve(params);
+  }
+
+  async yieldDeposit(params: YieldDepositParams): Promise<RawTransaction> {
+    return await this.sdk.yield.rawTxBuilder.deposit(params);
+  }
+
+  async yieldWithdraw(params: YieldWithdrawParams): Promise<RawTransaction> {
+    return await this.sdk.yield.rawTxBuilder.withdraw(params);
+  }
+
+  // Utils
+  async sponsorWrapRawTx(
+    sponsor: string,
+    tx: string,
+    fundLamports?: number
+  ): Promise<RawTransaction> {
+    const urls = ConfigService.getRPCUrls();
+    const connection = new solanaWeb3.Connection(urls["SOL"], "finalized");
+    const rawTxHex = tx.startsWith("0x") ? tx.slice(2) : tx;
+
+    return sponsorWrapRawTx({
+      connection,
+      sponsorPubkey: new PublicKey(sponsor),
+      fundLamports: fundLamports ?? 0,
+      rawTxHex,
+    });
   }
 }

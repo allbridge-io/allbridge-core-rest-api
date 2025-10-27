@@ -3,6 +3,7 @@ import {
   AmountFormatted,
   ChainDetailsMap,
   ChainSymbol,
+  CYDToken,
   EssentialWeb3Transaction,
   ExtraGasMaxLimitResponse,
   FeePaymentMethod,
@@ -11,9 +12,10 @@ import {
   Messenger,
   PendingStatusInfoResponse,
   PoolInfo,
-  RawSuiTransaction,
   TokenWithChainDetails,
+  TokenWithChainDetailsYield,
   TransferStatusResponse,
+  YieldWithdrawAmount,
 } from '@allbridge/bridge-core-sdk';
 import {
   UserBalanceInfoDTO
@@ -77,11 +79,14 @@ export class RestController {
   @Tags('Tokens')
   async getTokens(
     /**
-     * A string value which specifies a set of tokens to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup. Defaults to 'swap'.
+     * A string value which specifies a set of tokens to retrieve. Can be either 'swap' for send or 'pool' for liquidity pools setup or 'yield' for CYD Tokens. Defaults to 'swap'.
      */
-    @Query('type') type?: 'swap' | 'pool',
-  ): Promise<TokenWithChainDetails[]> {
+    @Query('type') type?: 'swap' | 'pool' | 'yield',
+  ): Promise<CYDToken[] | TokenWithChainDetails[]> {
     try {
+      if (type === 'yield') {
+        return this.sdkService.getCYDTokens();
+      }
       return this.sdkService.getTokens(type);
     } catch (e) {
       httpException(e);
@@ -89,11 +94,11 @@ export class RestController {
   }
 
   /**
-   * Creates a Raw Transaction for approving token usage (default: transfer; optional: pool).
+   * Creates a Raw Transaction for approving token usage (default: bridge; optional: pool).
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/raw/approve')
-  @Tags('Pool', 'Transfers', 'Raw Transactions')
+  @Tags('Pool', 'Transfers', 'Raw Transactions', 'Yield')
   async approve(
     @Query('ownerAddress') ownerAddress: string,
     /**
@@ -112,7 +117,7 @@ export class RestController {
      * <b>Default: bridge</b><br/>
      * Allowed values: `bridge`, `pool`
      */
-    @Query('type') type: 'bridge' | 'pool' = 'bridge',
+    @Query('type') type: 'bridge' | 'pool' | 'yield' = 'bridge',
     /**
      * The Messengers for different routes to approve.<br/>
      * <i><u>Optional.</u></i><br/>
@@ -128,12 +133,19 @@ export class RestController {
      */
     @Query('contractAddress') contractAddress?: string,
   ): Promise<RawTransaction> {
-    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    const tokenAddressObj = await this.sdkService.getTokenByAddressAndType(tokenAddress, type);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
 
     try {
+      if (type === 'yield') {
+        return await this.sdkService.yieldApprove({
+          token: tokenAddressObj as TokenWithChainDetailsYield,
+          owner: ownerAddress,
+          amount: amount
+        });
+      }
       if (type === 'pool') {
         return await this.sdkService.poolApprove({
           token: tokenAddressObj,
@@ -325,10 +337,7 @@ export class RestController {
         destinationTokenObj.decimals,
       ).toFixed();
     } catch (ignoreError) {
-      throw new HttpException(
-        'Invalid minimumReceiveAmount',
-        HttpStatus.BAD_REQUEST,
-      );
+      minimumReceiveAmountFloat = "0";
     }
     if (
       !!solanaTxFeeParams &&
@@ -486,6 +495,11 @@ export class RestController {
      * If specified, the approval will be made for the specified contract address.<br/>
      */
     @Query('contractAddress') contractAddress?: string,
+    /**
+     * Output format of the Sui transaction payload.<br/>
+     * <i><u>Optional. This parameter is relevant **only for Sui transactions**.</u></i><br/>
+     */
+    @Query('outputFormat') outputFormat: 'json' | 'base64' = 'json',
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
@@ -1124,7 +1138,7 @@ export class RestController {
    */
   @Response<HttpExceptionBody>(400, 'Bad request')
   @Get('/check/allowance')
-  @Tags('Transfers', 'Tokens', 'Pool')
+  @Tags('Transfers', 'Tokens', 'Pool', 'Yield')
   async checkAllowance(
     /**
      * Amount: Integer value according to the token precision
@@ -1140,7 +1154,7 @@ export class RestController {
      * Allowed values: `bridge`, `pool`<br/>
      * <b>Default: `bridge`</b>
      */
-    @Query('type') type: 'bridge' | 'pool' = 'bridge',
+    @Query('type') type: 'bridge' | 'pool' | 'yield' = 'bridge',
     @Query('feePaymentMethod') feePaymentMethod?: keyof typeof FeePaymentMethod,
     /**
      * The spender contract address for the approval.<br/>
@@ -1150,7 +1164,7 @@ export class RestController {
      */
     @Query('contractAddress') contractAddress?: string,
   ): Promise<boolean> {
-    const tokenAddressObj = await this.sdkService.getTokenByAddress(tokenAddress);
+    const tokenAddressObj = await this.sdkService.getTokenByAddressAndType(tokenAddress, type);
     if (!tokenAddressObj) {
       throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
     }
@@ -1166,6 +1180,14 @@ export class RestController {
         token: tokenAddressObj,
         gasFeePaymentMethod: feePaymentMethodEnum,
       };
+
+      if (type === 'yield') {
+        return await this.sdkService.checkYieldAllowance({
+          owner: ownerAddress,
+          token: tokenAddressObj as TokenWithChainDetailsYield,
+          amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        });
+      }
 
       return type === 'pool'
         ? await this.sdkService.checkPoolAllowance(params)
@@ -1661,6 +1683,312 @@ export class RestController {
         convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
         ownerAddress,
         tokenAddressObj,
+      );
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Returns a list of supported CYD tokens.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/yield/tokens')
+  @Tags('Tokens', 'Yield')
+  async getYieldTokens(): Promise<TokenWithChainDetails[]> {
+    try {
+      return this.sdkService.getCYDTokens();
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Get amount of tokens approved for yield
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/yield/allowance')
+  @Tags('Yield', 'Tokens')
+  async getYieldAllowance(
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+  ): Promise<string> {
+    const tokenAddressObj = await this.sdkService.getTokenWithYieldByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Yield not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getYieldAllowance({
+        owner: ownerAddress,
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Checks if the amount of approved tokens is enough for yield
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/check/yield/allowance')
+  @Tags('Tokens', 'Yield')
+  async checkYieldAllowance(
+    /**
+     * Amount: Integer value according to the token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+  ): Promise<boolean> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenWithYieldByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Yield not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.checkYieldAllowance({
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        owner: ownerAddress,
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Retrieves the balance of a specified yield token for an account.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/yield/balance')
+  @Tags('Tokens', 'Yield')
+  async getYieldTokenBalance(
+    @Query('address') address: string,
+    @Query('token') token: string,
+  ): Promise<{ result: string }> {
+    const tokenObj = await this.sdkService.getCYDTokenByYieldAddress(token);
+    if (!tokenObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return {
+        result: await this.sdkService.getCYDTokenBalance({
+          owner: address,
+          token: tokenObj,
+        }),
+      };
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Calculates the amount of CYD tokens that will be deposited.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/yield/deposit/calculate')
+  @Tags('Yield')
+  async getYieldAmountToBeDeposited(
+    /**
+     * Amount: Integer value according to the source token precision
+     */
+    @Query('amount') amount: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+  ): Promise<string> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenWithYieldByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getYieldEstimatedAmountOnDeposit({
+        amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+        token: tokenAddressObj,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Calculates the amounts of tokens ({@link YieldWithdrawAmount}) will be withdrawn
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/yield/withdrawn/calculate')
+  @Tags('Yield')
+  async getYieldAmountToBeWithdrawn(
+    /**
+     * Amount: Integer value according to the source token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * Yield address on the source chain.
+     */
+    @Query('yieldAddress') yieldAddress: string,
+  ): Promise<YieldWithdrawAmount[]> {
+    const CYDToken =
+      await this.sdkService.getCYDTokenByYieldAddress(yieldAddress);
+    if (!CYDToken) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.getYieldWithdrawAmounts({
+        amount: convertGt0IntAmountToFloat(amount, CYDToken.decimals),
+        owner: ownerAddress,
+        cydToken: CYDToken,
+        });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Creates a Raw Transaction for approving tokens usage by the Yield
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/yield/approve')
+  @Tags('Yield', 'Raw Transactions')
+  async approveYield(
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * Selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+    /**
+     * The integer amount of tokens to approve.<br/>
+     * <i><u>Optional.</u></i><br/>
+     * <b>The maximum amount by default.</b>
+     */
+    @Query('amount') amount?: string,
+  ): Promise<RawTransaction> {
+    const tokenAddressObj = await this.sdkService.getTokenWithYieldByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    try {
+      return await this.sdkService.yieldApprove({
+        token: tokenAddressObj as TokenWithChainDetailsYield,
+        owner: ownerAddress,
+        amount: amount
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Creates a Raw Transaction for depositing tokens to Yield
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/yield/deposit')
+  @Tags('Yield', 'Raw Transactions')
+  async depositYield(
+    /**
+     * Amount: Integer value according to the source token precision
+     */
+    @Query('amount') amount: string,
+    /**
+     * Min Virtual Amount: The Minimum float amount of CYD tokens.
+     */
+    @Query('minVirtualAmount') minVirtualAmount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected token on the source chain.
+     */
+    @Query('tokenAddress') tokenAddress: string,
+  ): Promise<RawTransaction> {
+    const tokenAddressObj =
+      await this.sdkService.getTokenWithYieldByAddress(tokenAddress);
+    if (!tokenAddressObj) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    const params = {
+      amount: convertGt0IntAmountToFloat(amount, tokenAddressObj.decimals),
+      owner: ownerAddress,
+      token: tokenAddressObj,
+      minVirtualAmount: minVirtualAmount,
+    };
+    try {
+      return await this.sdkService.yieldDeposit(params);
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Creates a Raw Transaction for withdrawing tokens from Yield
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/raw/yield/withdraw')
+  @Tags('Yield', 'Raw Transactions')
+  async withdrawYield(
+    /**
+     * Amount: Integer value according to the source token precision
+     */
+    @Query('amount') amount: string,
+    @Query('ownerAddress') ownerAddress: string,
+    /**
+     * selected yield address on the source chain.
+     */
+    @Query('yieldAddress') yieldAddress: string
+  ): Promise<RawTransaction> {
+    const cydToken =
+      await this.sdkService.getCYDTokenByYieldAddress(yieldAddress);
+    if (!cydToken) {
+      throw new HttpException('Token not found', HttpStatus.BAD_REQUEST);
+    }
+    const params = {
+      amount: convertGt0IntAmountToFloat(amount, cydToken.decimals),
+      owner: ownerAddress,
+      token: cydToken,
+    };
+    try {
+      return await this.sdkService.yieldWithdraw(params);
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+  /**
+   * Rewrites a Solana v0 transaction so that `sponsor` becomes the fee payer.
+   * Optionally prepends a SystemProgram.transfer(sponsor -> originalSigner) for `fundLamports`.
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/utils/solana/replace-fee-payer')
+  @Tags('Utils', 'Solana', 'Raw Transactions')
+  async sponsorWrapRawTx(
+    /**
+     * Base58 public key of the sponsor who will pay fees (new fee payer).
+     */
+    @Query('sponsor') sponsor: string,
+
+    /**
+     * Original serialized Solana transaction in hex.
+     */
+    @Query('tx') tx: string,
+
+    /**
+     * Optional lamports to fund the original signer before executing the original instructions.
+     * Integer in lamports.
+     */
+    @Query('fundLamports') fundLamports?: number,
+  ): Promise<RawTransaction> {
+    try {
+      return await this.sdkService.sponsorWrapRawTx(
+        sponsor,
+        tx,
+        fundLamports,
       );
     } catch (e) {
       httpException(e);

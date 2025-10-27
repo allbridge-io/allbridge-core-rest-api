@@ -61,6 +61,7 @@ The Allbridge Core REST API supports the following networks:
 - Sui (SUI)
 - Sonic (SNC)
 - Unichain (UNI)
+- Linea (LIN)
 
 ### Environment variables
 
@@ -134,6 +135,10 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://unichain-rpc.publicnode.com`
   - `https://unichain.therpc.io`
   - ...
+- `LIN_NODE_URL` - The JSON RPC URL of the Linea node. For example:
+  - `https://linea-rpc.publicnode.com`
+  - `https://rpc.linea.build`
+  - ...
 - `HEADERS` - Headers for the API requests. For example:
   - `{"Authorization": "Bearer YOUR-TOKEN"}`
 - `TRON_JSON_RPC` - The JSON RPC URL of the Tron node. For example:
@@ -164,6 +169,7 @@ docker run -p 3000:3000 \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
     -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
     -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
+    -e LIN_NODE_URL="https://linea-rpc.publicnode.com" \
     -d allbridge/io.allbridge.rest-api:latest    
 ```
 or use environment variables from the `.env` file:
@@ -191,6 +197,7 @@ docker run -p 3000:3000 \
     -e SUI_NODE_URL="https://sui-rpc.publicnode.com" \
     -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
     -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
+    -e LIN_NODE_URL="https://linea-rpc.publicnode.com" \
     -d allbridge-core-rest-api 
 ```
 ### Host on Digital Ocean
@@ -271,6 +278,9 @@ After running the docker image, you can access the swagger documentation at `htt
 | `/raw/deposit`         | Creates a raw transaction for depositing tokens into a liquidity pool.                                                            |
 | `/raw/withdraw`        | Creates a raw transaction for withdrawing tokens from a liquidity pool.                                                           |
 | `/raw/claim`           | Creates a raw transaction for claiming rewards from a liquidity pool.                                                             |
+| `/raw/yield/approve`   | Creates a Raw Transaction for approving tokens usage by the Yield.                                                                |
+| `/raw/yield/deposit`   | Creates a Raw Transaction for depositing tokens to Yield.                                                                         |
+| `/raw/yield/withdraw`  | Creates a Raw Transaction for withdrawing tokens from Yield.                                                                      |
 
 ### Tokens
 | **GET Endpoint**             | **Description**                                                                     |
@@ -289,6 +299,10 @@ After running the docker image, you can access the swagger documentation at `htt
 | `/check/pool/allowance`      | Checks if the approved token amount is sufficient for a liquidity pool deposit.     |
 | `/check/stellar/balanceline` | Retrieves Stellar Balance Line information, if available.                           |
 | `/pool/allowance`            | Retrieves the amount of tokens approved for liquidity pool operations.              |
+| `/yield/tokens`              | Returns a list of supported CYD tokens.                                             |
+| `/yield/allowance`           | Get amount of tokens approved for yield.                                            |
+| `/check/yield/allowance`     | Checks if the amount of approved tokens is enough for yield.                        |
+| `/yield/balance`             | Retrieves the balance of a specified yield token for an account.                    |
 
 ### Pools
 | **GET Endpoint**                 | **Description**                                                                                   |
@@ -326,6 +340,19 @@ After running the docker image, you can access the swagger documentation at `htt
 | `/check/allowance`           | Checks if the approved token amount is sufficient for a transfer or pool operation.                                                       |
 | `/check/bridge/allowance`    | Checks if the approved token amount is sufficient for a bridge transfer.                                                                  |
 | `/check/stellar/balanceline` | Retrieves Stellar Balance Line information, if available.                                                                                 |
+
+### Yield
+| **GET Endpoint**             | **Description**                                                    |
+|------------------------------|--------------------------------------------------------------------|
+| `/yield/tokens`              | Returns a list of supported CYD tokens.                            |
+| `/yield/allowance`           | Get amount of tokens approved for yield.                           |
+| `/check/yield/allowance`     | Checks if the amount of approved tokens is enough for yield.       |
+| `/yield/balance`             | Retrieves the balance of a specified yield token for an account.   |
+| `/yield/deposit/calculate`   | Calculates the amount of CYD tokens that will be deposited.        |
+| `/yield/withdrawn/calculate` | Calculates the amounts of tokens that will be withdrawn.           |
+| `/raw/yield/approve`         | Creates a Raw Transaction for approving tokens usage by the Yield. |
+| `/raw/yield/deposit`         | Creates a Raw Transaction for depositing tokens to Yield.          |
+| `/raw/yield/withdraw`        | Creates a Raw Transaction for withdrawing tokens from Yield.       |
 
 ## Troubleshooting
 | **Issue**                    | **Possible Cause**                    | **Solution**                                                                                                                                  |

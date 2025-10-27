@@ -1,6 +1,6 @@
 {
   "name": "rest-api",
-  "version": "3.24.0",
+  "version": "3.26.0",
   "description": "",
   "scripts": {
     "build": "tsoa spec && nest build",
@@ -22,8 +22,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@allbridge/bridge-core-sdk": "3.24.0",
+    "@allbridge/bridge-core-sdk": "3.26.0",
     "@allbridge/logger": "latest",
+    "@mysten/bcs": "latest",
+    "@mysten/sui": "latest",
     "@nestjs/common": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
