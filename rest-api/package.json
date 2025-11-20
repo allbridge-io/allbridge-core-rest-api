@@ -39,6 +39,7 @@
     "class-validator": "latest",
     "dotenv": "catalog:",
     "fast-safe-stringify": "latest",
+    "tronweb": "catalog:",
     "tsoa": "latest",
     "web3-core": "catalog:"
   },

@@ -499,7 +499,7 @@ export class RestController {
      * Output format of the Sui transaction payload.<br/>
      * <i><u>Optional. This parameter is relevant **only for Sui transactions**.</u></i><br/>
      */
-    @Query('outputFormat') outputFormat: 'json' | 'base64' = 'json',
+    @Query('outputFormat') outputFormat: 'json' | 'base64' | 'hex' = 'json',
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
@@ -1993,6 +1993,36 @@ export class RestController {
     } catch (e) {
       httpException(e);
     }
+  }
+
+  /**
+   * Convert SUI raw transaction to base64
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/utils/sui/raw2base64')
+  @Tags('Utils', 'SUI', 'Raw Transactions')
+  async suiRaw2Base64(
+    /**
+     * Raw transaction that should be converted to base64.
+     */
+    @Query('rawTx') rawTx: string
+  ): Promise<RawTransaction> {
+    return this.sdkService.suiRaw2Base64(rawTx);
+  }
+
+  /**
+   * Convert Tron raw transaction to hex
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/utils/tron/raw2hex')
+  @Tags('Utils', 'Tron', 'Raw Transactions')
+  async tronRaw2Hex(
+    /**
+     * Raw transaction that should be converted to hex.
+     */
+    @Query('rawTx') rawTx: string
+  ): Promise<RawTransaction> {
+    return this.sdkService.tronRaw2Hex(rawTx);
   }
 }
 

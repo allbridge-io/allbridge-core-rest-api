@@ -23,7 +23,6 @@ import {
   PoolInfo,
   RawBridgeSolanaTransaction,
   RawPoolSolanaTransaction,
-  RawSuiTransaction,
   RawTransaction,
   SendParams,
   SwapParams,
@@ -43,15 +42,14 @@ import {
 } from '@allbridge/bridge-core-sdk/dist/src/services/yield/models/yield.model';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import solanaWeb3, { PublicKey, VersionedTransaction } from '@solana/web3.js';
+import solanaWeb3, { PublicKey } from '@solana/web3.js';
+import { raw2base64 } from '../utils/sui';
+import { raw2hex } from '../utils/tron';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
-import { SuiClient } from '@mysten/sui/client';
-import { Transaction as SuiTransaction } from '@mysten/sui/transactions';
-import { toBase64 } from '@mysten/bcs';
 
 import { Big } from 'big.js';
 import * as console from 'node:console';
-import { sponsorWrapRawTx } from 'src/utils/solana';
+import { sponsorWrapRawTx } from '../utils/solana';
 import { ConfigService } from './config.service';
 
 export enum SolanaTxFeeParamsMethod {
@@ -218,7 +216,7 @@ export class SDKService {
   }
 
   // Bridge
-  async send(params: SwapParams | SendParams, outputFormat: 'json' | 'base64' = 'json'): Promise<RawTransaction> {
+  async send(params: SwapParams | SendParams, outputFormat: 'json' | 'base64' | 'hex' = 'json'): Promise<RawTransaction> {
     const rawTx = await this.sdk.bridge.rawTxBuilder.send(params);
     if (params.sourceToken.chainSymbol === ChainSymbol.SOL) {
       return Buffer.from(
@@ -228,12 +226,10 @@ export class SDKService {
       ).toString('hex');
     }
     if (params.sourceToken.chainSymbol === ChainSymbol.SUI && outputFormat === 'base64') {
-      const suiClient = new SuiClient({
-        url: ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()),
-      });
-      const tx = SuiTransaction.from(rawTx as RawSuiTransaction);
-      const bytes = await tx.build({ client: suiClient });
-      return toBase64(bytes);
+      return raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
+    }
+    if (params.sourceToken.chainSymbol === ChainSymbol.TRX && outputFormat === 'hex') {
+      return await raw2hex(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.TRX.toString()));
     }
     return rawTx;
   }
@@ -572,5 +568,13 @@ export class SDKService {
       fundLamports: fundLamports ?? 0,
       rawTxHex,
     });
+  }
+
+  async suiRaw2Base64(rawTx: string): Promise<RawTransaction> {
+    return raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
+  }
+
+  async tronRaw2Hex(rawTx: string): Promise<RawTransaction> {
+    return raw2hex(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.TRX.toString()));
   }
 }
