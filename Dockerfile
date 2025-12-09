@@ -1,17 +1,15 @@
-FROM node:22.12-alpine AS build
+FROM node:22-alpine3.23 AS build
 ARG SDK_VERSION=latest
 
-# Install python and build-base for node-gyp
-RUN apk update
-RUN apk upgrade --available --no-cache && sync
-RUN apk add --no-cache python3 make g++ bash openssl
+# Install build dependencies (sorted alphabetically)
+RUN apk update && \
+    apk upgrade --available --no-cache && \
+    apk add --no-cache bash g++ make openssl python3 && \
+    rm -rf /var/cache/apk/*
 
-RUN npm install -g npm@latest
-# Install pnpm globally
-RUN npm install -g pnpm@latest
-
-# Configure pnpm to work with monorepos
-RUN pnpm config set inject-workspace-packages=true
+# Install pnpm globally and configure for monorepos
+RUN npm install -g npm@latest pnpm@latest && \
+    pnpm config set inject-workspace-packages=true
 
 # Set the working directory
 WORKDIR /app
@@ -40,19 +38,23 @@ COPY rest-api/src ./src
 COPY rest-api/*.json ./
 COPY rest-api/pnpm-lock.yaml ./
 
-RUN pnpm audit --fix
 # Build the app
 RUN pnpm --filter rest-api build
 # Install only production dependencies
 RUN pnpm --filter rest-api --prod deploy pruned
 WORKDIR /app/rest-api/pruned
+# Remove devDependencies from package.json to prevent false positives in security scanners
+RUN node -e "const p=require('./package.json'); delete p.devDependencies; require('fs').writeFileSync('package.json', JSON.stringify(p, null, 2));"
 
 # Final stage
-FROM node:22.12-alpine
-RUN apk update
-RUN apk upgrade --available --no-cache && sync
-RUN apk add openssl
-RUN npm install -g npm@latest
+FROM node:22-alpine3.23
+
+# Update and install runtime dependencies in single layer
+RUN apk update && \
+    apk upgrade --available --no-cache && \
+    apk add --no-cache openssl && \
+    rm -rf /var/cache/apk/*
+
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/rest-api/pruned/node_modules ./node_modules

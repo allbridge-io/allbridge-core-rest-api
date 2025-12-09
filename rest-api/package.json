@@ -51,7 +51,9 @@
     "@semantic-release/changelog": "latest",
     "@semantic-release/exec": "latest",
     "@semantic-release/git": "latest",
-    "@semantic-release/github": "latest",
+    "@semantic-release/gitlab": "latest",
+    "@semantic-release/npm": "latest",
+    "conventional-changelog-conventionalcommits": "latest",
     "@types/express": "latest",
     "@types/jest": "latest",
     "@types/supertest": "latest",
@@ -83,7 +85,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "sr",
+    "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

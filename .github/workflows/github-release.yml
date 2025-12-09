@@ -1,0 +1,110 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get tag name
+        id: tag
+        run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      # Fetch release notes from GitLab (primary source of truth)
+      # GitLab releases contain the semantic-release generated changelog
+      - name: Get release notes from GitLab
+        id: notes
+        env:
+          SOURCE_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+          SOURCE_API_URL: ${{ secrets.GITLAB_API_URL }}
+          SOURCE_PROJECT: ${{ secrets.GITLAB_PROJECT_PATH }}
+        run: |
+          # Try to fetch release notes from GitLab
+          CURL_ERR=$(mktemp)
+          if ! RESPONSE=$(curl -sf -H "PRIVATE-TOKEN: $SOURCE_TOKEN" \
+            "$SOURCE_API_URL/projects/$SOURCE_PROJECT/releases/${{ steps.tag.outputs.TAG_NAME }}" 2>"$CURL_ERR"); then
+            echo "::warning::Failed to fetch release notes from GitLab:"
+            cat "$CURL_ERR"
+            RESPONSE="{}"
+          fi
+          rm -f "$CURL_ERR"
+
+          NOTES=$(echo "$RESPONSE" | jq -r '.description // empty')
+
+          if [ -z "$NOTES" ]; then
+            echo "No release notes found from GitLab, will use auto-generated"
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "found=true" >> $GITHUB_OUTPUT
+            # Use heredoc for multiline content (alphanumeric delimiter only)
+            EOF=$(head -c 32 /dev/urandom | base64 | tr -cd 'a-zA-Z0-9' | head -c 20)
+            echo "content<<$EOF" >> $GITHUB_OUTPUT
+            echo "$NOTES" >> $GITHUB_OUTPUT
+            echo "$EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build release body
+        id: body
+        env:
+          TAG: ${{ steps.tag.outputs.TAG_NAME }}
+          GITLAB_NOTES_FOUND: ${{ steps.notes.outputs.found }}
+          GITLAB_NOTES_CONTENT: ${{ steps.notes.outputs.content }}
+        run: |
+          VERSION=${TAG#v}
+
+          # Create release body with links (used as fallback)
+          cat << RELEASE_BODY > release_body.md
+          ## Docker Image
+
+          \`\`\`bash
+          docker pull allbridge/io.allbridge.rest-api:${TAG}
+          \`\`\`
+
+          **Docker Hub:** [allbridge/io.allbridge.rest-api](https://hub.docker.com/r/allbridge/io.allbridge.rest-api/tags?name=${VERSION})
+
+          ## Related Links
+
+          - [SDK npm package](https://www.npmjs.com/package/@allbridge/bridge-core-sdk)
+          - [API Documentation](https://docs.allbridge.io)
+          RELEASE_BODY
+
+          # Set outputs based on whether GitLab notes were found
+          if [ "$GITLAB_NOTES_FOUND" = "true" ]; then
+            # Use GitLab notes directly, no body_path needed
+            echo "use_body_path=false" >> $GITHUB_OUTPUT
+            echo "generate_notes=false" >> $GITHUB_OUTPUT
+          else
+            # Use body_path file and auto-generate notes
+            echo "use_body_path=true" >> $GITHUB_OUTPUT
+            echo "body_file=release_body.md" >> $GITHUB_OUTPUT
+            echo "generate_notes=true" >> $GITHUB_OUTPUT
+          fi
+
+      # Create the GitHub release with one of two sources:
+      # 1. GitLab release notes (if found) - uses 'body' parameter
+      # 2. Auto-generated + Docker Hub links (fallback) - uses 'body_path' + 'generate_release_notes'
+      - name: Create GitHub Release (with GitLab notes)
+        if: steps.notes.outputs.found == 'true'
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          body: ${{ steps.notes.outputs.content }}
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release (auto-generated)
+        if: steps.notes.outputs.found != 'true'
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          body_path: ${{ steps.body.outputs.body_file }}
+          generate_release_notes: true
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

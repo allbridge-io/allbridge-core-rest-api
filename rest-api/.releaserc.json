@@ -1,10 +1,7 @@
 {
   "branches": [
-    "+([0-9])?(.{+([0-9]),x}).x",
-    "main",
     "master",
-    "next",
-    "next-major",
+    "main",
     {
       "name": "beta",
       "prerelease": true
@@ -15,28 +12,44 @@
     }
   ],
   "plugins": [
-    "@semantic-release/commit-analyzer",
-    "@semantic-release/release-notes-generator",
+    ["@semantic-release/commit-analyzer", {
+      "preset": "conventionalcommits",
+      "releaseRules": [
+        {"type": "feat", "release": "minor"},
+        {"type": "fix", "release": "patch"},
+        {"type": "perf", "release": "patch"},
+        {"type": "refactor", "release": "patch"},
+        {"type": "docs", "release": false},
+        {"type": "chore", "release": false},
+        {"type": "style", "release": false},
+        {"type": "test", "release": false},
+        {"type": "ci", "release": false}
+      ]
+    }],
+    ["@semantic-release/release-notes-generator", {
+      "preset": "conventionalcommits",
+      "presetConfig": {
+        "types": [
+          {"type": "feat", "section": "Features"},
+          {"type": "fix", "section": "Bug Fixes"},
+          {"type": "perf", "section": "Performance"},
+          {"type": "refactor", "section": "Refactoring"},
+          {"type": "docs", "section": "Documentation", "hidden": true},
+          {"type": "chore", "hidden": true},
+          {"type": "style", "hidden": true},
+          {"type": "test", "hidden": true},
+          {"type": "ci", "hidden": true}
+        ]
+      }
+    }],
     "@semantic-release/changelog",
-    [
-      "@semantic-release/exec",
-      {
-        "verifyConditions": "node get-docker-version.mjs"
-      }
-    ],
-    [
-      "../.github/plugins/version",
-      {
-        "file": "version.txt"
-      }
-    ],
-    [
-      "@semantic-release/git",
-      {
-        "assets": ["CHANGELOG.md", "package.json"],
-        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}\n\nDocker image: https://hub.docker.com/r/allbridge/io.allbridge.rest-api:${nextRelease.version}"
-      }
-    ],
-    "@semantic-release/github"
+    ["@semantic-release/npm", {
+      "npmPublish": false
+    }],
+    ["@semantic-release/git", {
+      "assets": ["CHANGELOG.md", "package.json"],
+      "message": "chore(release): ${nextRelease.version} [skip ci]\n\nDocker image: https://hub.docker.com/r/allbridge/io.allbridge.rest-api/tags?name=${nextRelease.version}"
+    }],
+    "@semantic-release/gitlab"
   ]
 }
