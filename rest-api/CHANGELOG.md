@@ -1,3 +1,16 @@
+## [3.27.0](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-09)
+
+### Features
+
+* add ts-node dependency to package.json ([ef32a63](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/ef32a6387b81d9f99bcd1857cf02c79394512998))
+* enhance transaction utilities with base64 and hex conversion methods ([f31e5ff](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/f31e5ff8535f814b932cb1771c7266f6bd741c43))
+* update SDK service methods to support async operations and enhance transaction formatting ([cb83c27](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/cb83c27c4452a3bf7d0d40acc90631e9c356e33f))
+
+### Bug Fixes
+
+* **ci:** add missing eslint packages and passWithNoTests flag ([33f85ac](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/33f85aca39cba227b74e5c33b3270e8610b34d1f))
+* **ci:** use separate rules instead of regex with variables ([2e61743](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/2e61743d6a4526cd9f2533c60f024f292462b83b))
+
 # [3.27.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-09)
 
 
