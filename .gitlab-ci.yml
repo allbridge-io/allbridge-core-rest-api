@@ -313,8 +313,10 @@ publish:
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
   needs:
-    - build-amd64
-    - build-arm64
+    - job: build-amd64
+      optional: true
+    - job: build-arm64
+      optional: true
   tags:
     - kubernetes
 
@@ -352,7 +354,8 @@ container_scanning:
       when: never
     - if: $SECURITY_SCAN_LEVEL =~ /^(standard|full)$/ && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
   needs:
-    - publish
+    - job: publish
+      optional: true
   tags:
     - kubernetes
 
@@ -375,6 +378,7 @@ sbom_generation:
   rules:
     - if: $SCAN_SBOM == "true" && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
   needs:
-    - publish
+    - job: publish
+      optional: true
   tags:
     - kubernetes
