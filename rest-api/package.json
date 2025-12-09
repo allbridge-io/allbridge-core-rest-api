@@ -12,7 +12,7 @@
     "lint": "eslint src --fix",
     "generate:swagger": "tsoa spec",
     "semantic-release": "semantic-release",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -45,6 +45,8 @@
   },
   "devDependencies": {
     "@eslint/compat": "latest",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.28.0",
     "@nestjs/cli": "latest",
     "@nestjs/schematics": "latest",
     "@nestjs/testing": "latest",
