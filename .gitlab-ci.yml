@@ -252,42 +252,9 @@ release:
       when: on_success
 
 # STAGE: build
-# Kaniko base template for multi-arch Docker builds
-.kaniko-build:
+# Multi-arch Docker build using buildx with QEMU emulation
+build:
   stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:v1.23.2-debug
-    entrypoint: [""]
-  before_script:
-    - mkdir -p /kaniko/.docker
-    - |
-      echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$(printf '%s:%s' "${DOCKER_HUB_USER}" "${DOCKER_HUB_TOKEN}" | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
-  script:
-    - |
-      /kaniko/executor \
-        --context "${CI_PROJECT_DIR}" \
-        --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-        --destination "${DOCKER_IMAGE}:${CI_COMMIT_TAG}-${ARCH}" \
-        --build-arg SDK_VERSION=${SDK_VERSION} \
-        --custom-platform "linux/${ARCH}" \
-        --cache=true \
-        --cache-repo "${DOCKER_IMAGE}/cache"
-  rules:
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
-
-build-amd64:
-  extends: .kaniko-build
-  variables:
-    ARCH: amd64
-
-build-arm64:
-  extends: .kaniko-build
-  variables:
-    ARCH: arm64
-
-# STAGE: publish
-publish:
-  stage: publish
   image: docker:24
   services:
     - docker:24-dind
@@ -295,17 +262,30 @@ publish:
     DOCKER_TLS_CERTDIR: "/certs"
   before_script:
     - echo "${DOCKER_HUB_TOKEN}" | docker login -u "${DOCKER_HUB_USER}" --password-stdin
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker buildx create --name multiarch --driver docker-container --use
+    - docker buildx inspect --bootstrap
   script:
     - |
-      docker manifest create "${DOCKER_IMAGE}:${CI_COMMIT_TAG}" \
-        "${DOCKER_IMAGE}:${CI_COMMIT_TAG}-amd64" \
-        "${DOCKER_IMAGE}:${CI_COMMIT_TAG}-arm64"
-    - docker manifest push "${DOCKER_IMAGE}:${CI_COMMIT_TAG}"
-    - |
-      docker manifest create "${DOCKER_IMAGE}:latest" \
-        "${DOCKER_IMAGE}:${CI_COMMIT_TAG}-amd64" \
-        "${DOCKER_IMAGE}:${CI_COMMIT_TAG}-arm64"
-    - docker manifest push "${DOCKER_IMAGE}:latest"
+      docker buildx build \
+        --platform linux/amd64,linux/arm64 \
+        --build-arg SDK_VERSION=${SDK_VERSION} \
+        --tag "${DOCKER_IMAGE}:${CI_COMMIT_TAG}" \
+        --tag "${DOCKER_IMAGE}:latest" \
+        --push \
+        .
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+
+# STAGE: publish (placeholder for stage ordering)
+publish:
+  stage: publish
+  image: alpine:latest
+  script:
+    - echo "Multi-arch image already published in build stage"
+    - echo "Image tags:"
+    - echo "  - ${DOCKER_IMAGE}:${CI_COMMIT_TAG}"
+    - echo "  - ${DOCKER_IMAGE}:latest"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
 
