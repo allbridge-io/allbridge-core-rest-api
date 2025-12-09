@@ -67,7 +67,9 @@ lint:
     - pnpm --filter rest-api lint
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
 
 test:
   stage: validate
@@ -86,7 +88,9 @@ test:
     - pnpm --filter rest-api test
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
   allow_failure: true
 
 # STAGE: security
@@ -138,7 +142,9 @@ dependency_scanning:
     - if: $SECURITY_SCAN_LEVEL =~ /^(minimal|standard|full)$/
       when: on_success
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
 
 # Secret detection in codebase
 secret_detection:
@@ -174,7 +180,9 @@ secret_detection:
     - if: $SECURITY_SCAN_LEVEL =~ /^(standard|full)$/
       when: on_success
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
 
 # IaC and Dockerfile misconfiguration scanning
 iac_scanning:
@@ -210,7 +218,9 @@ iac_scanning:
     - if: $SECURITY_SCAN_LEVEL == "full"
       when: on_success
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
 
 # STAGE: release
 release:
@@ -236,7 +246,9 @@ release:
     - pnpm --filter rest-api install --frozen-lockfile
     - cd rest-api && pnpm semantic-release
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^($CI_DEFAULT_BRANCH|alpha|beta)$/'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_BRANCH == "alpha"'
+    - if: '$CI_COMMIT_BRANCH == "beta"'
       when: on_success
 
 # STAGE: build
