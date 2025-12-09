@@ -279,15 +279,11 @@ build-amd64:
   extends: .kaniko-build
   variables:
     ARCH: amd64
-  tags:
-    - kubernetes
 
 build-arm64:
   extends: .kaniko-build
   variables:
     ARCH: arm64
-  tags:
-    - kubernetes
 
 # STAGE: publish
 publish:
@@ -312,8 +308,6 @@ publish:
     - docker manifest push "${DOCKER_IMAGE}:latest"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
-  tags:
-    - kubernetes
 
 # STAGE: scan
 # Container vulnerability scanning (post-build)
@@ -348,8 +342,6 @@ container_scanning:
     - if: $SECURITY_SCAN_LEVEL == "minimal"
       when: never
     - if: $SECURITY_SCAN_LEVEL =~ /^(standard|full)$/ && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
-  tags:
-    - kubernetes
 
 # SBOM generation (optional, for future compliance)
 # Enable by setting SCAN_SBOM="true" in CI/CD variables
@@ -369,5 +361,3 @@ sbom_generation:
     expire_in: 90 days
   rules:
     - if: $SCAN_SBOM == "true" && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
-  tags:
-    - kubernetes
