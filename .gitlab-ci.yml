@@ -312,9 +312,6 @@ publish:
     - docker manifest push "${DOCKER_IMAGE}:latest"
   rules:
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
-  needs:
-    - build-amd64
-    - build-arm64
   tags:
     - kubernetes
 
@@ -351,8 +348,6 @@ container_scanning:
     - if: $SECURITY_SCAN_LEVEL == "minimal"
       when: never
     - if: $SECURITY_SCAN_LEVEL =~ /^(standard|full)$/ && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
-  needs:
-    - publish
   tags:
     - kubernetes
 
@@ -374,7 +369,5 @@ sbom_generation:
     expire_in: 90 days
   rules:
     - if: $SCAN_SBOM == "true" && $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/
-  needs:
-    - publish
   tags:
     - kubernetes
