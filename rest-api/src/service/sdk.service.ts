@@ -42,14 +42,13 @@ import {
 } from '@allbridge/bridge-core-sdk/dist/src/services/yield/models/yield.model';
 
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import solanaWeb3, { PublicKey } from '@solana/web3.js';
-import { raw2base64 } from '../utils/sui';
-import { raw2hex } from '../utils/tron';
+import { Connection as solanaWeb3Connection, PublicKey } from '@solana/web3.js';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon';
 
 import { Big } from 'big.js';
-import * as console from 'node:console';
 import { sponsorWrapRawTx } from '../utils/solana';
+import { raw2base64 } from '../utils/sui';
+import { raw2hex } from '../utils/tron';
 import { ConfigService } from './config.service';
 
 export enum SolanaTxFeeParamsMethod {
@@ -226,7 +225,7 @@ export class SDKService {
       ).toString('hex');
     }
     if (params.sourceToken.chainSymbol === ChainSymbol.SUI && outputFormat === 'base64') {
-      return raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
+      return await raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
     }
     if (params.sourceToken.chainSymbol === ChainSymbol.TRX && outputFormat === 'hex') {
       return await raw2hex(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.TRX.toString()));
@@ -559,7 +558,7 @@ export class SDKService {
     fundLamports?: number
   ): Promise<RawTransaction> {
     const urls = ConfigService.getRPCUrls();
-    const connection = new solanaWeb3.Connection(urls["SOL"], "finalized");
+    const connection = new solanaWeb3Connection(urls["SOL"], "finalized");
     const rawTxHex = tx.startsWith("0x") ? tx.slice(2) : tx;
 
     return sponsorWrapRawTx({
@@ -571,10 +570,10 @@ export class SDKService {
   }
 
   async suiRaw2Base64(rawTx: string): Promise<RawTransaction> {
-    return raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
+    return await raw2base64(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.SUI.toString()));
   }
 
   async tronRaw2Hex(rawTx: string): Promise<RawTransaction> {
-    return raw2hex(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.TRX.toString()));
+    return await raw2hex(rawTx, ConfigService.getNetworkNodeUrl(ChainSymbol.TRX.toString()));
   }
 }

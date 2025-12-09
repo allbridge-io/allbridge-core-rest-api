@@ -575,7 +575,7 @@ export class RestController {
       }
     }
     try {
-      return await this.sdkService.send(params);
+      return await this.sdkService.send(params, outputFormat);
     } catch (e) {
       httpException(e);
     }
@@ -1878,7 +1878,7 @@ export class RestController {
     }
     try {
       return await this.sdkService.yieldApprove({
-        token: tokenAddressObj as TokenWithChainDetailsYield,
+        token: tokenAddressObj,
         owner: ownerAddress,
         amount: amount
       });

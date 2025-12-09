@@ -10,5 +10,5 @@ export async function raw2hex(rawTx: string | RawTransaction, nodeUrl: string): 
     rawTx = JSON.parse(rawTx) as RawTransaction;
   }
   const bytes = tronWeb.utils.transaction.txJsonToPb(rawTx).serializeBinary();
-  return tronWeb.utils.bytes.byteArray2hexStr(bytes).toLowerCase();
+  return Promise.resolve(tronWeb.utils.bytes.byteArray2hexStr(bytes).toLowerCase());
 }
