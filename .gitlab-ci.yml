@@ -263,7 +263,8 @@ build:
   before_script:
     - echo "${DOCKER_HUB_TOKEN}" | docker login -u "${DOCKER_HUB_USER}" --password-stdin
     - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-    - docker buildx create --name multiarch --driver docker-container --use
+    - docker context create tls-context
+    - docker buildx create --name multiarch --driver docker-container --use tls-context
     - docker buildx inspect --bootstrap
   script:
     - |
