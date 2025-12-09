@@ -1,3 +1,11 @@
+# [3.27.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-09)
+
+
+### Features
+
+* add ts-node dependency to package.json ([ef32a63](https://github.com/allbridge-io/allbridge-core-rest-api/commit/ef32a6387b81d9f99bcd1857cf02c79394512998))
+* enhance transaction utilities with base64 and hex conversion methods ([f31e5ff](https://github.com/allbridge-io/allbridge-core-rest-api/commit/f31e5ff8535f814b932cb1771c7266f6bd741c43))
+
 # [3.23.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.22.0...v3.23.0) (2025-10-28)
 
 
