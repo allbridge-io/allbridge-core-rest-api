@@ -273,6 +273,7 @@ build:
         --build-arg SDK_VERSION=${SDK_VERSION} \
         --tag "${DOCKER_IMAGE}:${CI_COMMIT_TAG}" \
         --tag "${DOCKER_IMAGE}:latest" \
+        --provenance=false \
         --push \
         .
   rules:
