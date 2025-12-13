@@ -1,11 +1,11 @@
-<h1 align="center">
+<h1 style="text-align: center;">
    <b>
-        <a href="https://core.allbridge.io/"><img src="https://allbridge.io/assets/icons/core.svg" /></a><br>
+        <a href="https://core.allbridge.io/"><img src="https://allbridge.io/assets/icons/core.svg" alt="Allbridge Core Logo" /></a><br>
     </b>
 </h1>
 
 
-<p align="center">
+<p style="text-align: center;">
     <a href="https://core.allbridge.io/"><b>Allbridge Core Website</b></a> •
     <a href="https://docs-core.allbridge.io"><b>Documentation</b></a> •
     <a href="https://bridge-core-sdk.web.app"><b>SDK TS doc</b></a>
@@ -38,6 +38,7 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
     * [Tokens](#tokens)
     * [Pools](#pools)
     * [Transfers](#transfers)
+    * [Yield](#yield)
   * [Troubleshooting](#troubleshooting)
 <!-- TOC -->
 
@@ -202,7 +203,10 @@ docker run -p 3000:3000 \
 ```
 ### Host on Digital Ocean
 
-If you are hosting the REST API on Digital Ocean, you may encounter a `403 Forbidden` error. This error is due to the Digital Ocean is blocked by the Allbridge Core API firewall system. To resolve this issue, please open a ticket on our [Discord](https://discord.com/invite/ASuPY8d3E6) and we will provide you with a detailed guide on how to solve it.
+If you are hosting the REST API on Digital Ocean, you may encounter a `403 Forbidden` error.
+This error is due to the Digital Ocean is blocked by the Allbridge Core API firewall system.
+To resolve this issue, please open a ticket on our [Discord,](https://discord.com/invite/ASuPY8d3E6)
+and we will provide you with a detailed guide on how to solve it.
 
 ### Host on Heroku
 
@@ -231,32 +235,32 @@ Below is a step-by-step guide on how to do this.
    
 ##### Deploy and release REST-API container
 
-Repeat steps 7-11 to upgrade to a newer REST-API version
+Repeat steps 1-5 below to upgrade to a newer REST-API version
 
-7. Login to Heroku Container Registry
+1. Login to Heroku Container Registry
    * Run `heroku container:login` or log in via Docker following [these instructions](https://devcenter.heroku.com/articles/container-registry-and-runtime#logging-in-to-the-registry)
-8. Pull the REST-API Locally
+2. Pull the REST-API Locally
    * Run the command: `docker pull --platform linux/amd64 allbridge/io.allbridge.rest-api:<version>`
-9. Tag the Docker Image
+3. Tag the Docker Image
    * Run the command: `docker tag allbridge/io.allbridge.rest-api:<version> registry.heroku.com/<app-name>/web`
-10. Push the Tagged Image to Heroku
-    * Run the command: `docker push registry.heroku.com/<app-name>/web`
-11. Release the Container on Heroku
-    * Run the command: `heroku container:release web --app <app-name>`
+4. Push the Tagged Image to Heroku
+   * Run the command: `docker push registry.heroku.com/<app-name>/web`
+5. Release the Container on Heroku
+   * Run the command: `heroku container:release web --app <app-name>`
 
 ##### One-Time Setup (Optional for Updates)
 
-12. Set Configuration Variables
-    * Run the commands, like: `heroku config:set ETH_NODE_URL=https://ethereum-rpc.publicnode.com --app <app-name>`
-    * Alternatively, you can set it via the Heroku Dashboard under the [app's settings](https://devcenter.heroku.com/articles/config-vars#using-the-heroku-dashboard)
+1. Set Configuration Variables
+   * Run the commands, like: `heroku config:set ETH_NODE_URL=https://ethereum-rpc.publicnode.com --app <app-name>`
+   * Alternatively, you can set it via the Heroku Dashboard under the [app's settings](https://devcenter.heroku.com/articles/config-vars#using-the-heroku-dashboard)
 
 ##### Final Steps
 
-13. Retrieve the Base URL
-    * Find the base URL in the domains section of your app's settings (`https://dashboard.heroku.com/apps/<app-name>/settings`) on the Heroku Dashboard
-    * Or click the button `Open App`
-14. Check API Availability
-    * Append `/api` to the base URL to check the availability of the Swagger
+1. Retrieve the Base URL
+   * Find the base URL in the domains section of your app's settings (`https://dashboard.heroku.com/apps/<app-name>/settings`) on the Heroku Dashboard
+   * Or click the button `Open App`
+2. Check API Availability
+   * Append `/api` to the base URL to check the availability of the Swagger
 
 You are now ready to use your rest-api app.
 

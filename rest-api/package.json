@@ -12,7 +12,7 @@
     "lint": "eslint src --fix",
     "generate:swagger": "tsoa spec",
     "semantic-release": "semantic-release",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -39,18 +39,23 @@
     "class-validator": "latest",
     "dotenv": "catalog:",
     "fast-safe-stringify": "latest",
+    "tronweb": "catalog:",
     "tsoa": "latest",
     "web3-core": "catalog:"
   },
   "devDependencies": {
     "@eslint/compat": "latest",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.28.0",
     "@nestjs/cli": "latest",
     "@nestjs/schematics": "latest",
     "@nestjs/testing": "latest",
     "@semantic-release/changelog": "latest",
     "@semantic-release/exec": "latest",
     "@semantic-release/git": "latest",
-    "@semantic-release/github": "latest",
+    "@semantic-release/gitlab": "latest",
+    "@semantic-release/npm": "latest",
+    "conventional-changelog-conventionalcommits": "latest",
     "@types/express": "latest",
     "@types/jest": "latest",
     "@types/supertest": "latest",
@@ -82,7 +87,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "sr",
+    "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"

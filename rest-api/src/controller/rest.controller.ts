@@ -30,16 +30,16 @@ import {
 } from '@nestjs/common';
 import { VersionedTransaction } from '@solana/web3.js';
 import { HorizonApi } from '@stellar/stellar-sdk/lib/horizon/horizon_api';
-import { Big } from 'big.js';
 import { Example, Response, Route, Tags } from 'tsoa';
 import { httpException } from '../error/errors';
+import { BridgeQuoteResponse, BridgeQuoteService } from '../service/bridge-quote.service';
 import {
   BridgeAmounts,
   SDKService,
   SolanaTxFeeParamsMethod,
   SwapCalcInfo,
 } from '../service/sdk.service';
-import { convertIntAmountToFloat } from '../utils/calculation';
+import { convertGt0IntAmountToFloat, convertIntAmountToFloat } from '../utils/calculation';
 
 type RawTransaction =
   | VersionedTransaction
@@ -50,7 +50,8 @@ type RawTransaction =
 @Controller()
 @Route()
 export class RestController {
-  constructor(private readonly sdkService: SDKService) {}
+  constructor(private readonly sdkService: SDKService,
+              private readonly quoteService: BridgeQuoteService) {}
 
   /**
    * Returns a ChainDetailsMap containing a list of supported tokens grouped by chain.
@@ -499,7 +500,7 @@ export class RestController {
      * Output format of the Sui transaction payload.<br/>
      * <i><u>Optional. This parameter is relevant **only for Sui transactions**.</u></i><br/>
      */
-    @Query('outputFormat') outputFormat: 'json' | 'base64' = 'json',
+    @Query('outputFormat') outputFormat: 'json' | 'base64' | 'hex' = 'json',
   ): Promise<RawTransaction> {
     const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
     if (!sourceTokenObj) {
@@ -575,7 +576,7 @@ export class RestController {
       }
     }
     try {
-      return await this.sdkService.send(params);
+      return await this.sdkService.send(params, outputFormat);
     } catch (e) {
       httpException(e);
     }
@@ -1878,7 +1879,7 @@ export class RestController {
     }
     try {
       return await this.sdkService.yieldApprove({
-        token: tokenAddressObj as TokenWithChainDetailsYield,
+        token: tokenAddressObj,
         owner: ownerAddress,
         amount: amount
       });
@@ -1960,6 +1961,37 @@ export class RestController {
     }
   }
 
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/bridge/quote')
+  @Tags('Transfers')
+  async bridgeQuote(
+    @Query('amount') amountInt: string,
+    @Query('sourceToken') sourceToken: string,
+    @Query('destinationToken') destinationToken: string,
+  ): Promise<BridgeQuoteResponse> {
+
+    const sourceTokenObj = await this.sdkService.getTokenByAddress(sourceToken);
+    if (!sourceTokenObj) {
+      throw new HttpException('Source token not found', HttpStatus.BAD_REQUEST);
+    }
+
+    const destinationTokenObj = await this.sdkService.getTokenByAddress(destinationToken);
+    if (!destinationTokenObj) {
+      throw new HttpException('Destination token not found', HttpStatus.BAD_REQUEST);
+    }
+
+    try {
+      return await this.quoteService.getQuote({
+        amountInt,
+        sourceToken: sourceTokenObj,
+        destinationToken: destinationTokenObj,
+      });
+    } catch (e) {
+      httpException(e);
+    }
+  }
+
+
   /**
    * Rewrites a Solana v0 transaction so that `sponsor` becomes the fee payer.
    * Optionally prepends a SystemProgram.transfer(sponsor -> originalSigner) for `fundLamports`.
@@ -1994,31 +2026,34 @@ export class RestController {
       httpException(e);
     }
   }
-}
 
-/**
- * Utility function that converts an integer amount (as a string) to a floating-point string,
- * ensuring the amount is greater than zero. Throws an HTTP exception if the conversion fails
- * or the amount is zero or less.
- *
- * @param amount - The integer amount as a string.
- * @param decimals - The number of decimals for the token.
- * @param exceptionMsg - Optional message to include in the error (default: 'Invalid amount').
- * @returns The converted floating-point amount as a string.
- */
-export function convertGt0IntAmountToFloat(
-  amount: string,
-  decimals: number,
-  exceptionMsg: string = 'Invalid amount',
-): string {
-  let amountFloatBig: Big;
-  try {
-    amountFloatBig = convertIntAmountToFloat(amount, decimals);
-  } catch (ignoreError) {
-    throw new HttpException(exceptionMsg, HttpStatus.BAD_REQUEST);
+  /**
+   * Convert SUI raw transaction to base64
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/utils/sui/raw2base64')
+  @Tags('Utils', 'SUI', 'Raw Transactions')
+  async suiRaw2Base64(
+    /**
+     * Raw transaction that should be converted to base64.
+     */
+    @Query('rawTx') rawTx: string
+  ): Promise<RawTransaction> {
+    return this.sdkService.suiRaw2Base64(rawTx);
   }
-  if (amountFloatBig.lte(0)) {
-    throw new HttpException(exceptionMsg, HttpStatus.BAD_REQUEST);
+
+  /**
+   * Convert Tron raw transaction to hex
+   */
+  @Response<HttpExceptionBody>(400, 'Bad request')
+  @Get('/utils/tron/raw2hex')
+  @Tags('Utils', 'Tron', 'Raw Transactions')
+  async tronRaw2Hex(
+    /**
+     * Raw transaction that should be converted to hex.
+     */
+    @Query('rawTx') rawTx: string
+  ): Promise<RawTransaction> {
+    return this.sdkService.tronRaw2Hex(rawTx);
   }
-  return amountFloatBig.toFixed();
 }
