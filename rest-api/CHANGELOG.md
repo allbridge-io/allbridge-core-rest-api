@@ -40,6 +40,27 @@
 * **ci:** use Docker V2 manifest format for Heroku compatibility ([4781377](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/4781377a459b717cd3482dca19d96718089bea7a))
 * **ci:** use separate rules instead of regex with variables ([2e61743](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/2e61743d6a4526cd9f2533c60f024f292462b83b))
 
+## [3.27.0](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-13)
+
+### Features
+
+* add ts-node dependency to package.json ([ef32a63](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/ef32a6387b81d9f99bcd1857cf02c79394512998))
+* **ci:** switch to docker buildx for multi-arch builds ([d326666](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/d3266663ca90b96ceeca983bea7035190ed9d452))
+* enhance transaction utilities with base64 and hex conversion methods ([f31e5ff](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/f31e5ff8535f814b932cb1771c7266f6bd741c43))
+* **quote:** introduce bridge quote endpoint ([dd40d6e](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/dd40d6ee532e9938a52f3924099f9ec0558ed590))
+* update SDK service methods to support async operations and enhance transaction formatting ([cb83c27](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/cb83c27c4452a3bf7d0d40acc90631e9c356e33f))
+
+### Bug Fixes
+
+* **ci:** add missing eslint packages and passWithNoTests flag ([33f85ac](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/33f85aca39cba227b74e5c33b3270e8610b34d1f))
+* **ci:** add optional flag to needs for tag pipelines ([d6322f6](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/d6322f6b709a8c2ddb1a96bdedc370fde888faa6))
+* **ci:** remove kubernetes tags - runner has no tags ([8be6225](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/8be6225b88274e86ea3f481791f91b41a6cd531a))
+* **ci:** remove needs to rely on stage ordering ([2d5af8b](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/2d5af8b2cf0ba3256c8583b9cda2f128542b8f75))
+* **ci:** revert optional needs - not needed for tag pipelines ([2a03a74](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/2a03a744a1d1525d058830349e67cfd8e1a2a6a5))
+* **ci:** use docker context for buildx with TLS support ([d3b4617](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/d3b4617b3cbc0cbd905f1bf0cb27a6444e5748fd))
+* **ci:** use Docker V2 manifest format for Heroku compatibility ([4781377](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/4781377a459b717cd3482dca19d96718089bea7a))
+* **ci:** use separate rules instead of regex with variables ([2e61743](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/2e61743d6a4526cd9f2533c60f024f292462b83b))
+
 ## [3.27.0](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-09)
 
 ### Features
