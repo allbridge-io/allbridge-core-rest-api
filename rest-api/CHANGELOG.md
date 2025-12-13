@@ -1,3 +1,9 @@
+## [3.27.0-alpha.2](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.27.0-alpha.1...v3.27.0-alpha.2) (2025-12-13)
+
+### Bug Fixes
+
+* remove unnecessary blank lines in bridge quote service interface ([0b6a3fc](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/0b6a3fc5f8f2be35a44cd9b38264c36ea49c16d6))
+
 ## [3.27.0-alpha.1](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0-alpha.1) (2025-12-13)
 
 ### Features
