@@ -1,3 +1,18 @@
+## [3.27.0-alpha.1](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0-alpha.1) (2025-12-13)
+
+### Features
+
+* **ci:** enable workspace package injection in pnpm configuration ([21838a5](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/21838a58541e450fcd73acf68d0064576a4576bd))
+* **quote:** add spacing for improved readability in bridge quote service ([bf6d180](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/bf6d180c9402d76e9ee432418ffbf39dc86362ff))
+* **quote:** introduce bridge quote endpoint ([09b6fcd](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/09b6fcd7cb2fe52ea6ae1e953913d343f4eebeb0))
+* start 3.27 alpha ([c8a7a3c](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/c8a7a3c8c741662d997518e8b8dbe013918ada78))
+
+### Bug Fixes
+
+* add ts-node dependency to package.json ([9c0fa4b](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/9c0fa4b3ee3267ab32123cf6ad6dce02bac6253a))
+* update pnpm ([60a1f7e](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/60a1f7e8c51a4069528e1a721d0e9976f2abf3c0))
+* update pnpm ([f12b40e](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/f12b40ec5b1cedbe9cf5c2d1d9fda5ac72478def))
+
 # [3.23.0](https://github.com/allbridge-public/allbridge-core-rest-api/compare/v3.22.0...v3.23.0) (2025-09-05)
 
 
