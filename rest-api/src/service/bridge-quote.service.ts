@@ -17,6 +17,7 @@ export interface BridgeQuoteResponse {
   destinationTokenAddress: string;
   options: BridgeQuoteOption[];
 }
+
 export interface BridgeQuoteOption {
   messenger: keyof typeof Messenger;
   messengerIndex?: Messenger;
@@ -24,6 +25,7 @@ export interface BridgeQuoteOption {
   sourceTxCostInNative: string;
   paymentMethods: BridgeQuotePayment[];
 }
+
 export interface BridgeQuotePayment {
   feePaymentMethod: keyof typeof FeePaymentMethod;
   fee: string;
