@@ -1,3 +1,9 @@
+## [3.27.1](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.27.0...v3.27.1) (2025-12-15)
+
+### Bug Fixes
+
+* **ci:** only tag stable releases as latest ([e376e4c](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/commit/e376e4c4869d1704e8994734db35ffdab1a22411))
+
 ## [3.27.0](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.26.0...v3.27.0) (2025-12-13)
 
 ### Features
