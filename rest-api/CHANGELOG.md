@@ -1,3 +1,9 @@
+## [3.27.4](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.3...v3.27.4) (2025-12-22)
+
+### Bug Fixes
+
+* **ci:** separate Docker build workflow triggered on release event ([3e6b146](https://github.com/allbridge-io/allbridge-core-rest-api/commit/3e6b146b5cc5c1e51d413eef84d1b7832212252d))
+
 ## [3.27.3](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.2...v3.27.3) (2025-12-22)
 
 ### Bug Fixes
