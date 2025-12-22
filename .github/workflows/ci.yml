@@ -26,6 +26,7 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
+  PNPM_VERSION: '9'
   DOCKER_IMAGE: 'allbridge/io.allbridge.rest-api'
   SDK_VERSION: 'latest'
   # Security scan configuration
@@ -54,6 +55,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
         shell: bash
@@ -87,6 +90,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
         shell: bash
@@ -236,6 +241,8 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Get pnpm store directory
         shell: bash
