@@ -3,6 +3,12 @@ name: Docker Build & Push
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build (e.g., v3.27.3)'
+        required: true
+        type: string
 
 env:
   DOCKER_IMAGE: 'allbridge/io.allbridge.rest-api'
@@ -15,19 +21,26 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.release.tag_name }}
-
-      - name: Determine release type
-        id: release_type
+      - name: Determine tag
+        id: tag
         run: |
-          TAG="${{ github.event.release.tag_name }}"
+          # Use input tag for workflow_dispatch, or release tag for release event
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${{ github.event.release.tag_name }}"
+          fi
+          echo "value=$TAG" >> $GITHUB_OUTPUT
+          # Check if stable (no -alpha, -beta, etc.)
           if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "is_stable=true" >> $GITHUB_OUTPUT
           else
             echo "is_stable=false" >> $GITHUB_OUTPUT
           fi
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.tag.outputs.value }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -42,7 +55,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push (stable release)
-        if: steps.release_type.outputs.is_stable == 'true'
+        if: steps.tag.outputs.is_stable == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -51,7 +64,7 @@ jobs:
           build-args: |
             SDK_VERSION=${{ env.SDK_VERSION }}
           tags: |
-            ${{ env.DOCKER_IMAGE }}:${{ github.event.release.tag_name }}
+            ${{ env.DOCKER_IMAGE }}:${{ steps.tag.outputs.value }}
             ${{ env.DOCKER_IMAGE }}:latest
           provenance: false
           sbom: false
@@ -59,7 +72,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and push (pre-release)
-        if: steps.release_type.outputs.is_stable == 'false'
+        if: steps.tag.outputs.is_stable == 'false'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -68,7 +81,7 @@ jobs:
           build-args: |
             SDK_VERSION=${{ env.SDK_VERSION }}
           tags: |
-            ${{ env.DOCKER_IMAGE }}:${{ github.event.release.tag_name }}
+            ${{ env.DOCKER_IMAGE }}:${{ steps.tag.outputs.value }}
           provenance: false
           sbom: false
           cache-from: type=gha
@@ -78,15 +91,15 @@ jobs:
         run: |
           echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag:** \`${{ github.event.release.tag_name }}\`" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.release_type.outputs.is_stable }}" == "true" ]; then
+          echo "**Tag:** \`${{ steps.tag.outputs.value }}\`" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.tag.outputs.is_stable }}" == "true" ]; then
             echo "**Latest:** Yes" >> $GITHUB_STEP_SUMMARY
           else
             echo "**Pre-release:** Yes (no latest tag)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ github.event.release.tag_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ steps.tag.outputs.value }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
   container_scanning:
@@ -94,6 +107,15 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "value=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - uses: actions/checkout@v6
 
       - name: Cache Trivy DB
@@ -107,7 +129,7 @@ jobs:
       - name: Run Trivy container scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: '${{ env.DOCKER_IMAGE }}:${{ github.event.release.tag_name }}'
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.tag.outputs.value }}'
           severity: ${{ env.SECURITY_SEVERITY }}
           format: 'sarif'
           output: 'trivy-container-results.sarif'
@@ -126,6 +148,15 @@ jobs:
     runs-on: ubuntu-latest
     if: vars.SCAN_SBOM == 'true'
     steps:
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "value=${{ inputs.tag }}" >> $GITHUB_OUTPUT
+          else
+            echo "value=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Cache Trivy DB
         uses: actions/cache@v5
         with:
@@ -137,13 +168,13 @@ jobs:
       - name: Generate SBOM
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: '${{ env.DOCKER_IMAGE }}:${{ github.event.release.tag_name }}'
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.tag.outputs.value }}'
           format: 'cyclonedx'
           output: 'sbom.cdx.json'
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v6
         with:
-          name: sbom-${{ github.event.release.tag_name }}
+          name: sbom-${{ steps.tag.outputs.value }}
           path: sbom.cdx.json
           retention-days: 90
