@@ -3,8 +3,6 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [main, master, beta, alpha]
-    tags:
-      - 'v*.*.*'
     paths-ignore:
       - '**/*.md'
       - '.editorconfig'
@@ -44,7 +42,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -79,7 +77,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -116,8 +114,7 @@ jobs:
   dependency_scanning:
     name: Dependency Scanning
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -150,8 +147,7 @@ jobs:
   secret_detection:
     name: Secret Detection
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -185,8 +181,7 @@ jobs:
   iac_scanning:
     name: IaC Scanning
     runs-on: ubuntu-latest
-    if: |
-      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     steps:
       - uses: actions/checkout@v6
 
@@ -222,8 +217,12 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'push' &&
-      !startsWith(github.ref, 'refs/tags/') &&
       (github.ref_name == 'main' || github.ref_name == 'master' || github.ref_name == 'beta' || github.ref_name == 'alpha')
+    outputs:
+      new_release_published: ${{ steps.check.outputs.new_release_published }}
+      new_release_version: ${{ steps.check.outputs.new_release_version }}
+      new_release_git_tag: ${{ steps.check.outputs.new_release_git_tag }}
+      is_stable: ${{ steps.check.outputs.is_stable }}
     permissions:
       contents: write
       issues: write
@@ -259,6 +258,13 @@ jobs:
       - name: Install dependencies
         run: pnpm --filter rest-api install --frozen-lockfile
 
+      - name: Get latest tag before release
+        id: before
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag --sort=-v:refname | head -1 || echo "")
+          echo "tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -268,14 +274,44 @@ jobs:
           GIT_COMMITTER_EMAIL: 'actions@github.com'
         run: cd rest-api && pnpm semantic-release
 
+      - name: Check for new release
+        id: check
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git tag --sort=-v:refname | head -1 || echo "")
+          BEFORE_TAG="${{ steps.before.outputs.tag }}"
+
+          echo "Before: $BEFORE_TAG"
+          echo "After: $LATEST_TAG"
+
+          if [ "$LATEST_TAG" != "$BEFORE_TAG" ] && [ -n "$LATEST_TAG" ]; then
+            echo "new_release_published=true" >> $GITHUB_OUTPUT
+            echo "new_release_git_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+            # Extract version without 'v' prefix
+            VERSION=${LATEST_TAG#v}
+            echo "new_release_version=$VERSION" >> $GITHUB_OUTPUT
+            # Check if stable (no -alpha, -beta, etc.)
+            if [[ "$LATEST_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "is_stable=true" >> $GITHUB_OUTPUT
+            else
+              echo "is_stable=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "new_release_published=false" >> $GITHUB_OUTPUT
+            echo "is_stable=false" >> $GITHUB_OUTPUT
+          fi
+
   # STAGE: build
   # Multi-arch Docker build using buildx with QEMU emulation
   build:
     name: Build & Push Docker Image
+    needs: [release]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: needs.release.outputs.new_release_published == 'true'
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release.outputs.new_release_git_tag }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -289,20 +325,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          TAG=${GITHUB_REF#refs/tags/}
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-          # Check if this is a stable release (no -alpha, -beta, etc.)
-          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "is_stable=true" >> $GITHUB_OUTPUT
-          else
-            echo "is_stable=false" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build and push (stable release)
-        if: steps.version.outputs.is_stable == 'true'
+        if: needs.release.outputs.is_stable == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -311,7 +335,7 @@ jobs:
           build-args: |
             SDK_VERSION=${{ env.SDK_VERSION }}
           tags: |
-            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:${{ needs.release.outputs.new_release_git_tag }}
             ${{ env.DOCKER_IMAGE }}:latest
           provenance: false
           sbom: false
@@ -319,7 +343,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Build and push (pre-release)
-        if: steps.version.outputs.is_stable == 'false'
+        if: needs.release.outputs.is_stable == 'false'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -328,7 +352,7 @@ jobs:
           build-args: |
             SDK_VERSION=${{ env.SDK_VERSION }}
           tags: |
-            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:${{ needs.release.outputs.new_release_git_tag }}
           provenance: false
           sbom: false
           cache-from: type=gha
@@ -338,30 +362,26 @@ jobs:
         run: |
           echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag:** \`${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.version.outputs.is_stable }}" == "true" ]; then
+          echo "**Tag:** \`${{ needs.release.outputs.new_release_git_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ needs.release.outputs.is_stable }}" == "true" ]; then
             echo "**Latest:** Yes" >> $GITHUB_STEP_SUMMARY
           else
             echo "**Pre-release:** Yes (no latest tag)" >> $GITHUB_STEP_SUMMARY
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ needs.release.outputs.new_release_git_tag }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
 
   # STAGE: scan (post-build)
   # Container vulnerability scanning
   container_scanning:
     name: Container Scanning
-    needs: [build]
+    needs: [release, build]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: needs.release.outputs.new_release_published == 'true'
     steps:
       - uses: actions/checkout@v6
-
-      - name: Extract version from tag
-        id: version
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Cache Trivy DB
         uses: actions/cache@v5
@@ -374,7 +394,7 @@ jobs:
       - name: Run Trivy container scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}'
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ needs.release.outputs.new_release_git_tag }}'
           severity: ${{ env.SECURITY_SEVERITY }}
           format: 'sarif'
           output: 'trivy-container-results.sarif'
@@ -389,14 +409,10 @@ jobs:
 
   sbom_generation:
     name: Generate SBOM
-    needs: [build]
+    needs: [release, build]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v') && vars.SCAN_SBOM == 'true'
+    if: needs.release.outputs.new_release_published == 'true' && vars.SCAN_SBOM == 'true'
     steps:
-      - name: Extract version from tag
-        id: version
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Cache Trivy DB
         uses: actions/cache@v5
         with:
@@ -408,13 +424,13 @@ jobs:
       - name: Generate SBOM
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}'
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ needs.release.outputs.new_release_git_tag }}'
           format: 'cyclonedx'
           output: 'sbom.cdx.json'
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v6
         with:
-          name: sbom-${{ steps.version.outputs.tag }}
+          name: sbom-${{ needs.release.outputs.new_release_git_tag }}
           path: sbom.cdx.json
           retention-days: 90
