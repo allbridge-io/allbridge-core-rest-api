@@ -1,3 +1,9 @@
+## [3.27.3](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.2...v3.27.3) (2025-12-22)
+
+### Bug Fixes
+
+* **ci:** trigger Docker build from release job outputs ([f7bf71c](https://github.com/allbridge-io/allbridge-core-rest-api/commit/f7bf71cba4c2ef13fad0e9e9f5fc12ff6ef53f54))
+
 ## [3.27.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.1...v3.27.2) (2025-12-22)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 {
   "name": "rest-api",
-  "version": "3.27.2",
+  "version": "3.27.3",
   "description": "",
   "scripts": {
     "build": "tsoa spec && nest build",
