@@ -1,3 +1,10 @@
+## [3.27.2](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.1...v3.27.2) (2025-12-22)
+
+### Bug Fixes
+
+* **ci:** specify pnpm version for action-setup ([e417d04](https://github.com/allbridge-io/allbridge-core-rest-api/commit/e417d04bf33a63e37c5f46fc0325447ec21b891f))
+* **ci:** update lockfile for semantic-release/github ([65f90f5](https://github.com/allbridge-io/allbridge-core-rest-api/commit/65f90f5ef2e4bf489fd84a17fe824e54d6b7d805))
+
 ## [3.27.1](https://gitlab.allbrid.ge/allbridge-io/allbridge-core-rest-api/compare/v3.27.0...v3.27.1) (2025-12-15)
 
 ### Bug Fixes
