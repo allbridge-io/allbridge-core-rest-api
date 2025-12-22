@@ -1,3 +1,9 @@
+## [3.27.5](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.4...v3.27.5) (2025-12-22)
+
+### Bug Fixes
+
+* **ci:** add workflow_dispatch to docker build ([0601065](https://github.com/allbridge-io/allbridge-core-rest-api/commit/0601065857a6accdba32f7b1acd64858bce1ed72))
+
 ## [3.27.4](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.3...v3.27.4) (2025-12-22)
 
 ### Bug Fixes
