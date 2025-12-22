@@ -53,7 +53,7 @@
     "@semantic-release/changelog": "latest",
     "@semantic-release/exec": "latest",
     "@semantic-release/git": "latest",
-    "@semantic-release/gitlab": "latest",
+    "@semantic-release/github": "latest",
     "@semantic-release/npm": "latest",
     "conventional-changelog-conventionalcommits": "latest",
     "@types/express": "latest",

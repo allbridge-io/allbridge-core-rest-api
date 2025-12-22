@@ -1,0 +1,413 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master, beta, alpha]
+    tags:
+      - 'v*.*.*'
+    paths-ignore:
+      - '**/*.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - '.vscode/**'
+      - '.idea/**'
+  pull_request:
+    branches: [main, master, beta, alpha]
+    paths-ignore:
+      - '**/*.md'
+      - '.editorconfig'
+      - '.gitignore'
+      - '.vscode/**'
+      - '.idea/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+  DOCKER_IMAGE: 'allbridge/io.allbridge.rest-api'
+  SDK_VERSION: 'latest'
+  # Security scan configuration
+  # Scan depth: "none" | "minimal" | "standard" | "full"
+  #   none     - skip all security scans
+  #   minimal  - dependency scan only
+  #   standard - dependency + secrets + container (default)
+  #   full     - all scans including IaC/misconfig
+  SECURITY_SCAN_LEVEL: 'standard'
+  SECURITY_SEVERITY: 'CRITICAL,HIGH'
+  SECURITY_FAIL_ON_VULN: 'false'
+
+jobs:
+  # STAGE: validate
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm --filter rest-api install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm --filter rest-api lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/'))
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm --filter rest-api install --frozen-lockfile
+
+      - name: Test
+        run: pnpm --filter rest-api test
+        continue-on-error: true
+
+  # STAGE: security
+  dependency_scanning:
+    name: Dependency Scanning
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: |
+            trivy-db-
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'vuln'
+          severity: ${{ env.SECURITY_SEVERITY }}
+          format: 'sarif'
+          output: 'trivy-dependency-results.sarif'
+          exit-code: ${{ env.SECURITY_FAIL_ON_VULN == 'true' && '1' || '0' }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-dependency-results.sarif'
+          category: 'dependency-scanning'
+
+  secret_detection:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: |
+            trivy-db-
+
+      - name: Run Trivy secret scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          scanners: 'secret'
+          format: 'sarif'
+          output: 'trivy-secret-results.sarif'
+          exit-code: ${{ env.SECURITY_FAIL_ON_VULN == 'true' && '1' || '0' }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-secret-results.sarif'
+          category: 'secret-detection'
+
+  iac_scanning:
+    name: IaC Scanning
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')))
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: |
+            trivy-db-
+
+      - name: Run Trivy config scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          severity: ${{ env.SECURITY_SEVERITY }}
+          format: 'sarif'
+          output: 'trivy-iac-results.sarif'
+          exit-code: ${{ env.SECURITY_FAIL_ON_VULN == 'true' && '1' || '0' }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-iac-results.sarif'
+          category: 'iac-scanning'
+
+  # STAGE: release
+  release:
+    name: Semantic Release
+    needs: [lint]
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' &&
+      !startsWith(github.ref, 'refs/tags/') &&
+      (github.ref_name == 'main' || github.ref_name == 'master' || github.ref_name == 'beta' || github.ref_name == 'alpha')
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm --filter rest-api install --frozen-lockfile
+
+      - name: Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GIT_AUTHOR_NAME: 'GitHub Actions'
+          GIT_AUTHOR_EMAIL: 'actions@github.com'
+          GIT_COMMITTER_NAME: 'GitHub Actions'
+          GIT_COMMITTER_EMAIL: 'actions@github.com'
+        run: cd rest-api && pnpm semantic-release
+
+  # STAGE: build
+  # Multi-arch Docker build using buildx with QEMU emulation
+  build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          # Check if this is a stable release (no -alpha, -beta, etc.)
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "is_stable=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_stable=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push (stable release)
+        if: steps.version.outputs.is_stable == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            SDK_VERSION=${{ env.SDK_VERSION }}
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}
+            ${{ env.DOCKER_IMAGE }}:latest
+          provenance: false
+          sbom: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push (pre-release)
+        if: steps.version.outputs.is_stable == 'false'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            SDK_VERSION=${{ env.SDK_VERSION }}
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}
+          provenance: false
+          sbom: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image digest
+        run: |
+          echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ steps.version.outputs.tag }}\`" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.version.outputs.is_stable }}" == "true" ]; then
+            echo "**Latest:** Yes" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Pre-release:** Yes (no latest tag)" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+  # STAGE: scan (post-build)
+  # Container vulnerability scanning
+  container_scanning:
+    name: Container Scanning
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: |
+            trivy-db-
+
+      - name: Run Trivy container scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}'
+          severity: ${{ env.SECURITY_SEVERITY }}
+          format: 'sarif'
+          output: 'trivy-container-results.sarif'
+          exit-code: ${{ env.SECURITY_FAIL_ON_VULN == 'true' && '1' || '0' }}
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-container-results.sarif'
+          category: 'container-scanning'
+
+  sbom_generation:
+    name: Generate SBOM
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v') && vars.SCAN_SBOM == 'true'
+    steps:
+      - name: Extract version from tag
+        id: version
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Cache Trivy DB
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ github.run_id }}
+          restore-keys: |
+            trivy-db-
+
+      - name: Generate SBOM
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: '${{ env.DOCKER_IMAGE }}:${{ steps.version.outputs.tag }}'
+          format: 'cyclonedx'
+          output: 'sbom.cdx.json'
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: sbom-${{ steps.version.outputs.tag }}
+          path: sbom.cdx.json
+          retention-days: 90
