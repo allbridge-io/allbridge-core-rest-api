@@ -33,6 +33,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - uses: actions/checkout@v6
 
@@ -67,6 +68,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - uses: actions/checkout@v6
 
@@ -103,6 +105,7 @@ jobs:
   dependency_scanning:
     name: Dependency Scanning
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - uses: actions/checkout@v6
 
@@ -135,6 +138,7 @@ jobs:
   secret_detection:
     name: Secret Detection
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - uses: actions/checkout@v6
         with:
@@ -168,6 +172,7 @@ jobs:
   iac_scanning:
     name: IaC Scanning
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - uses: actions/checkout@v6
 
@@ -201,7 +206,12 @@ jobs:
     name: Semantic Release
     needs: [lint]
     runs-on: ubuntu-latest
+    outputs:
+      new_release_published: ${{ steps.check-release.outputs.released }}
+      new_release_version: ${{ steps.check-release.outputs.version }}
+      new_release_git_tag: ${{ steps.check-release.outputs.tag }}
     if: |
+      github.repository == 'allbridge-io/allbridge-core-rest-api' &&
       github.event_name == 'push' &&
       (github.ref_name == 'main' || github.ref_name == 'master' || github.ref_name == 'beta' || github.ref_name == 'alpha') &&
       !startsWith(github.event.head_commit.message, 'chore(release)')
@@ -240,6 +250,12 @@ jobs:
       - name: Install dependencies
         run: pnpm --filter rest-api install --frozen-lockfile
 
+      - name: Get latest tag before release
+        id: pre-release
+        run: |
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -248,3 +264,71 @@ jobs:
           GIT_COMMITTER_NAME: 'GitHub Actions'
           GIT_COMMITTER_EMAIL: 'actions@github.com'
         run: cd rest-api && pnpm semantic-release
+
+      - name: Check if new release was created
+        id: check-release
+        run: |
+          git fetch --tags
+          NEW_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
+          OLD_TAG="${{ steps.pre-release.outputs.latest_tag }}"
+          if [ "$NEW_TAG" != "$OLD_TAG" ] && [ "$NEW_TAG" != "none" ]; then
+            echo "released=true" >> $GITHUB_OUTPUT
+            echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+            echo "version=${NEW_TAG#v}" >> $GITHUB_OUTPUT
+            echo "New release created: $NEW_TAG"
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+            echo "No new release created"
+          fi
+
+  # STAGE: mirror
+  mirror-to-public:
+    name: Mirror to Public Repository
+    needs: [release]
+    runs-on: ubuntu-latest
+    if: |
+      github.repository == 'allbridge-io/allbridge-core-rest-api' &&
+      needs.release.outputs.new_release_published == 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push to public repository
+        env:
+          PUBLIC_REPO_PAT: ${{ secrets.PUBLIC_REPO_PAT }}
+        run: |
+          git fetch --tags
+          git remote add public https://x-access-token:${PUBLIC_REPO_PAT}@github.com/allbridge-public/allbridge-core-rest-api.git
+          git push public ${{ github.ref_name }}:${{ github.ref_name }} --force
+          git push public ${{ needs.release.outputs.new_release_git_tag }} --force
+
+      - name: Create GitHub Release in public repository
+        env:
+          GH_TOKEN: ${{ secrets.PUBLIC_REPO_PAT }}
+          SOURCE_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          TAG="${{ needs.release.outputs.new_release_git_tag }}"
+
+          PRERELEASE_FLAG=""
+          if [[ "$TAG" == *"-alpha"* ]] || [[ "$TAG" == *"-beta"* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          # Get release notes from source repo
+          NOTES=$(GH_TOKEN=$SOURCE_TOKEN gh release view "$TAG" --json body -q '.body' --repo allbridge-io/allbridge-core-rest-api 2>/dev/null || echo "Release $TAG")
+
+          # Create or update release in public repo
+          if gh release view "$TAG" --repo allbridge-public/allbridge-core-rest-api >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo allbridge-public/allbridge-core-rest-api --title "$TAG" --notes "$NOTES" $PRERELEASE_FLAG
+          else
+            gh release create "$TAG" --repo allbridge-public/allbridge-core-rest-api --title "$TAG" --notes "$NOTES" $PRERELEASE_FLAG
+          fi
+
+      - name: Summary
+        run: |
+          echo "## Mirror Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ needs.release.outputs.new_release_git_tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Public Repo:** [allbridge-public/allbridge-core-rest-api](https://github.com/allbridge-public/allbridge-core-rest-api)" >> $GITHUB_STEP_SUMMARY
