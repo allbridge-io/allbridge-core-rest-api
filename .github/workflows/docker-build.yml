@@ -20,6 +20,7 @@ jobs:
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - name: Determine tag
         id: tag
@@ -106,6 +107,7 @@ jobs:
     name: Container Scanning
     needs: [build]
     runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
     steps:
       - name: Determine tag
         id: tag
@@ -146,7 +148,7 @@ jobs:
     name: Generate SBOM
     needs: [build]
     runs-on: ubuntu-latest
-    if: vars.SCAN_SBOM == 'true'
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api' && vars.SCAN_SBOM == 'true'
     steps:
       - name: Determine tag
         id: tag
