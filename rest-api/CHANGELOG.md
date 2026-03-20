@@ -1,3 +1,9 @@
+## [3.27.6](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.5...v3.27.6) (2026-03-20)
+
+### Bug Fixes
+
+* **ci:** pin trivy-action to SHA after ([#8](https://github.com/allbridge-io/allbridge-core-rest-api/issues/8)) ([cff7867](https://github.com/allbridge-io/allbridge-core-rest-api/commit/cff7867b984032f7fac729829b782aebbb5404f8))
+
 ## [3.27.5](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.4...v3.27.5) (2025-12-22)
 
 ### Bug Fixes
