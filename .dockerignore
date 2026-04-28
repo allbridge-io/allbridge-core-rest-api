@@ -1,0 +1,14 @@
+.DS_Store
+.git
+.idea
+.pnpm-store
+**/.DS_Store
+**/.git
+**/.idea
+**/.env
+**/.env.*
+**/*.log
+**/*.tsbuildinfo
+**/coverage
+**/dist
+**/node_modules
