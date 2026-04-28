@@ -61,14 +61,16 @@ export class ConfigService {
   static getRPCUrls(): NodeRpcUrls {
     const rpcUrls: NodeRpcUrls = {};
     const networks = this.getNetworks() || Object.values(ChainSymbol);
-    networks.forEach((chain) => {
+    for (const chain of networks) {
       try {
         rpcUrls[chain] = ConfigService.getNetworkNodeUrl(chain);
         ConfigService.getLogger().log(
           `${chain} RPC Url loaded with ${rpcUrls[chain]}`,
         );
-      } catch {}
-    });
+      } catch (ignore) {
+        continue;
+      }
+    }
     if (!this.checkSRBandSTLRRpcUrlsBothPresence(rpcUrls)) {
       throw new ConfigError(`Requires SRB_NODE_URL and STLR_NODE_URL both`);
     }

@@ -22,8 +22,8 @@ import {
   STELLAR_BALANCE_LINE_EXAMPLE,
   TOKEN_EXAMPLE,
 } from '../swagger/examples';
-import { ensureEnumKey, requireQueryParam } from '../utils/validation';
 import { resolveRuntimeChainSymbol } from '../utils/runtime-chain';
+import { ensureEnumKey, requireQueryParam } from '../utils/validation';
 
 @Controller()
 @Route()

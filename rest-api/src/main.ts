@@ -4,8 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import safeStringify from 'fast-safe-stringify';
 import { AppModule } from './app.module';
-import { readSwaggerDocument } from './swagger/document';
 import { ConfigService } from './service/config.service';
+import { readSwaggerDocument } from './swagger/document';
 import { getLogger } from './utils/logger-factory';
 import { requestContextMiddleware } from './utils/request-context';
 

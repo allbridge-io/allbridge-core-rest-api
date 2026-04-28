@@ -411,9 +411,9 @@ export class PoolController {
   @Get('/liquidity/apr/format')
   @Tags('Pool')
   @Example<string>(APR_PERCENT_EXAMPLE, 'APR formatted as a percentage string')
-  async formatApr(
+  formatApr(
     @Query('apr') apr: string,
-  ): Promise<string> {
+  ): string {
     apr = requireQueryParam(apr, 'apr');
     try {
       return this.sdkService.aprInPercents(apr);

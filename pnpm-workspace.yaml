@@ -14,7 +14,7 @@ catalog:
   big.js: ^6.2.2
   bs58: ^6.0.0
   dotenv: ^16.4.7
-  eslint: latest
+  eslint: ^9.0.0
   eslint-config-prettier: latest
   eslint-plugin-prettier: latest
   ethers: ^6.15.0

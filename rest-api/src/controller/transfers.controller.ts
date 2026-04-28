@@ -39,8 +39,8 @@ import {
   RawTronTransactionResponse,
 } from '../types/raw-transaction';
 import { convertGt0IntAmountToFloat, convertIntAmountToFloat } from '../utils/calculation';
-import { buildBridgeSolanaTxFeeParams } from '../utils/solana-tx-fee-params';
 import { resolveRuntimeChainSymbol } from '../utils/runtime-chain';
+import { buildBridgeSolanaTxFeeParams } from '../utils/solana-tx-fee-params';
 import { withBridgeAddressOverride } from '../utils/token';
 import {
   ensureEnumKey,
