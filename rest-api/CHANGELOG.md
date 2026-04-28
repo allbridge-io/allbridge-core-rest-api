@@ -1,3 +1,23 @@
+## [3.28.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.6...v3.28.0) (2026-04-28)
+
+### Features
+
+* add .npmrc for workspace package injection and update Dockerfile ([82b62c1](https://github.com/allbridge-io/allbridge-core-rest-api/commit/82b62c11b3589e81dce1b2c9cf3839988f5b18e6))
+* add CLI for Allbridge Core REST API and .dockerignore file ([81a3853](https://github.com/allbridge-io/allbridge-core-rest-api/commit/81a38536d3eb102338fd3454b2963cb7e35452bc))
+* add liquidity-related functionalities and improve environment variable handling ([8d79c8f](https://github.com/allbridge-io/allbridge-core-rest-api/commit/8d79c8ff28fc062454b219fabb5fedebcabefa97))
+* **ci:** enable workspace package injection in pnpm configuration ([f9d573f](https://github.com/allbridge-io/allbridge-core-rest-api/commit/f9d573f269ca5df63bd122e90fac2c23ed8df021))
+* **quote:** add spacing for improved readability in bridge quote service ([fdc7e6f](https://github.com/allbridge-io/allbridge-core-rest-api/commit/fdc7e6fd1d3cfc09b96934a30daf28fbb9661986))
+* **quote:** introduce bridge quote endpoint ([23784e9](https://github.com/allbridge-io/allbridge-core-rest-api/commit/23784e98c6d53c5b176ddfc9cb56573690b943ca))
+* start 3.27 alpha ([220e03a](https://github.com/allbridge-io/allbridge-core-rest-api/commit/220e03ac57a34d40812a4e6c55aa042a34a92d62))
+
+### Bug Fixes
+
+* **ci:** update Node.js and PNPM versions in CI configuration ([d8a77e1](https://github.com/allbridge-io/allbridge-core-rest-api/commit/d8a77e151a02aa9319e6cdf94cb0b7d1b75e2a66))
+* remove unnecessary blank lines in bridge quote service interface ([37f2434](https://github.com/allbridge-io/allbridge-core-rest-api/commit/37f2434468f8370887f69b8b602309af9f4f73bc))
+* update ESLint and related dependencies to improve code quality and maintainability ([60dd717](https://github.com/allbridge-io/allbridge-core-rest-api/commit/60dd7174514c7c84dc162d5582671c0e62d54d32))
+* update pnpm ([37fd4a2](https://github.com/allbridge-io/allbridge-core-rest-api/commit/37fd4a25bd9c03ef665473fe0741cf930a0f11bc))
+* update pnpm ([487f8d6](https://github.com/allbridge-io/allbridge-core-rest-api/commit/487f8d6b280de8649ce460a9bbe4fc5621eb8e03))
+
 ## [3.27.6](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.5...v3.27.6) (2026-03-20)
 
 ### Bug Fixes
