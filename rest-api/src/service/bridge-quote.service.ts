@@ -20,8 +20,7 @@ export interface BridgeQuoteResponse {
 export interface BridgeQuoteOption {
   messenger: keyof typeof Messenger;
   messengerIndex?: Messenger;
-  estimatedTimeMs: number;
-  sourceTxCostInNative: string;
+  estimatedTimeMs: number | null;
   paymentMethods: BridgeQuotePayment[];
 }
 export interface BridgeQuotePayment {
@@ -33,11 +32,14 @@ export interface BridgeQuotePayment {
     min: string;
     max: string;
   };
-  relayerFeeInStable: string;
-  relayerFeeInNative: string;
-  lpFee: SwapCalcInfo;
-  lpFeeTotal: string;
-  transferFee: string;
+  relayerFeeInStable?: string;
+  relayerFeeInNative?: string;
+  relayerFeeInAbr?: string;
+  abrPayerAddress?: string;
+  abrTokenAddress?: string;
+  poolImpact?: SwapCalcInfo;
+  lpFeeTotal?: string;
+  transferFee?: string;
 }
 
 @Injectable()
@@ -88,8 +90,6 @@ export class BridgeQuoteService {
     const estimatedTimeMs =
       this.sdk.getTransferTime(sourceToken, destinationToken, messengerIndex) ?? null;
 
-    const sourceTxCostInNative = '0';
-
     const gasFeeOptions = await this.sdk.getGasFeeOptions(
       sourceToken,
       destinationToken,
@@ -104,6 +104,13 @@ export class BridgeQuoteService {
       if (!feeData) continue;
 
       const feeInt = feeData[AmountFormat.INT];
+      const amountForRouteInt = method === FeePaymentMethod.WITH_STABLECOIN
+        ? Big(amountInt).minus(feeInt)
+        : Big(amountInt);
+      if (amountForRouteInt.lte(0)) {
+        continue;
+      }
+
       const pending = await this.getPendingSafe(amountInt, sourceToken, destinationToken);
 
       const receive = await this.calcReceive({
@@ -113,6 +120,9 @@ export class BridgeQuoteService {
         amountFloat,
         feeInt: method === FeePaymentMethod.WITH_STABLECOIN ? feeInt : undefined,
       });
+      if (!receive) {
+        continue;
+      }
 
       let lpFeeRaw: SwapCalcInfo = {
         sourceLiquidityFee: '0',
@@ -124,7 +134,7 @@ export class BridgeQuoteService {
 
       if ([Messenger.ALLBRIDGE, Messenger.WORMHOLE].includes(messengerIndex)) {
         lpFeeRaw = await this.sdk.swapAndBridgeDetails(
-          amountInt,
+          amountForRouteInt.gt(0) ? amountForRouteInt.toString() : '0',
           AmountFormat.INT,
           sourceToken,
           destinationToken,
@@ -137,9 +147,11 @@ export class BridgeQuoteService {
         messengerIndex,
         sourceToken,
         destinationToken,
+        method,
+        feeInt,
       );
 
-      payments.push({
+      const payment: BridgeQuotePayment = {
         feePaymentMethod: methodKey as keyof typeof FeePaymentMethod,
         fee: feeInt,
         pendingTxs: pending?.pendingTxs,
@@ -148,26 +160,66 @@ export class BridgeQuoteService {
           min: receive.min,
           max: receive.max,
         },
-        relayerFeeInStable:
-          method === FeePaymentMethod.WITH_STABLECOIN ? feeData[AmountFormat.INT] : '0',
-        relayerFeeInNative:
-          method === FeePaymentMethod.WITH_NATIVE_CURRENCY ? feeData[AmountFormat.INT] : '0',
-        lpFee: {
-          sourceLiquidityFee: Big(lpFeeRaw.sourceLiquidityFee).mul(Big('10').pow(sourceToken.decimals)).round(0, Big.roundDown).toString(),
-          sourceSwap: Big(lpFeeRaw.sourceSwap).mul(Big('10').pow(sourceToken.decimals)).round(0, Big.roundDown).toString(),
-          destinationLiquidityFee: Big(lpFeeRaw.destinationLiquidityFee).mul(Big('10').pow(destinationToken.decimals)).round(0, Big.roundDown).toString(),
-          destinationSwap: Big(lpFeeRaw.destinationSwap).mul(Big('10').pow(destinationToken.decimals)).round(0, Big.roundDown).toString(),
-        },
-        lpFeeTotal: Big(lpFeeTotal).mul(Big('10').pow(destinationToken.decimals)).mul('-1').round(0, Big.roundDown).toString(),
-        transferFee,
-      });
+      };
+
+      if (method === FeePaymentMethod.WITH_STABLECOIN) {
+        payment.relayerFeeInStable = feeData[AmountFormat.INT];
+      }
+
+      if (method === FeePaymentMethod.WITH_NATIVE_CURRENCY) {
+        payment.relayerFeeInNative = feeData[AmountFormat.INT];
+      }
+
+      if (method === FeePaymentMethod.WITH_ABR) {
+        payment.relayerFeeInAbr = feeData[AmountFormat.INT];
+        payment.abrPayerAddress = sourceToken.abrPayer?.payerAddress;
+        payment.abrTokenAddress = sourceToken.abrPayer?.abrToken.tokenAddress;
+      }
+
+      if ([Messenger.ALLBRIDGE, Messenger.WORMHOLE].includes(messengerIndex)) {
+        payment.poolImpact = {
+          sourceLiquidityFee: Big(lpFeeRaw.sourceLiquidityFee)
+            .mul(Big('10').pow(sourceToken.decimals))
+            .round(0, Big.roundDown)
+            .toString(),
+          sourceSwap: Big(lpFeeRaw.sourceSwap)
+            .mul(Big('10').pow(sourceToken.decimals))
+            .round(0, Big.roundDown)
+            .toString(),
+          destinationLiquidityFee: Big(lpFeeRaw.destinationLiquidityFee)
+            .mul(Big('10').pow(destinationToken.decimals))
+            .round(0, Big.roundDown)
+            .toString(),
+          destinationSwap: Big(lpFeeRaw.destinationSwap)
+            .mul(Big('10').pow(destinationToken.decimals))
+            .round(0, Big.roundDown)
+            .toString(),
+        };
+        payment.lpFeeTotal = Big(lpFeeTotal)
+          .mul(Big('10').pow(destinationToken.decimals))
+          .mul('-1')
+          .round(0, Big.roundDown)
+          .toString();
+      }
+
+      if (
+        [
+          Messenger.CCTP,
+          Messenger.CCTP_V2,
+          Messenger.OFT,
+          Messenger.X_RESERVE,
+        ].includes(messengerIndex)
+      ) {
+        payment.transferFee = transferFee;
+      }
+
+      payments.push(payment);
     }
 
     return {
       messengerIndex,
       messenger: Messenger[messengerIndex] as keyof typeof Messenger,
       estimatedTimeMs,
-      sourceTxCostInNative,
       paymentMethods: payments,
     };
   }
@@ -199,6 +251,10 @@ export class BridgeQuoteService {
       list.push(Messenger.OFT);
     }
 
+    if (source.xReserve && dest.xReserve) {
+      list.push(Messenger.X_RESERVE);
+    }
+
     return list;
   }
 
@@ -220,7 +276,7 @@ export class BridgeQuoteService {
     destinationToken: TokenWithChainDetails;
     amountFloat: string;
     feeInt?: string;
-  }): Promise<{ min: string; max: string }> {
+  }): Promise<{ min: string; max: string } | null> {
     const { messengerIndex, sourceToken, destinationToken, amountFloat, feeInt } = params;
 
     const stableFeeFloat = feeInt
@@ -235,6 +291,9 @@ export class BridgeQuoteService {
       false,
       stableFeeFloat,
     );
+    if (!result.amountReceivedInFloat) {
+      return null;
+    }
 
     const intAmount = this.toInt(result.amountReceivedInFloat, destinationToken.decimals);
 
@@ -249,16 +308,28 @@ export class BridgeQuoteService {
     messenger: Messenger,
     source: TokenWithChainDetails,
     dest: TokenWithChainDetails,
+    feePaymentMethod: FeePaymentMethod,
+    feeInt: string,
   ): Promise<string> {
+    const amountForRoute = feePaymentMethod === FeePaymentMethod.WITH_STABLECOIN
+      ? Big(amountInt).minus(feeInt)
+      : Big(amountInt);
+
+    if (amountForRoute.lte(0)) {
+      return '0';
+    }
+
     if (
       messenger === Messenger.CCTP &&
       source.cctpAddress &&
       dest.cctpAddress &&
       source.cctpFeeShare
     ) {
-      return Big(amountInt)
-        .mul(Big(source.cctpFeeShare))
-        .round(0, Big.roundUp)
+      const amountAfterRouteFee = amountForRoute
+        .mul(Big(1).minus(source.cctpFeeShare))
+        .round(0, Big.roundUp);
+      return amountForRoute
+        .minus(amountAfterRouteFee)
         .toString();
     }
 
@@ -268,9 +339,11 @@ export class BridgeQuoteService {
       dest.cctpV2Address &&
       source.cctpV2FeeShare
     ) {
-      return Big(amountInt)
-        .mul(Big(source.cctpV2FeeShare))
-        .round(0, Big.roundUp)
+      const amountAfterRouteFee = amountForRoute
+        .mul(Big(1).minus(source.cctpV2FeeShare))
+        .round(0, Big.roundUp);
+      return amountForRoute
+        .minus(amountAfterRouteFee)
         .toString();
     }
 
@@ -283,12 +356,29 @@ export class BridgeQuoteService {
       dest.oftBridgeAddress
     ) {
       const gasFeeOptions = await this.sdk.getGasFeeOptions(source, dest, messenger);
-      const shareFloat = Big(gasFeeOptions.adminFeeShareWithExtras)
-        .div(Big(10)
-        .pow(source.decimals));
-      return Big(amountInt)
-        .mul(shareFloat)
-        .round(0, Big.roundUp)
+      const shareFloat = gasFeeOptions.adminFeeShareWithExtras;
+      if (!shareFloat) {
+        return '0';
+      }
+      const amountAfterRouteFee = amountForRoute
+        .mul(Big(1).minus(shareFloat))
+        .round(0, Big.roundUp);
+      return amountForRoute
+        .minus(amountAfterRouteFee)
+        .toString();
+    }
+
+    if (
+      messenger === Messenger.X_RESERVE &&
+      source.xReserve &&
+      dest.xReserve
+    ) {
+      const amountAfterRouteFee = amountForRoute
+        .mul(Big(1).minus(source.xReserve.feeShare))
+        .minus(source.xReserve.feeConst)
+        .round(0, Big.roundDown);
+      return amountForRoute
+        .minus(amountAfterRouteFee)
         .toString();
     }
 

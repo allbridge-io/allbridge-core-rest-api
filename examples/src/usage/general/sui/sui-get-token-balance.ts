@@ -10,13 +10,11 @@ const accountAddress = getEnvVar("SUI_ACCOUNT_ADDRESS");
 
 const main = async () => {
   try {
-    // Get native token balance
     const nativeBalanceUrl = `${restApiUrl}/token/native/balance?address=${accountAddress}&chain=SUI`;
     console.log(`Requesting native token balance from: ${nativeBalanceUrl}`);
     const { data: nativeTokenBalance } = await axios.get(nativeBalanceUrl);
     console.log("Native Token Balance: ", nativeTokenBalance);
 
-    // Get token balance
     const tokenBalanceUrl = `${restApiUrl}/token/balance?address=${accountAddress}&token=${tokenAddress}`;
     console.log(`Requesting token balance from: ${tokenBalanceUrl}`);
     const { data: tokenBalance } = await axios.get(tokenBalanceUrl);

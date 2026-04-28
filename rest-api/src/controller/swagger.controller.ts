@@ -1,9 +1,7 @@
-import { readFile } from 'fs/promises';
-import { join } from 'path';
-
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation } from '@nestjs/swagger';
 import { Hidden, Route } from 'tsoa';
+import { readSwaggerDocument } from '../swagger/document';
 
 @Controller('api')
 @Route('api')
@@ -13,11 +11,7 @@ export class SwaggerController {
   @ApiOperation({
     description: 'swagger static file',
   })
-  async swagger(): Promise<any> {
-    return JSON.parse(
-      (await readFile(join(process.cwd(), 'public', 'swagger.json'))).toString(
-        'utf-8',
-      ),
-    );
+  async swagger(): Promise<unknown> {
+    return readSwaggerDocument();
   }
 }

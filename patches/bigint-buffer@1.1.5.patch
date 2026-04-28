@@ -1,0 +1,39 @@
+diff --git a/dist/node.js b/dist/node.js
+index 513168c89e387668a79b6beb109587b3eb41a7d0..23bd9a2a753e919ba510474e4df1a0e1c7fa741c 100644
+--- a/dist/node.js
++++ b/dist/node.js
+@@ -2,14 +2,6 @@
+ 
+ Object.defineProperty(exports, "__esModule", { value: true });
+ let converter;
+-{
+-    try {
+-        converter = require('bindings')('bigint_buffer');
+-    }
+-    catch (e) {
+-        console.warn('bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)');
+-    }
+-}
+ /**
+  * Convert a little-endian buffer into a BigInt.
+  * @param buf The little-endian buffer to convert
+diff --git a/src/index.ts b/src/index.ts
+index 3c78463c2fac414612aa49a9fd27d529a2041ec0..6ac44354f59601918c01cf00b022bb852c3890e9 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -8,15 +8,6 @@ declare var process: {browser: boolean;};
+ 
+ let converter: ConverterInterface;
+ 
+-if (!process.browser) {
+-  try {
+-    converter = require('bindings')('bigint_buffer');
+-  } catch (e) {
+-    console.warn(
+-        'bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)');
+-  }
+-}
+-
+ /**
+  * Convert a little-endian buffer into a BigInt.
+  * @param buf The little-endian buffer to convert

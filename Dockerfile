@@ -1,4 +1,4 @@
-FROM node:22-alpine3.23 AS build
+FROM node:24-alpine AS build
 ARG SDK_VERSION=latest
 
 # Install build dependencies (sorted alphabetically)
@@ -21,7 +21,8 @@ COPY pnpm-lock.yaml ./
 COPY package.json ./
 # Copy only the necessary files for the rest-api package
 COPY rest-api/package.json ./rest-api/
-COPY rest-api/pnpm-lock.yaml ./rest-api/
+COPY patches/bigint-buffer@1.1.5.patch ./patches/
+
 # Install dependencies
 RUN pnpm --filter rest-api install
 # Set the working directory to the rest-api package
@@ -29,14 +30,11 @@ WORKDIR /app/rest-api
 # If the SDK_VERSION build argument is provided, update the package.json
 # Otherwise, keep the default value
 RUN if [ "${SDK_VERSION}" != "latest" ]; then \
-        pnpm --filter rest-api update @allbridge/bridge-core-sdk@${SDK_VERSION}; \
-    else \
-        pnpm --filter rest-api update @allbridge/bridge-core-sdk; \
+        pnpm --filter rest-api add @allbridge/bridge-core-sdk@${SDK_VERSION}; \
     fi
 # Copy the rest of the files
 COPY rest-api/src ./src
 COPY rest-api/*.json ./
-COPY rest-api/pnpm-lock.yaml ./
 
 # Build the app
 RUN pnpm --filter rest-api build
@@ -47,7 +45,7 @@ WORKDIR /app/rest-api/pruned
 RUN node -e "const p=require('./package.json'); delete p.devDependencies; require('fs').writeFileSync('package.json', JSON.stringify(p, null, 2));"
 
 # Final stage
-FROM node:22-alpine3.23
+FROM node:24-alpine
 
 # Update and install runtime dependencies in single layer
 RUN apk update && \

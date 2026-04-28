@@ -8,7 +8,8 @@
     "lib": [
       "es2022"
     ],
-    "module": "commonjs",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "target": "es2022",
     "outDir": "dist",
 
@@ -26,7 +27,8 @@
     "allowSyntheticDefaultImports": true,
     "inlineSources": true,
     "strictFunctionTypes": true,
-    "baseUrl": "./",
+    "isolatedModules": true,
+    "rootDir": ".",
     "incremental": true,
     "strictNullChecks": false,
     "noImplicitAny": false,

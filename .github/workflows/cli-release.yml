@@ -1,0 +1,78 @@
+name: CLI Release
+
+on:
+  push:
+    tags:
+      - 'cli/v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'CLI tag to release, for example cli/v0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: GoReleaser
+    runs-on: ubuntu-latest
+    if: github.repository == 'allbridge-io/allbridge-core-rest-api'
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: cli/go.mod
+          cache-dependency-path: cli/go.sum
+
+      - name: Resolve release tag
+        id: tag
+        shell: bash
+        run: |
+          CLI_TAG="${{ inputs.tag || github.ref_name }}"
+          VERSION_TAG="${CLI_TAG#cli/}"
+          if [[ "$CLI_TAG" != cli/v* ]]; then
+            echo "::error::CLI releases must use cli/v* tags, got $CLI_TAG"
+            exit 1
+          fi
+          echo "cli_tag=$CLI_TAG" >> "$GITHUB_OUTPUT"
+          echo "version_tag=$VERSION_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifacts
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean --skip=publish --skip=validate
+          workdir: cli
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.version_tag }}
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          tag_name: ${{ steps.tag.outputs.cli_tag }}
+          name: Allbridge CLI ${{ steps.tag.outputs.version_tag }}
+          body: |
+            Allbridge Core CLI release.
+
+            Default REST API endpoint: `https://core-rest-api.allbridge.io`.
+          files: |
+            cli/dist/*.tar.gz
+            cli/dist/*.zip
+            cli/dist/checksums.txt
+          make_latest: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

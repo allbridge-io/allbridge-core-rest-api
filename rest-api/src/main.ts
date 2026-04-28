@@ -1,26 +1,22 @@
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 import { contextMiddleware, LoggingInterceptor } from '@allbridge/logger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import safeStringify from 'fast-safe-stringify';
 import { AppModule } from './app.module';
+import { readSwaggerDocument } from './swagger/document';
 import { ConfigService } from './service/config.service';
 import { getLogger } from './utils/logger-factory';
+import { requestContextMiddleware } from './utils/request-context';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
-  // read the JSON file to string and parse the string to object literal
-  const document = JSON.parse(
-    (await readFile(join(process.cwd(), 'public', 'swagger.json'))).toString(
-      'utf-8',
-    ),
-  );
-  SwaggerModule.setup('api', app, document);
+  const document = await readSwaggerDocument();
+  SwaggerModule.setup('api', app, document as Parameters<typeof SwaggerModule.setup>[2]);
 
   app.use(contextMiddleware);
+  app.use(requestContextMiddleware);
   app.useGlobalInterceptors(new LoggingInterceptor(getLogger('http')));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   await app.listen(ConfigService.getPort());

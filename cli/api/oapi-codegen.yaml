@@ -1,0 +1,22 @@
+# oapi-codegen configuration. See: https://github.com/oapi-codegen/oapi-codegen
+#
+# Used by `make gen` (or `go generate ./...`) to produce a typed Go client
+# for the Allbridge REST API from api/swagger.json. The generated code lives
+# in internal/api/gen/openapi.gen.go and is opt-in — the hand-written client
+# in internal/api/client.go is what the CLI uses by default.
+# Note: oapi-codegen resolves `output` relative to the CURRENT WORKING
+# DIRECTORY of the generator process, NOT relative to this YAML file. The
+# //go:generate directive lives in internal/api/gen.go, so the generator
+# runs from cli/internal/api/, and the path below is relative to there.
+package: gen
+output: gen/openapi.gen.go
+generate:
+  models: true
+  client: true
+  embedded-spec: false
+output-options:
+  # Keep operation response wrappers from colliding with component schemas such
+  # as BridgeQuoteResponse.
+  response-type-suffix: HTTPResponse
+compatibility:
+  always-prefix-enum-values: true

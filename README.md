@@ -13,7 +13,8 @@
 
 # Allbridge Core REST API
 
-Provides an easy integration with the Allbridge Core ChainBridgeService for DApps vie REST API.
+Provides a straightforward integration with the Allbridge Core ChainBridgeService for DApps via REST API.
+Runnable usage examples live in the [`examples/`](./examples) workspace.
 
 ## Table of Contents
 
@@ -34,6 +35,7 @@ Provides an easy integration with the Allbridge Core ChainBridgeService for DApp
         * [Final Steps](#final-steps)
   * [How to use](#how-to-use)
     * [Swagger](#swagger)
+    * [Capability Matrix](#capability-matrix)
     * [Raw Transactions](#raw-transactions)
     * [Tokens](#tokens)
     * [Pools](#pools)
@@ -63,11 +65,13 @@ The Allbridge Core REST API supports the following networks:
 - Sonic (SNC)
 - Unichain (UNI)
 - Linea (LIN)
+- Algorand (ALG)
+- Stacks (STX)
 
 ### Environment variables
 
 The Allbridge Core REST API requires the following environment variables:
-
+- `NETWORKS` - The list of enabled networks
 - `ETH_NODE_URL` - The JSON RPC URL of the Ethereum node. For example:
   - `https://ethereum-rpc.publicnode.com`
   - `https://mainnet.infura.io/v3/YOUR-PROJECT-ID`
@@ -140,6 +144,19 @@ The Allbridge Core REST API requires the following environment variables:
   - `https://linea-rpc.publicnode.com`
   - `https://rpc.linea.build`
   - ...
+- `ALG_NODE_URL` - The JSON RPC URL of the Algorand node. For example:
+  - `https://algod.algorand.chain.love`
+  - `https://algorand-mainnet-algod.gateway.tatum.io`
+  - `https://mainnet-api.4160.nodely.dev`
+  - ...
+- `STX_NODE_URL` - The Stacks API base URL used by the SDK. For example:
+  - `https://api.mainnet.hiro.so`
+  - `https://api.testnet.hiro.so`
+  - ...
+- `STX_IS_TESTNET` - Optional boolean flag for the Stacks network mode. Use `true` with testnet API endpoints and `false` for mainnet. Default:
+  - `false`
+- `STX_HERO_API_KEY` - Optional Hiro API key used for Stacks requests. For example:
+  - `YOUR-HIRO-API-KEY`
 - `HEADERS` - Headers for the API requests. For example:
   - `{"Authorization": "Bearer YOUR-TOKEN"}`
 - `TRON_JSON_RPC` - The JSON RPC URL of the Tron node. For example:
@@ -155,6 +172,7 @@ The easiest way to use the Allbridge Core REST API is to use the existing docker
 
 ```bash
 docker run -p 3000:3000 \
+    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\",\"SUI\",\"SNC\",\"UNI\",\"LIN\",\"ALG\",\"STX\"]" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
     -e TRX_NODE_URL="https://tron-rpc.publicnode.com" \
@@ -171,6 +189,8 @@ docker run -p 3000:3000 \
     -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
     -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
     -e LIN_NODE_URL="https://linea-rpc.publicnode.com" \
+    -e ALG_NODE_URL="https://mainnet-api.4160.nodely.dev" \
+    -e STX_NODE_URL="https://api.mainnet.hiro.so" \
     -d allbridge/io.allbridge.rest-api:latest    
 ```
 or use environment variables from the `.env` file:
@@ -183,6 +203,7 @@ docker run -p 3000:3000 --env-file .env -d allbridge/io.allbridge.rest-api:lates
 ```bash
 docker build -t allbridge-core-rest-api .
 docker run -p 3000:3000 \
+    -e NETWORKS="[\"ETH\",\"BSC\",\"TRX\",\"ARB\",\"POL\",\"AVA\",\"OPT\",\"BAS\",\"CEL\",\"SOL\",\"SRB\",\"STLR\",\"SUI\",\"SNC\",\"UNI\",\"LIN\",\"ALG\",\"STX\"]" \
     -e ETH_NODE_URL="https://ethereum-rpc.publicnode.com" \
     -e BSC_NODE_URL="https://bsc-rpc.publicnode.com" \
     -e TRX_NODE_URL="https://tron-rpc.publicnode.com" \
@@ -199,12 +220,14 @@ docker run -p 3000:3000 \
     -e SNC_NODE_URL="https://sonic-rpc.publicnode.com:443" \
     -e UNI_NODE_URL="https://unichain-rpc.publicnode.com" \
     -e LIN_NODE_URL="https://linea-rpc.publicnode.com" \
+    -e ALG_NODE_URL="https://mainnet-api.4160.nodely.dev" \
+    -e STX_NODE_URL="https://api.mainnet.hiro.so" \
     -d allbridge-core-rest-api 
 ```
 ### Host on Digital Ocean
 
 If you are hosting the REST API on Digital Ocean, you may encounter a `403 Forbidden` error.
-This error is due to the Digital Ocean is blocked by the Allbridge Core API firewall system.
+This happens because Digital Ocean traffic is blocked by the Allbridge Core API firewall system.
 To resolve this issue, please open a ticket on our [Discord,](https://discord.com/invite/ASuPY8d3E6)
 and we will provide you with a detailed guide on how to solve it.
 
@@ -219,7 +242,7 @@ Below is a step-by-step guide on how to do this.
 #### Step-by-Step Guide
 
 1. Sign up for Heroku
-   * [Heroku Sing Up](https://id.heroku.com/login)
+   * [Heroku Sign Up](https://id.heroku.com/login)
 2. Install Heroku CLI
    * Follow the instructions [here](https://devcenter.heroku.com/articles/heroku-cli#install-the-heroku-cli)
 3. Login to Heroku CLI
@@ -269,6 +292,46 @@ You are now ready to use your rest-api app.
 ### Swagger
 
 After running the docker image, you can access the swagger documentation at `http://localhost:3000/api`. The swagger documentation provides a detailed description of the available endpoints and their parameters.
+
+### Capability Matrix
+
+The REST API is grouped into `Tokens`, `Transfers`, `Pool`, `Yield`, and `Utils`. The matrix below summarizes which route families exist, what they are intended for, and what payload shape to expect from the chain-specific raw transaction builders.
+
+| Route family | Paths | Chain families | Response / payload format | Notes |
+|--------------|-------|----------------|---------------------------|-------|
+| Token metadata | `/chains`, `/tokens`, `/token/details` | All configured chains | JSON | `/tokens` supports `swap`, `pool`, and `yield` filtering |
+| Token balances | `/token/balance`, `/token/native/balance` | All SDK-supported chains, including `ALG`, `SUI`, `SRB/STLR`, `STX` | JSON | `/token/balance` returns the token amount in smallest units |
+| Gas information | `/gas/fee`, `/gas/balance`, `/gas/extra/limits` | Transfer-capable chains | JSON | Availability depends on source/destination token pair support |
+| Transfer calculations | `/transfer/time`, `/transfer/status`, `/pending/info`, `/swap/details`, `/bridge/details`, `/bridge/receive/calculate`, `/bridge/send/calculate`, `/bridge/quote` | Bridge-capable chains | JSON | REST is generic here; exact availability depends on SDK token pair and messenger support |
+| Generic approvals / allowances | `/raw/approve`, `/raw/bridge/approve`, `/bridge/allowance`, `/check/allowance`, `/check/bridge/allowance`, `/raw/pool/approve`, `/pool/allowance`, `/check/pool/allowance`, `/yield/allowance`, `/check/yield/allowance`, `/raw/yield/approve` | Approval-based chains and tokens | JSON or raw tx | Not every chain needs approvals; approval routes are meaningful only where the SDK exposes them |
+| Bridge raw transactions | `/raw/swap`, `/raw/bridge` | `EVM`, `TRX`, `SOL`, `SRB/STLR`, `ALG`, `SUI`, `STX` where supported by SDK/token pair | Chain-specific raw transaction payload | Use Swagger examples to see the expected shape per chain family |
+| Pool raw transactions | `/raw/deposit`, `/raw/withdraw`, `/raw/claim` | Pool-enabled chains and tokens | Chain-specific raw transaction payload | Includes chains such as `EVM`, `TRX`, `SOL`, `SUI`, `ALG`, `STX` where pools are supported |
+| Yield raw transactions | `/raw/yield/approve`, `/raw/yield/deposit`, `/raw/yield/withdraw` | Yield-enabled chains / tokens only | Chain-specific raw transaction payload | Only applicable to tokens returned by `/yield/tokens` |
+| Pool analytics | `/pool/info/server`, `/pool/info/blockchain`, `/liquidity/details`, `/liquidity/deposit/calculate`, `/liquidity/withdrawn/calculate` | Pool-enabled chains / tokens | JSON | `/pool/info/blockchain` reads on-chain state; `/pool/info/server` comes from core API |
+| Algorand utilities | `/raw/algorand/optin/`, `/check/algorand/optin` | `ALG` | Raw tx array / boolean | Supports both `asset` and `app` opt-in flows |
+| Stellar / Soroban utilities | `/raw/stellar/restore/`, `/raw/stellar/trustline`, `/check/stellar/balanceline`, `/utils/stellar/submit`, `/utils/soroban/send`, `/utils/soroban/confirm` | `STLR`, `SRB` | XDR string / JSON / boolean | `restore`, `send`, and `confirm` are Soroban-oriented; `trustline`, `balanceline`, and `submit` are Stellar-oriented |
+| Solana utilities | `/utils/solana/add-memo`, `/utils/solana/replace-fee-payer` | `SOL` | Serialized transaction hex string | Both routes modify an already-built Solana transaction |
+| Sui utilities | `/utils/sui/build-send-from-custom-tx`, `/utils/sui/raw2base64` | `SUI` | Raw tx JSON string / base64 string | `build-send-from-custom-tx` expects serialized `baseTx`, `inputCoin`, and `params` values |
+| Tron utilities | `/utils/tron/raw2hex` | `TRX` | Hex string | Converts a Tron transaction JSON payload to raw hex |
+
+#### Raw transaction payload formats
+
+| Chain family | Raw payload returned by REST |
+|--------------|------------------------------|
+| `EVM` | JSON object with minimal web3 transaction fields such as `to`, `data`, `value` |
+| `TRX` | Tron transaction JSON |
+| `SOL` | Serialized transaction hex string |
+| `SRB` / `STLR` | XDR string |
+| `ALG` | Array of hex-encoded unsigned transactions |
+| `SUI` | Serialized Sui transaction JSON string |
+| `STX` | Serialized Stacks transaction string |
+
+#### Notes by chain family
+
+- `STX` is supported through the generic bridge, pool, and token routes once `STX_NODE_URL` is configured. It does not have a dedicated controller family in the REST API.
+- `SRB` and `STLR` intentionally share utility routes because a real integration often needs both trustline / balance line flows and Soroban restore / send / confirm flows.
+- `ALG` opt-in routes are exposed explicitly because they are a required operational step for some bridge and pool interactions.
+- `SUI` custom transaction support is exposed as a utility route because it depends on an externally prepared transaction context rather than a plain bridge request.
 
 ### Raw Transactions
 | **GET Endpoint**       | **Description**                                                                                                                   |

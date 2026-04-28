@@ -15,16 +15,21 @@ export class ConfigError extends RestSDKError {
   }
 }
 
+const GENERIC_BAD_REQUEST_MESSAGE = 'Bad request';
+
 export const httpException = (e) => {
+  if (e instanceof HttpException) {
+    throw e;
+  }
   if (e instanceof SdkRootError) {
     throw new HttpException(
       {
         statusCode: HttpStatus.BAD_REQUEST,
         errorCode: e.errorCode,
-        message: e.message,
+        message: GENERIC_BAD_REQUEST_MESSAGE,
       },
       HttpStatus.BAD_REQUEST,
     );
   }
-  throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+  throw new HttpException(GENERIC_BAD_REQUEST_MESSAGE, HttpStatus.BAD_REQUEST);
 };

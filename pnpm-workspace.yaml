@@ -1,25 +1,25 @@
 packages:
-  - 'rest-api'
-  - 'examples'
-shared-workspace-lockfile: true
+  - rest-api
+  - examples
 
 catalog:
-  '@solana/web3.js': ^1.98.0
+  '@allbridge/bridge-core-sdk': 3.31.0-alpha.2
   '@mysten/sui': ^1.21.2
-  '@stellar/stellar-sdk': ^13.1.0
-  'axios': ^1.12.0
+  '@solana/web3.js': ^1.98.0
+  '@stellar/stellar-sdk': ^15.0.1
   '@types/big.js': ^6.2.2
-  'big.js': ^6.2.2
-  'tronweb': 6.0.4
-  'web3': ^4.16.0
-  'web3-core': ^4.7.1
-  'web3-types': ^1.10.0
-  'web3-eth-contract': ^4.7.2
   '@typescript-eslint/eslint-plugin': ^8.18.1
   '@typescript-eslint/parser': ^8.18.1
-  'bs58': ^6.0.0
-  'dotenv': ^16.4.7
-  'eslint': ^9.17.0
-  'eslint-config-prettier': ^9.1.0
-  'eslint-plugin-prettier': ^5.2.1
-  'prettier': ^3.4.2
+  axios: ^1.15.0
+  big.js: ^6.2.2
+  bs58: ^6.0.0
+  dotenv: ^16.4.7
+  eslint: latest
+  eslint-config-prettier: latest
+  eslint-plugin-prettier: latest
+  ethers: ^6.15.0
+  prettier: ^3.4.2
+  tronweb: 6.0.4
+  web3-core: ^4.7.1
+
+shared-workspace-lockfile: true

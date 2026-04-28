@@ -1,0 +1,23 @@
+# Binaries
+/bin/
+/dist/
+allbridge
+
+# Test/build artifacts
+*.test
+*.out
+coverage.txt
+
+# Local config & keystore
+*.local
+.allbridge/
+keystore.json
+*.keystore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

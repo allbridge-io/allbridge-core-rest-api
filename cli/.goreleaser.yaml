@@ -1,0 +1,73 @@
+version: 2
+
+project_name: allbridge
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: allbridge
+    main: ./cmd/allbridge
+    binary: allbridge
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/allbridge-io/rest-api/cli/internal/version.Version={{ .Version }}
+      - -X github.com/allbridge-io/rest-api/cli/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/allbridge-io/rest-api/cli/internal/version.Date={{ .Date }}
+
+archives:
+  - id: allbridge
+    ids:
+      - allbridge
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    formats:
+      - tar.gz
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+    files:
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+snapshot:
+  version_template: '{{ incpatch .Version }}-next'
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+
+release:
+  github:
+    owner: allbridge-io
+    name: allbridge-core-rest-api
+  name_template: 'Allbridge CLI {{ .Tag }}'
+  header: |
+    Allbridge Core CLI release.
+
+    Default REST API endpoint: `https://core-rest-api.allbridge.io`.

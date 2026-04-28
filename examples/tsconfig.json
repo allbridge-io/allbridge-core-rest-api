@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "commonjs",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": [
       "es2022",
       "dom"
@@ -15,6 +16,13 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "experimentalResolver": true
+  },
   "include": ["./src/**/*.ts"],
-  "exclude": ["./src/**/__tests__"]
+  "exclude": [
+    "./src/**/__tests__",
+  ]
 }

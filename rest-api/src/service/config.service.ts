@@ -67,7 +67,7 @@ export class ConfigService {
         ConfigService.getLogger().log(
           `${chain} RPC Url loaded with ${rpcUrls[chain]}`,
         );
-      } catch (ignoreError) { /* empty */ }
+      } catch {}
     });
     if (!this.checkSRBandSTLRRpcUrlsBothPresence(rpcUrls)) {
       throw new ConfigError(`Requires SRB_NODE_URL and STLR_NODE_URL both`);
@@ -91,12 +91,15 @@ export class ConfigService {
     return process.env.NETWORKS ? JSON.parse(process.env.NETWORKS) : [];
   }
 
-  static getCoreApiHeaders() {
-    return process.env.HEADERS
-      ? Object.assign(JSON.parse(process.env.HEADERS), {
-          'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}`,
-        })
-      : { 'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}` };
+  static getCoreApiHeaders(): Record<string, string> {
+    const headers = process.env.HEADERS
+      ? { ...JSON.parse(process.env.HEADERS) }
+      : {};
+
+    return {
+      ...headers,
+      'x-Rest-Agent': `AllbridgeCoreRestApi/${VERSION}`,
+    };
   }
 
   static getCoreApiQueryParams() {
@@ -169,5 +172,17 @@ export class ConfigService {
     return process.env.ADDITIONAL_CHAINS_PROPERTIES
       ? JSON.parse(process.env.ADDITIONAL_CHAINS_PROPERTIES)
       : mainnet.additionalChainsProperties;
+  }
+
+  static getStxIsTestnet() {
+    return process.env.STX_IS_TESTNET
+      ? process.env.STX_IS_TESTNET === 'true'
+      : mainnet.stxIsTestnet;
+  }
+
+  static getStxHeroApiKey() {
+    return process.env.STX_HERO_API_KEY
+      ? process.env.STX_HERO_API_KEY
+      : mainnet.stxHeroApiKey;
   }
 }

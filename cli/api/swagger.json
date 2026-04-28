@@ -1,0 +1,8253 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"XReserveTokenInfo": {
+				"properties": {
+					"bridgeAddress": {
+						"type": "string"
+					},
+					"feeConst": {
+						"type": "string"
+					},
+					"feeShare": {
+						"type": "string"
+					},
+					"protocolAddress": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"bridgeAddress",
+					"feeConst",
+					"feeShare"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SuiAddresses": {
+				"properties": {
+					"bridgeAddress": {
+						"type": "string"
+					},
+					"bridgeAddressOrigin": {
+						"type": "string"
+					},
+					"bridgeObjectAddress": {
+						"type": "string"
+					},
+					"allbridgeMessengerAddress": {
+						"type": "string"
+					},
+					"allbridgeMessengerAddressOrigin": {
+						"type": "string"
+					},
+					"allbridgeMessengerObjectAddress": {
+						"type": "string"
+					},
+					"gasOracleAddress": {
+						"type": "string"
+					},
+					"gasOracleAddressOrigin": {
+						"type": "string"
+					},
+					"gasOracleObjectAddress": {
+						"type": "string"
+					},
+					"utilsAddress": {
+						"type": "string"
+					},
+					"wormholeMessengerAddress": {
+						"type": "string"
+					},
+					"wormholeMessengerAddressOrigin": {
+						"type": "string"
+					},
+					"wormholeMessengerObjectAddress": {
+						"type": "string"
+					},
+					"wormholeStateObjectAddress": {
+						"type": "string"
+					},
+					"cctpAddress": {
+						"type": "string"
+					},
+					"cctpAddressOrigin": {
+						"type": "string"
+					},
+					"cctpObjectAddress": {
+						"type": "string"
+					},
+					"cctpDenyListObjectAddress": {
+						"type": "string"
+					},
+					"cctpMessageTransmitterStateObjectAddress": {
+						"type": "string"
+					},
+					"cctpTokenMessengerMinterStateObjectAddress": {
+						"type": "string"
+					},
+					"cctpTreasuryObjectAddress": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"bridgeAddress",
+					"bridgeObjectAddress",
+					"allbridgeMessengerAddress",
+					"allbridgeMessengerObjectAddress",
+					"gasOracleAddress",
+					"gasOracleObjectAddress",
+					"utilsAddress",
+					"wormholeMessengerAddress",
+					"wormholeMessengerObjectAddress",
+					"wormholeStateObjectAddress",
+					"cctpAddress",
+					"cctpObjectAddress",
+					"cctpDenyListObjectAddress",
+					"cctpMessageTransmitterStateObjectAddress",
+					"cctpTokenMessengerMinterStateObjectAddress",
+					"cctpTreasuryObjectAddress"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ChainSymbol": {
+				"enum": [
+					"BSC",
+					"ETH",
+					"BAS",
+					"SOL",
+					"TRX",
+					"POL",
+					"ARB",
+					"CEL",
+					"AVA",
+					"SRB",
+					"STLR",
+					"OPT",
+					"SUI",
+					"SNC",
+					"UNI",
+					"LIN",
+					"ALG",
+					"STX"
+				],
+				"type": "string"
+			},
+			"Pick_TokenWithChainDetails.tokenAddress-or-chainSymbol-or-decimals-or-originTokenAddress_": {
+				"properties": {
+					"chainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol",
+						"description": "The symbol of the chain representing one of the supported blockchain networks (e.g., \"ETH\" for Ethereum). For more details, see: {@link ChainSymbol}."
+					},
+					"tokenAddress": {
+						"type": "string",
+						"description": "Token address"
+					},
+					"decimals": {
+						"type": "number",
+						"format": "double",
+						"description": "Token decimals"
+					},
+					"originTokenAddress": {
+						"type": "string",
+						"description": "Token origin address"
+					}
+				},
+				"required": [
+					"chainSymbol",
+					"tokenAddress",
+					"decimals"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"TokenCoreFields": {
+				"$ref": "#/components/schemas/Pick_TokenWithChainDetails.tokenAddress-or-chainSymbol-or-decimals-or-originTokenAddress_"
+			},
+			"Partial_Record_Messenger.boolean__": {
+				"properties": {
+					"1": {
+						"type": "boolean"
+					},
+					"2": {
+						"type": "boolean"
+					},
+					"3": {
+						"type": "boolean"
+					},
+					"4": {
+						"type": "boolean"
+					},
+					"5": {
+						"type": "boolean"
+					},
+					"6": {
+						"type": "boolean"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"AbrPayerAvailability": {
+				"$ref": "#/components/schemas/Partial_Record_Messenger.boolean__"
+			},
+			"AbrPayerChainInfo": {
+				"properties": {
+					"payerAddress": {
+						"type": "string",
+						"description": "ABR proxy for paying fees with ABR"
+					},
+					"abrToken": {
+						"$ref": "#/components/schemas/TokenCoreFields"
+					},
+					"payerAvailability": {
+						"$ref": "#/components/schemas/AbrPayerAvailability",
+						"description": "Availability to pay by abr"
+					}
+				},
+				"required": [
+					"payerAddress",
+					"abrToken",
+					"payerAvailability"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MessengerTransferTime": {
+				"properties": {
+					"1": {
+						"type": "number",
+						"format": "double"
+					},
+					"2": {
+						"type": "number",
+						"format": "double"
+					},
+					"3": {
+						"type": "number",
+						"format": "double"
+					},
+					"4": {
+						"type": "number",
+						"format": "double"
+					},
+					"5": {
+						"type": "number",
+						"format": "double"
+					},
+					"6": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"type": "object",
+				"description": "Contains Avg transaction time withing different messenger protocols"
+			},
+			"Record_string.MessengerTransferTime_": {
+				"properties": {},
+				"additionalProperties": {
+					"$ref": "#/components/schemas/MessengerTransferTime"
+				},
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"TransferTime": {
+				"$ref": "#/components/schemas/Record_string.MessengerTransferTime_"
+			},
+			"TxCostAmount": {
+				"description": "Contains transfer costs",
+				"properties": {
+					"maxAmount": {
+						"type": "string",
+						"description": "The maximum gas amount that can be received as extra gas for one transfer"
+					},
+					"swap": {
+						"type": "string",
+						"description": "Swap cost"
+					},
+					"transfer": {
+						"type": "string",
+						"description": "Transfer cost"
+					}
+				},
+				"required": [
+					"maxAmount",
+					"swap",
+					"transfer"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ChainType": {
+				"enum": [
+					"EVM",
+					"SOLANA",
+					"TRX",
+					"SRB",
+					"SUI",
+					"ALG",
+					"STX"
+				],
+				"type": "string"
+			},
+			"Pick_ChainDetails.Exclude_keyofChainDetails.name__": {
+				"properties": {
+					"allbridgeChainId": {
+						"type": "number",
+						"format": "double",
+						"description": "Allbridge's Id"
+					},
+					"bridgeId": {
+						"type": "string",
+						"description": "Algo Bridge appId"
+					},
+					"paddingUtilId": {
+						"type": "string",
+						"description": "Algo Padding appId"
+					},
+					"bridgeAddress": {
+						"type": "string",
+						"description": "Bridge contract address"
+					},
+					"oftBridgeAddress": {
+						"type": "string",
+						"description": "OFT Bridge contract address\nOptional. Defined if the chain supports OFT"
+					},
+					"yieldAddress": {
+						"type": "string",
+						"description": "Yield contract address"
+					},
+					"abrPayer": {
+						"$ref": "#/components/schemas/AbrPayerChainInfo",
+						"description": "ABR payer chain info"
+					},
+					"transferTime": {
+						"$ref": "#/components/schemas/TransferTime",
+						"description": "Average transfer time to other blockchains"
+					},
+					"txCostAmount": {
+						"$ref": "#/components/schemas/TxCostAmount",
+						"description": "Transfers costs"
+					},
+					"confirmations": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of confirmations required"
+					},
+					"suiAddresses": {
+						"$ref": "#/components/schemas/SuiAddresses",
+						"description": "Sui addresses\nOptional. Defined for SUI"
+					},
+					"chainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol",
+						"description": "The symbol of the chain representing one of the supported blockchain networks (e.g., \"ETH\" for Ethereum). For more details, see: {@link ChainSymbol}."
+					},
+					"chainId": {
+						"type": "string",
+						"description": "Common Blockchain Id</br>\nA 0x-prefixed hexadecimal string</br>\nOptional."
+					},
+					"chainType": {
+						"$ref": "#/components/schemas/ChainType",
+						"description": "Blockchain type. For more details, see: {@link ChainType}."
+					}
+				},
+				"required": [
+					"allbridgeChainId",
+					"bridgeAddress",
+					"transferTime",
+					"txCostAmount",
+					"confirmations",
+					"chainSymbol",
+					"chainType"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"TokenWithChainDetails": {
+				"description": "General Token Interface",
+				"properties": {
+					"symbol": {
+						"type": "string",
+						"description": "Token symbol"
+					},
+					"name": {
+						"type": "string",
+						"description": "Token name"
+					},
+					"decimals": {
+						"type": "number",
+						"format": "double",
+						"description": "Token decimals"
+					},
+					"poolAddress": {
+						"type": "string",
+						"description": "Token pool address"
+					},
+					"tokenAddress": {
+						"type": "string",
+						"description": "Token address"
+					},
+					"originTokenAddress": {
+						"type": "string",
+						"description": "Token origin address"
+					},
+					"cctpAddress": {
+						"type": "string",
+						"description": "Token CCTP address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpFeeShare": {
+						"type": "string",
+						"description": "Token CCTP V2 address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpV2Address": {
+						"type": "string",
+						"description": "Token CCTP address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpV2FeeShare": {
+						"type": "string",
+						"description": "Token CCTP V2 address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"xReserve": {
+						"$ref": "#/components/schemas/XReserveTokenInfo",
+						"description": "XReserve bridge configuration for token.\nOptional. Defined if XReserve supported by token"
+					},
+					"oftId": {
+						"type": "string",
+						"description": "Internal identifier for the same token across different chains.\n\nUsed to link representations of a token deployed on multiple networks (e.g., Ethereum, BSC).\nTokens with the same `oftId` are considered to be equivalent.\n\nOptional. Defined if OFT supported by token"
+					},
+					"feeShare": {
+						"type": "string",
+						"description": "Token fee share"
+					},
+					"apr": {
+						"type": "string"
+					},
+					"apr7d": {
+						"type": "string",
+						"description": "Token APR based on last 7 days"
+					},
+					"apr30d": {
+						"type": "string",
+						"description": "Token APR based on last 30 days"
+					},
+					"lpRate": {
+						"type": "string",
+						"description": "Token LP rate"
+					},
+					"yieldId": {
+						"type": "number",
+						"format": "double"
+					},
+					"suiAddresses": {
+						"$ref": "#/components/schemas/SuiAddresses",
+						"description": "Sui addresses\nOptional. Defined for SUI"
+					},
+					"allbridgeChainId": {
+						"type": "number",
+						"format": "double",
+						"description": "Allbridge's Id"
+					},
+					"bridgeId": {
+						"type": "string",
+						"description": "Algo Bridge appId"
+					},
+					"paddingUtilId": {
+						"type": "string",
+						"description": "Algo Padding appId"
+					},
+					"bridgeAddress": {
+						"type": "string",
+						"description": "Bridge contract address"
+					},
+					"oftBridgeAddress": {
+						"type": "string",
+						"description": "OFT Bridge contract address\nOptional. Defined if the chain supports OFT"
+					},
+					"yieldAddress": {
+						"type": "string",
+						"description": "Yield contract address"
+					},
+					"abrPayer": {
+						"$ref": "#/components/schemas/AbrPayerChainInfo",
+						"description": "ABR payer chain info"
+					},
+					"transferTime": {
+						"$ref": "#/components/schemas/TransferTime",
+						"description": "Average transfer time to other blockchains"
+					},
+					"txCostAmount": {
+						"$ref": "#/components/schemas/TxCostAmount",
+						"description": "Transfers costs"
+					},
+					"confirmations": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of confirmations required"
+					},
+					"chainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol",
+						"description": "The symbol of the chain representing one of the supported blockchain networks (e.g., \"ETH\" for Ethereum). For more details, see: {@link ChainSymbol}."
+					},
+					"chainId": {
+						"type": "string",
+						"description": "Common Blockchain Id</br>\nA 0x-prefixed hexadecimal string</br>\nOptional."
+					},
+					"chainType": {
+						"$ref": "#/components/schemas/ChainType",
+						"description": "Blockchain type. For more details, see: {@link ChainType}."
+					},
+					"chainName": {
+						"type": "string",
+						"description": "Blockchain network name"
+					}
+				},
+				"required": [
+					"symbol",
+					"name",
+					"decimals",
+					"poolAddress",
+					"tokenAddress",
+					"feeShare",
+					"apr",
+					"apr7d",
+					"apr30d",
+					"lpRate",
+					"allbridgeChainId",
+					"bridgeAddress",
+					"transferTime",
+					"txCostAmount",
+					"confirmations",
+					"chainSymbol",
+					"chainType",
+					"chainName"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HttpExceptionBodyMessage": {
+				"anyOf": [
+					{
+						"type": "string"
+					},
+					{
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					{
+						"type": "number",
+						"format": "double"
+					}
+				]
+			},
+			"HttpExceptionBody": {
+				"properties": {
+					"message": {
+						"$ref": "#/components/schemas/HttpExceptionBodyMessage"
+					},
+					"error": {
+						"type": "string"
+					},
+					"statusCode": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"message",
+					"statusCode"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TokenWithChainDetailsYield": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/TokenWithChainDetails"
+					},
+					{
+						"properties": {
+							"yieldId": {
+								"type": "string"
+							},
+							"yieldAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"yieldId",
+							"yieldAddress"
+						],
+						"type": "object"
+					}
+				]
+			},
+			"YieldWithdrawAmount": {
+				"properties": {
+					"amount": {
+						"type": "string",
+						"description": "The float amount of tokens to be withdrawn."
+					},
+					"token": {
+						"$ref": "#/components/schemas/TokenWithChainDetailsYield"
+					}
+				},
+				"required": [
+					"amount",
+					"token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ContractType": {
+				"enum": [
+					"AccountCreateContract",
+					"TransferContract",
+					"TransferAssetContract",
+					"VoteAssetContract",
+					"VoteWitnessContract",
+					"WitnessCreateContract",
+					"AssetIssueContract",
+					"WitnessUpdateContract",
+					"ParticipateAssetIssueContract",
+					"AccountUpdateContract",
+					"FreezeBalanceContract",
+					"UnfreezeBalanceContract",
+					"CancelAllUnfreezeV2Contract",
+					"WithdrawBalanceContract",
+					"UnfreezeAssetContract",
+					"UpdateAssetContract",
+					"ProposalCreateContract",
+					"ProposalApproveContract",
+					"ProposalDeleteContract",
+					"SetAccountIdContract",
+					"CustomContract",
+					"CreateSmartContract",
+					"TriggerSmartContract",
+					"GetContract",
+					"UpdateSettingContract",
+					"ExchangeCreateContract",
+					"ExchangeInjectContract",
+					"ExchangeWithdrawContract",
+					"ExchangeTransactionContract",
+					"UpdateEnergyLimitContract",
+					"AccountPermissionUpdateContract",
+					"ClearABIContract",
+					"UpdateBrokerageContract",
+					"ShieldedTransferContract",
+					"MarketSellAssetContract",
+					"MarketCancelOrderContract",
+					"FreezeBalanceV2Contract",
+					"UnfreezeBalanceV2Contract",
+					"WithdrawExpireUnfreezeContract",
+					"DelegateResourceContract",
+					"UnDelegateResourceContract",
+					"UNRECOGNIZED"
+				],
+				"type": "string"
+			},
+			"TransferContract": {
+				"properties": {
+					"to_address": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"to_address",
+					"owner_address",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TransferAssetContract": {
+				"properties": {
+					"to_address": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"asset_name": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"to_address",
+					"owner_address",
+					"amount",
+					"asset_name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ParticipateAssetIssueContract": {
+				"properties": {
+					"to_address": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					},
+					"asset_name": {
+						"type": "string"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"to_address",
+					"owner_address",
+					"asset_name",
+					"amount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TriggerSmartContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"contract_address": {
+						"type": "string"
+					},
+					"call_value": {
+						"type": "number",
+						"format": "double"
+					},
+					"call_token_value": {
+						"type": "number",
+						"format": "double"
+					},
+					"token_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"data": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address",
+					"contract_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Resource": {
+				"type": "string",
+				"enum": [
+					"BANDWIDTH",
+					"ENERGY"
+				]
+			},
+			"FreezeBalanceContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"frozen_balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"frozen_duration": {
+						"type": "number",
+						"format": "double"
+					},
+					"resource": {
+						"$ref": "#/components/schemas/Resource"
+					},
+					"receiver_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address",
+					"frozen_balance",
+					"frozen_duration"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UnfreezeBalanceContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"resource": {
+						"type": "string"
+					},
+					"receiver_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address",
+					"resource",
+					"receiver_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"WithdrawBalanceContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"FreezeBalanceV2Contract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"frozen_balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"resource": {
+						"$ref": "#/components/schemas/Resource"
+					}
+				},
+				"required": [
+					"owner_address",
+					"frozen_balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CancelFreezeBalanceV2Contract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UnfreezeBalanceV2Contract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"unfreeze_balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"resource": {
+						"$ref": "#/components/schemas/Resource"
+					}
+				},
+				"required": [
+					"owner_address",
+					"unfreeze_balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"DelegateResourceContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"receiver_address": {
+						"type": "string"
+					},
+					"balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"resource": {
+						"$ref": "#/components/schemas/Resource"
+					},
+					"lock": {
+						"type": "boolean"
+					},
+					"lock_period": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"receiver_address",
+					"balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UnDelegateResourceContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"receiver_address": {
+						"type": "string"
+					},
+					"balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"resource": {
+						"$ref": "#/components/schemas/Resource"
+					}
+				},
+				"required": [
+					"owner_address",
+					"receiver_address",
+					"balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"WithdrawExpireUnfreezeContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ReadonlyArray_AbiFragment_": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ContractAbiInterface": {
+				"$ref": "#/components/schemas/ReadonlyArray_AbiFragment_"
+			},
+			"CreateSmartContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"call_token_value": {
+						"type": "number",
+						"format": "double"
+					},
+					"token_id": {
+						"type": "string"
+					},
+					"new_contract": {
+						"properties": {
+							"origin_energy_limit": {
+								"type": "number",
+								"format": "double"
+							},
+							"consume_user_resource_percent": {
+								"type": "number",
+								"format": "double"
+							},
+							"call_value": {
+								"type": "number",
+								"format": "double"
+							},
+							"bytecode": {
+								"type": "string"
+							},
+							"abi": {
+								"properties": {
+									"entrys": {
+										"$ref": "#/components/schemas/ContractAbiInterface"
+									}
+								},
+								"type": "object"
+							},
+							"contract_address": {
+								"type": "string"
+							},
+							"origin_address": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"origin_energy_limit",
+							"consume_user_resource_percent",
+							"call_value",
+							"bytecode",
+							"abi",
+							"contract_address",
+							"origin_address",
+							"name"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"owner_address",
+					"call_token_value",
+					"token_id",
+					"new_contract"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ClearABIContract": {
+				"properties": {
+					"contract_address": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"contract_address",
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateBrokerageContract": {
+				"properties": {
+					"brokerage": {
+						"type": "number",
+						"format": "double"
+					},
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"brokerage",
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"FrozenSupply": {
+				"properties": {
+					"frozen_amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"frozen_days": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"frozen_amount",
+					"frozen_days"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AssetIssueContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"abbr": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					},
+					"total_supply": {
+						"type": "number",
+						"format": "double"
+					},
+					"trx_num": {
+						"type": "number",
+						"format": "double"
+					},
+					"num": {
+						"type": "number",
+						"format": "double"
+					},
+					"start_time": {
+						"type": "number",
+						"format": "double"
+					},
+					"end_time": {
+						"type": "number",
+						"format": "double"
+					},
+					"precision": {
+						"type": "number",
+						"format": "double"
+					},
+					"free_asset_net_limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"public_free_asset_net_limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"public_free_asset_net_usage": {
+						"type": "number",
+						"format": "double"
+					},
+					"public_latest_free_net_time": {
+						"type": "number",
+						"format": "double"
+					},
+					"vote_score": {
+						"type": "number",
+						"format": "double"
+					},
+					"frozen_supply": {
+						"items": {
+							"$ref": "#/components/schemas/FrozenSupply"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"owner_address",
+					"name",
+					"abbr",
+					"description",
+					"url",
+					"total_supply",
+					"trx_num",
+					"num",
+					"start_time",
+					"end_time",
+					"precision",
+					"free_asset_net_limit",
+					"public_free_asset_net_limit",
+					"public_free_asset_net_usage",
+					"public_latest_free_net_time",
+					"vote_score",
+					"frozen_supply"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountCreateContract": {
+				"properties": {
+					"account_address": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"account_address",
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountUpdateContract": {
+				"properties": {
+					"account_name": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"account_name",
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetAccountIdContract": {
+				"properties": {
+					"account_id": {
+						"type": "string"
+					},
+					"owner_address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"account_id",
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Record_string.string-or-number_": {
+				"properties": {},
+				"additionalProperties": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "number",
+							"format": "double"
+						}
+					]
+				},
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"ProposalCreateContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"parameters": {
+						"items": {
+							"$ref": "#/components/schemas/Record_string.string-or-number_"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"owner_address",
+					"parameters"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ProposalDeleteContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"proposal_id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"proposal_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VoteProposalContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"proposal_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"is_add_approval": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"owner_address",
+					"proposal_id",
+					"is_add_approval"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExchangeCreateContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"first_token_id": {
+						"type": "string"
+					},
+					"first_token_balance": {
+						"type": "number",
+						"format": "double"
+					},
+					"second_token_id": {
+						"type": "string"
+					},
+					"second_token_balance": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"first_token_id",
+					"first_token_balance",
+					"second_token_id",
+					"second_token_balance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExchangeInjectContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"exchange_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"token_id": {
+						"type": "string"
+					},
+					"quant": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"exchange_id",
+					"token_id",
+					"quant"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExchangeWithdrawContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"exchange_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"token_id": {
+						"type": "string"
+					},
+					"quant": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"exchange_id",
+					"token_id",
+					"quant"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExchangeTransactionContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"exchange_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"token_id": {
+						"type": "string"
+					},
+					"quant": {
+						"type": "number",
+						"format": "double"
+					},
+					"expected": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"exchange_id",
+					"token_id",
+					"quant",
+					"expected"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateSettingContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"contract_address": {
+						"type": "string"
+					},
+					"consume_user_resource_percent": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"contract_address",
+					"consume_user_resource_percent"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateEnergyLimitContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"contract_address": {
+						"type": "string"
+					},
+					"origin_energy_limit": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"contract_address",
+					"origin_energy_limit"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PermissionKey": {
+				"properties": {
+					"address": {
+						"type": "string"
+					},
+					"weight": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"address",
+					"weight"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Permission": {
+				"properties": {
+					"type": {
+						"type": "number",
+						"format": "double"
+					},
+					"id": {
+						"type": "number",
+						"format": "double",
+						"description": "Owner id=0, Witness id=1, Active id start by 2"
+					},
+					"permission_name": {
+						"type": "string"
+					},
+					"threshold": {
+						"type": "number",
+						"format": "double"
+					},
+					"operations": {
+						"type": "string"
+					},
+					"keys": {
+						"items": {
+							"$ref": "#/components/schemas/PermissionKey"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"type",
+					"permission_name",
+					"threshold",
+					"keys"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountPermissionUpdateContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"owner": {
+						"$ref": "#/components/schemas/Permission"
+					},
+					"witness": {
+						"$ref": "#/components/schemas/Permission"
+					},
+					"actives": {
+						"items": {
+							"$ref": "#/components/schemas/Permission"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"owner_address"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UpdateAssetContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					},
+					"new_limit": {
+						"type": "number",
+						"format": "double"
+					},
+					"new_public_limit": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"owner_address",
+					"description",
+					"url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"WitnessCreateContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"url": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner_address",
+					"url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VoteWitnessContract": {
+				"properties": {
+					"owner_address": {
+						"type": "string"
+					},
+					"votes": {
+						"items": {
+							"properties": {
+								"vote_count": {
+									"type": "number",
+									"format": "double"
+								},
+								"vote_address": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"vote_count",
+								"vote_address"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"owner_address",
+					"votes"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ContractParamter": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/TransferContract"
+					},
+					{
+						"$ref": "#/components/schemas/TransferAssetContract"
+					},
+					{
+						"$ref": "#/components/schemas/ParticipateAssetIssueContract"
+					},
+					{
+						"$ref": "#/components/schemas/TriggerSmartContract"
+					},
+					{
+						"$ref": "#/components/schemas/FreezeBalanceContract"
+					},
+					{
+						"$ref": "#/components/schemas/UnfreezeBalanceContract"
+					},
+					{
+						"$ref": "#/components/schemas/WithdrawBalanceContract"
+					},
+					{
+						"$ref": "#/components/schemas/FreezeBalanceV2Contract"
+					},
+					{
+						"$ref": "#/components/schemas/CancelFreezeBalanceV2Contract"
+					},
+					{
+						"$ref": "#/components/schemas/UnfreezeBalanceV2Contract"
+					},
+					{
+						"$ref": "#/components/schemas/DelegateResourceContract"
+					},
+					{
+						"$ref": "#/components/schemas/UnDelegateResourceContract"
+					},
+					{
+						"$ref": "#/components/schemas/WithdrawExpireUnfreezeContract"
+					},
+					{
+						"$ref": "#/components/schemas/CreateSmartContract"
+					},
+					{
+						"$ref": "#/components/schemas/ClearABIContract"
+					},
+					{
+						"$ref": "#/components/schemas/UpdateBrokerageContract"
+					},
+					{
+						"$ref": "#/components/schemas/AssetIssueContract"
+					},
+					{
+						"$ref": "#/components/schemas/AccountCreateContract"
+					},
+					{
+						"$ref": "#/components/schemas/AccountUpdateContract"
+					},
+					{
+						"$ref": "#/components/schemas/SetAccountIdContract"
+					},
+					{
+						"$ref": "#/components/schemas/ProposalCreateContract"
+					},
+					{
+						"$ref": "#/components/schemas/ProposalDeleteContract"
+					},
+					{
+						"$ref": "#/components/schemas/VoteProposalContract"
+					},
+					{
+						"$ref": "#/components/schemas/ExchangeCreateContract"
+					},
+					{
+						"$ref": "#/components/schemas/ExchangeInjectContract"
+					},
+					{
+						"$ref": "#/components/schemas/ExchangeWithdrawContract"
+					},
+					{
+						"$ref": "#/components/schemas/ExchangeTransactionContract"
+					},
+					{
+						"$ref": "#/components/schemas/UpdateSettingContract"
+					},
+					{
+						"$ref": "#/components/schemas/UpdateEnergyLimitContract"
+					},
+					{
+						"$ref": "#/components/schemas/AccountPermissionUpdateContract"
+					},
+					{
+						"$ref": "#/components/schemas/UpdateAssetContract"
+					},
+					{
+						"$ref": "#/components/schemas/WitnessCreateContract"
+					},
+					{
+						"$ref": "#/components/schemas/VoteWitnessContract"
+					}
+				]
+			},
+			"ContractParamterWrapper_ContractParamter_": {
+				"properties": {
+					"value": {
+						"$ref": "#/components/schemas/ContractParamter"
+					},
+					"type_url": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"value",
+					"type_url"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TransactionContract_ContractParamter_": {
+				"properties": {
+					"type": {
+						"$ref": "#/components/schemas/ContractType"
+					},
+					"parameter": {
+						"$ref": "#/components/schemas/ContractParamterWrapper_ContractParamter_"
+					},
+					"Permission_id": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"type",
+					"parameter"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Transaction": {
+				"properties": {
+					"visible": {
+						"type": "boolean"
+					},
+					"txID": {
+						"type": "string"
+					},
+					"raw_data": {
+						"properties": {
+							"fee_limit": {},
+							"data": {},
+							"timestamp": {
+								"type": "number",
+								"format": "double"
+							},
+							"expiration": {
+								"type": "number",
+								"format": "double"
+							},
+							"ref_block_hash": {
+								"type": "string"
+							},
+							"ref_block_bytes": {
+								"type": "string"
+							},
+							"contract": {
+								"items": {
+									"$ref": "#/components/schemas/TransactionContract_ContractParamter_"
+								},
+								"type": "array"
+							}
+						},
+						"required": [
+							"timestamp",
+							"expiration",
+							"ref_block_hash",
+							"ref_block_bytes",
+							"contract"
+						],
+						"type": "object"
+					},
+					"raw_data_hex": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"visible",
+					"txID",
+					"raw_data",
+					"raw_data_hex"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RawTronTransaction": {
+				"$ref": "#/components/schemas/Transaction"
+			},
+			"EssentialWeb3Transaction": {
+				"description": "The `EssentialWeb3Transaction` interface provides the minimum set of Web3 Transaction\nreturned by the SDK. It allows any web3-like provider to be used, as long as it\nmatches the signature of these essential interface. This prevents\ntight coupling to a specific version of the `web3` library.",
+				"properties": {
+					"from": {
+						"type": "string"
+					},
+					"to": {
+						"type": "string"
+					},
+					"value": {
+						"type": "string"
+					},
+					"data": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RawEvmTransaction": {
+				"$ref": "#/components/schemas/EssentialWeb3Transaction"
+			},
+			"RawSorobanTransaction": {
+				"type": "string"
+			},
+			"RawAlgTransaction": {
+				"items": {
+					"type": "string"
+				},
+				"type": "array"
+			},
+			"RawStxTransaction": {
+				"type": "string"
+			},
+			"RawSuiTransaction": {
+				"type": "string"
+			},
+			"Uint8Array": {
+				"description": "A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the\nrequested number of bytes could not be allocated an exception is raised.",
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MessageHeader": {
+				"properties": {
+					"numReadonlyUnsignedAccounts": {
+						"type": "number",
+						"format": "double",
+						"description": "The last `numReadonlySignedAccounts` of the unsigned keys are read-only accounts"
+					},
+					"numReadonlySignedAccounts": {
+						"type": "number",
+						"format": "double",
+						"description": "The last `numReadonlySignedAccounts` of the signed keys are read-only accounts"
+					},
+					"numRequiredSignatures": {
+						"type": "number",
+						"format": "double",
+						"description": "The number of signatures required for this message to be considered valid. The\nsignatures must match the first `numRequiredSignatures` of `accountKeys`."
+					}
+				},
+				"required": [
+					"numReadonlyUnsignedAccounts",
+					"numReadonlySignedAccounts",
+					"numRequiredSignatures"
+				],
+				"type": "object",
+				"description": "The message header, identifying signed and read-only account"
+			},
+			"PublicKey": {
+				"type": "string",
+				"description": "A public key"
+			},
+			"Blockhash": {
+				"type": "string",
+				"description": "Blockhash as Base58 string."
+			},
+			"CompiledInstruction": {
+				"properties": {
+					"data": {
+						"type": "string",
+						"description": "The program input data encoded as base 58"
+					},
+					"accounts": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"description": "Ordered indices into the transaction keys array indicating which accounts to pass to the program"
+					},
+					"programIdIndex": {
+						"type": "number",
+						"format": "double",
+						"description": "Index into the transaction keys array indicating the program account that executes this instruction"
+					}
+				},
+				"required": [
+					"data",
+					"accounts",
+					"programIdIndex"
+				],
+				"type": "object",
+				"description": "An instruction to execute by a program"
+			},
+			"Message": {
+				"description": "List of instructions to be processed atomically",
+				"properties": {
+					"header": {
+						"$ref": "#/components/schemas/MessageHeader"
+					},
+					"accountKeys": {
+						"items": {
+							"$ref": "#/components/schemas/PublicKey"
+						},
+						"type": "array"
+					},
+					"recentBlockhash": {
+						"$ref": "#/components/schemas/Blockhash"
+					},
+					"instructions": {
+						"items": {
+							"$ref": "#/components/schemas/CompiledInstruction"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"header",
+					"accountKeys",
+					"recentBlockhash",
+					"instructions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MessageCompiledInstruction": {
+				"properties": {
+					"data": {
+						"$ref": "#/components/schemas/Uint8Array",
+						"description": "The program input data"
+					},
+					"accountKeyIndexes": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array",
+						"description": "Ordered indices into the transaction keys array indicating which accounts to pass to the program"
+					},
+					"programIdIndex": {
+						"type": "number",
+						"format": "double",
+						"description": "Index into the transaction keys array indicating the program account that executes this instruction"
+					}
+				},
+				"required": [
+					"data",
+					"accountKeyIndexes",
+					"programIdIndex"
+				],
+				"type": "object",
+				"description": "An instruction to execute by a program"
+			},
+			"MessageAddressTableLookup": {
+				"properties": {
+					"readonlyIndexes": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"writableIndexes": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					},
+					"accountKey": {
+						"$ref": "#/components/schemas/PublicKey"
+					}
+				},
+				"required": [
+					"readonlyIndexes",
+					"writableIndexes",
+					"accountKey"
+				],
+				"type": "object",
+				"description": "An address table lookup used to load additional accounts"
+			},
+			"MessageV0": {
+				"properties": {
+					"header": {
+						"$ref": "#/components/schemas/MessageHeader"
+					},
+					"staticAccountKeys": {
+						"items": {
+							"$ref": "#/components/schemas/PublicKey"
+						},
+						"type": "array"
+					},
+					"recentBlockhash": {
+						"$ref": "#/components/schemas/Blockhash"
+					},
+					"compiledInstructions": {
+						"items": {
+							"$ref": "#/components/schemas/MessageCompiledInstruction"
+						},
+						"type": "array"
+					},
+					"addressTableLookups": {
+						"items": {
+							"$ref": "#/components/schemas/MessageAddressTableLookup"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"header",
+					"staticAccountKeys",
+					"recentBlockhash",
+					"compiledInstructions",
+					"addressTableLookups"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VersionedMessage": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/Message"
+					},
+					{
+						"$ref": "#/components/schemas/MessageV0"
+					}
+				]
+			},
+			"VersionedTransaction": {
+				"description": "Versioned transaction class",
+				"properties": {
+					"signatures": {
+						"items": {
+							"$ref": "#/components/schemas/Uint8Array"
+						},
+						"type": "array"
+					},
+					"message": {
+						"$ref": "#/components/schemas/VersionedMessage"
+					}
+				},
+				"required": [
+					"signatures",
+					"message"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RawBridgeSolanaTransaction": {
+				"$ref": "#/components/schemas/VersionedTransaction"
+			},
+			"SignaturePubkeyPair": {
+				"properties": {
+					"publicKey": {
+						"$ref": "#/components/schemas/PublicKey"
+					},
+					"signature": {
+						"type": "string",
+						"format": "byte",
+						"nullable": true
+					}
+				},
+				"required": [
+					"publicKey",
+					"signature"
+				],
+				"type": "object",
+				"description": "Pair of signature and corresponding public key"
+			},
+			"AccountMeta": {
+				"properties": {
+					"isWritable": {
+						"type": "boolean",
+						"description": "True if the `pubkey` can be loaded as a read-write account."
+					},
+					"isSigner": {
+						"type": "boolean",
+						"description": "True if an instruction requires a transaction signature matching `pubkey`"
+					},
+					"pubkey": {
+						"$ref": "#/components/schemas/PublicKey",
+						"description": "An account's public key"
+					}
+				},
+				"required": [
+					"isWritable",
+					"isSigner",
+					"pubkey"
+				],
+				"type": "object",
+				"description": "Account metadata used to define instructions"
+			},
+			"TransactionInstruction": {
+				"description": "Transaction Instruction class",
+				"properties": {
+					"keys": {
+						"items": {
+							"$ref": "#/components/schemas/AccountMeta"
+						},
+						"type": "array",
+						"description": "Public keys to include in this transaction\nBoolean represents whether this pubkey needs to sign the transaction"
+					},
+					"programId": {
+						"$ref": "#/components/schemas/PublicKey",
+						"description": "Program Id to execute"
+					},
+					"data": {
+						"type": "string",
+						"format": "byte",
+						"description": "Program input"
+					}
+				},
+				"required": [
+					"keys",
+					"programId",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NonceInformation": {
+				"properties": {
+					"nonceInstruction": {
+						"$ref": "#/components/schemas/TransactionInstruction",
+						"description": "AdvanceNonceAccount Instruction"
+					},
+					"nonce": {
+						"$ref": "#/components/schemas/Blockhash",
+						"description": "The current blockhash stored in the nonce"
+					}
+				},
+				"required": [
+					"nonceInstruction",
+					"nonce"
+				],
+				"type": "object",
+				"description": "Nonce information to be used to build an offline Transaction."
+			},
+			"SolanaWeb3Transaction": {
+				"description": "Transaction class",
+				"properties": {
+					"signatures": {
+						"items": {
+							"$ref": "#/components/schemas/SignaturePubkeyPair"
+						},
+						"type": "array",
+						"description": "Signatures for the transaction.  Typically created by invoking the\n`sign()` method"
+					},
+					"feePayer": {
+						"$ref": "#/components/schemas/PublicKey",
+						"description": "The transaction fee payer"
+					},
+					"instructions": {
+						"items": {
+							"$ref": "#/components/schemas/TransactionInstruction"
+						},
+						"type": "array",
+						"description": "The instructions to atomically execute"
+					},
+					"recentBlockhash": {
+						"$ref": "#/components/schemas/Blockhash",
+						"description": "A recent transaction id. Must be populated by the caller"
+					},
+					"lastValidBlockHeight": {
+						"type": "number",
+						"format": "double",
+						"description": "the last block chain can advance to before tx is declared expired"
+					},
+					"nonceInfo": {
+						"$ref": "#/components/schemas/NonceInformation",
+						"description": "Optional Nonce information. If populated, transaction will use a durable\nNonce hash instead of a recentBlockhash. Must be populated by the caller"
+					},
+					"minNonceContextSlot": {
+						"type": "number",
+						"format": "double",
+						"description": "If this is a nonce transaction this represents the minimum slot from which\nto evaluate if the nonce has advanced when attempting to confirm the\ntransaction. This protects against a case where the transaction confirmation\nlogic loads the nonce account from an old slot and assumes the mismatch in\nnonce value implies that the nonce has been advanced."
+					}
+				},
+				"required": [
+					"signatures",
+					"instructions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"RawPoolSolanaTransaction": {
+				"$ref": "#/components/schemas/SolanaWeb3Transaction"
+			},
+			"SdkRawTransaction": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/RawTronTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawEvmTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawSorobanTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawAlgTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawStxTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawSuiTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawBridgeSolanaTransaction"
+					},
+					{
+						"$ref": "#/components/schemas/RawPoolSolanaTransaction"
+					}
+				]
+			},
+			"RawTransaction": {
+				"$ref": "#/components/schemas/SdkRawTransaction"
+			},
+			"HorizonApi.SubmitTransactionResponse": {
+				"properties": {
+					"hash": {
+						"type": "string"
+					},
+					"ledger": {
+						"type": "number",
+						"format": "double"
+					},
+					"successful": {
+						"type": "boolean"
+					},
+					"envelope_xdr": {
+						"type": "string"
+					},
+					"result_xdr": {
+						"type": "string"
+					},
+					"result_meta_xdr": {
+						"type": "string"
+					},
+					"paging_token": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"hash",
+					"ledger",
+					"successful",
+					"envelope_xdr",
+					"result_xdr",
+					"result_meta_xdr",
+					"paging_token"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.TransactionResult": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.DiagnosticEvent": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.SendTransactionStatus": {
+				"type": "string",
+				"enum": [
+					"PENDING",
+					"DUPLICATE",
+					"TRY_AGAIN_LATER",
+					"ERROR"
+				]
+			},
+			"Api.SendTransactionResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/Api.SendTransactionStatus"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"latestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"latestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"errorResult": {
+						"$ref": "#/components/schemas/xdr.TransactionResult"
+					},
+					"diagnosticEvents": {
+						"items": {
+							"$ref": "#/components/schemas/xdr.DiagnosticEvent"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"status",
+					"hash",
+					"latestLedger",
+					"latestLedgerCloseTime"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.GetTransactionStatus.SUCCESS": {
+				"enum": [
+					"SUCCESS"
+				],
+				"type": "string"
+			},
+			"xdr.TransactionEnvelope": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.TransactionMeta": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.ScVal": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.TransactionEvent": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"xdr.ContractEvent": {
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.TransactionEvents": {
+				"properties": {
+					"transactionEventsXdr": {
+						"items": {
+							"$ref": "#/components/schemas/xdr.TransactionEvent"
+						},
+						"type": "array"
+					},
+					"contractEventsXdr": {
+						"items": {
+							"items": {
+								"$ref": "#/components/schemas/xdr.ContractEvent"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"transactionEventsXdr",
+					"contractEventsXdr"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.GetTransactionStatus": {
+				"enum": [
+					"SUCCESS",
+					"NOT_FOUND",
+					"FAILED"
+				],
+				"type": "string"
+			},
+			"Api.GetSuccessfulTransactionResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/Api.GetTransactionStatus.SUCCESS"
+					},
+					"txHash": {
+						"type": "string"
+					},
+					"latestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"latestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"ledger": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "number",
+						"format": "double"
+					},
+					"applicationOrder": {
+						"type": "number",
+						"format": "double"
+					},
+					"feeBump": {
+						"type": "boolean"
+					},
+					"envelopeXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionEnvelope"
+					},
+					"resultXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionResult"
+					},
+					"resultMetaXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionMeta"
+					},
+					"diagnosticEventsXdr": {
+						"items": {
+							"$ref": "#/components/schemas/xdr.DiagnosticEvent"
+						},
+						"type": "array"
+					},
+					"returnValue": {
+						"$ref": "#/components/schemas/xdr.ScVal"
+					},
+					"events": {
+						"$ref": "#/components/schemas/Api.TransactionEvents"
+					}
+				},
+				"required": [
+					"status",
+					"txHash",
+					"latestLedger",
+					"latestLedgerCloseTime",
+					"oldestLedger",
+					"oldestLedgerCloseTime",
+					"ledger",
+					"createdAt",
+					"applicationOrder",
+					"feeBump",
+					"envelopeXdr",
+					"resultXdr",
+					"resultMetaXdr",
+					"events"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.GetTransactionStatus.FAILED": {
+				"enum": [
+					"FAILED"
+				],
+				"type": "string"
+			},
+			"Api.GetFailedTransactionResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/Api.GetTransactionStatus.FAILED"
+					},
+					"txHash": {
+						"type": "string"
+					},
+					"latestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"latestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"ledger": {
+						"type": "number",
+						"format": "double"
+					},
+					"createdAt": {
+						"type": "number",
+						"format": "double"
+					},
+					"applicationOrder": {
+						"type": "number",
+						"format": "double"
+					},
+					"feeBump": {
+						"type": "boolean"
+					},
+					"envelopeXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionEnvelope"
+					},
+					"resultXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionResult"
+					},
+					"resultMetaXdr": {
+						"$ref": "#/components/schemas/xdr.TransactionMeta"
+					},
+					"diagnosticEventsXdr": {
+						"items": {
+							"$ref": "#/components/schemas/xdr.DiagnosticEvent"
+						},
+						"type": "array"
+					},
+					"events": {
+						"$ref": "#/components/schemas/Api.TransactionEvents"
+					}
+				},
+				"required": [
+					"status",
+					"txHash",
+					"latestLedger",
+					"latestLedgerCloseTime",
+					"oldestLedger",
+					"oldestLedgerCloseTime",
+					"ledger",
+					"createdAt",
+					"applicationOrder",
+					"feeBump",
+					"envelopeXdr",
+					"resultXdr",
+					"resultMetaXdr",
+					"events"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.GetTransactionStatus.NOT_FOUND": {
+				"enum": [
+					"NOT_FOUND"
+				],
+				"type": "string"
+			},
+			"Api.GetMissingTransactionResponse": {
+				"properties": {
+					"status": {
+						"$ref": "#/components/schemas/Api.GetTransactionStatus.NOT_FOUND"
+					},
+					"txHash": {
+						"type": "string"
+					},
+					"latestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"latestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedger": {
+						"type": "number",
+						"format": "double"
+					},
+					"oldestLedgerCloseTime": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"status",
+					"txHash",
+					"latestLedger",
+					"latestLedgerCloseTime",
+					"oldestLedger",
+					"oldestLedgerCloseTime"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Api.GetTransactionResponse": {
+				"anyOf": [
+					{
+						"$ref": "#/components/schemas/Api.GetSuccessfulTransactionResponse"
+					},
+					{
+						"$ref": "#/components/schemas/Api.GetFailedTransactionResponse"
+					},
+					{
+						"$ref": "#/components/schemas/Api.GetMissingTransactionResponse"
+					}
+				]
+			},
+			"Messenger": {
+				"enum": [
+					1,
+					2,
+					3,
+					4,
+					5,
+					6
+				],
+				"type": "number"
+			},
+			"BridgeTransaction": {
+				"properties": {
+					"txId": {
+						"type": "string"
+					},
+					"sourceChainId": {
+						"type": "number",
+						"format": "double"
+					},
+					"destinationChainId": {
+						"type": "number",
+						"format": "double"
+					},
+					"fee": {
+						"type": "string"
+					},
+					"feeFormatted": {
+						"type": "number",
+						"format": "double"
+					},
+					"stableFee": {
+						"type": "string"
+					},
+					"stableFeeFormatted": {
+						"type": "number",
+						"format": "double"
+					},
+					"amount": {
+						"type": "string"
+					},
+					"amountFormatted": {
+						"type": "number",
+						"format": "double"
+					},
+					"virtualAmount": {
+						"type": "string"
+					},
+					"bridgeContract": {
+						"type": "string"
+					},
+					"sender": {
+						"type": "string"
+					},
+					"recipient": {
+						"type": "string"
+					},
+					"sourceTokenAddress": {
+						"type": "string"
+					},
+					"destinationTokenAddress": {
+						"type": "string"
+					},
+					"originSourceTokenAddress": {
+						"type": "string"
+					},
+					"originDestinationTokenAddress": {
+						"type": "string"
+					},
+					"hash": {
+						"type": "string"
+					},
+					"messenger": {
+						"$ref": "#/components/schemas/Messenger"
+					},
+					"blockTime": {
+						"type": "number",
+						"format": "double"
+					},
+					"blockId": {
+						"type": "string"
+					},
+					"confirmations": {
+						"type": "number",
+						"format": "double"
+					},
+					"confirmationsNeeded": {
+						"type": "number",
+						"format": "double"
+					},
+					"isClaimable": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"txId",
+					"sourceChainId",
+					"destinationChainId",
+					"fee",
+					"feeFormatted",
+					"stableFee",
+					"stableFeeFormatted",
+					"amount",
+					"amountFormatted",
+					"virtualAmount",
+					"bridgeContract",
+					"sender",
+					"recipient",
+					"sourceTokenAddress",
+					"destinationTokenAddress",
+					"hash",
+					"messenger",
+					"blockTime",
+					"blockId",
+					"confirmations",
+					"confirmationsNeeded"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"TransferStatusResponse": {
+				"properties": {
+					"txId": {
+						"type": "string"
+					},
+					"sourceChainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol"
+					},
+					"destinationChainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol"
+					},
+					"sendAmount": {
+						"type": "string"
+					},
+					"sendAmountFormatted": {
+						"type": "number",
+						"format": "double"
+					},
+					"stableFee": {
+						"type": "string"
+					},
+					"stableFeeFormatted": {
+						"type": "number",
+						"format": "double"
+					},
+					"sourceTokenAddress": {
+						"type": "string"
+					},
+					"destinationTokenAddress": {
+						"type": "string"
+					},
+					"originSourceTokenAddress": {
+						"type": "string"
+					},
+					"originDestinationTokenAddress": {
+						"type": "string"
+					},
+					"senderAddress": {
+						"type": "string"
+					},
+					"recipientAddress": {
+						"type": "string"
+					},
+					"signaturesCount": {
+						"type": "number",
+						"format": "double"
+					},
+					"signaturesNeeded": {
+						"type": "number",
+						"format": "double"
+					},
+					"send": {
+						"$ref": "#/components/schemas/BridgeTransaction"
+					},
+					"receive": {
+						"$ref": "#/components/schemas/BridgeTransaction"
+					},
+					"responseTime": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"txId",
+					"sourceChainSymbol",
+					"destinationChainSymbol",
+					"sendAmount",
+					"sendAmountFormatted",
+					"stableFee",
+					"stableFeeFormatted",
+					"sourceTokenAddress",
+					"destinationTokenAddress",
+					"senderAddress",
+					"recipientAddress",
+					"signaturesCount",
+					"signaturesNeeded",
+					"send"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AmountFormatted": {
+				"properties": {
+					"int": {
+						"type": "string"
+					},
+					"float": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"int",
+					"float"
+				],
+				"type": "object",
+				"description": "Describes the same amount in two variation formats.\n\nFor {@link AmountFormat.INT} value contains the amount in the smallest denomination\n\nFor {@link AmountFormat.FLOAT} value contains the amount in tokens denomination"
+			},
+			"PendingStatusInfoResponse": {
+				"description": "Provide pending status information",
+				"properties": {
+					"pendingTxs": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of pending transactions"
+					},
+					"pendingAmount": {
+						"$ref": "#/components/schemas/AmountFormatted",
+						"description": "Total amount of pending transactions"
+					},
+					"estimatedAmount": {
+						"properties": {
+							"max": {
+								"$ref": "#/components/schemas/AmountFormatted"
+							},
+							"min": {
+								"$ref": "#/components/schemas/AmountFormatted"
+							}
+						},
+						"required": [
+							"max",
+							"min"
+						],
+						"type": "object",
+						"description": "The amount of tokens can be received as a result of transfer considering pending transactions"
+					}
+				},
+				"required": [
+					"pendingTxs",
+					"pendingAmount",
+					"estimatedAmount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SwapCalcInfo": {
+				"description": "Response containing the fee and amount adjustments in Token for the bridge transaction.",
+				"properties": {
+					"sourceLiquidityFee": {
+						"type": "string",
+						"description": "Paid for the swap liquidity on the source Chain"
+					},
+					"sourceSwap": {
+						"type": "string",
+						"description": "Amount adjustment on the swap from the source Token"
+					},
+					"destinationLiquidityFee": {
+						"type": "string",
+						"description": "Paid for the swap liquidity on the destination Chain"
+					},
+					"destinationSwap": {
+						"type": "string",
+						"description": "Amount adjustment on the swap to the destination Token"
+					}
+				},
+				"required": [
+					"sourceLiquidityFee",
+					"sourceSwap",
+					"destinationLiquidityFee",
+					"destinationSwap"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BridgeAmounts": {
+				"properties": {
+					"amountInFloat": {
+						"type": "string"
+					},
+					"amountReceivedInFloat": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"amountInFloat",
+					"amountReceivedInFloat"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BridgeQuotePayment": {
+				"properties": {
+					"feePaymentMethod": {
+						"type": "string",
+						"enum": [
+							"WITH_NATIVE_CURRENCY",
+							"WITH_STABLECOIN",
+							"WITH_ABR"
+						],
+						"nullable": false
+					},
+					"fee": {
+						"type": "string"
+					},
+					"pendingTxs": {
+						"type": "number",
+						"format": "double"
+					},
+					"pendingAmount": {
+						"type": "string"
+					},
+					"estimatedAmount": {
+						"properties": {
+							"max": {
+								"type": "string"
+							},
+							"min": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"max",
+							"min"
+						],
+						"type": "object"
+					},
+					"relayerFeeInStable": {
+						"type": "string"
+					},
+					"relayerFeeInNative": {
+						"type": "string"
+					},
+					"relayerFeeInAbr": {
+						"type": "string"
+					},
+					"abrPayerAddress": {
+						"type": "string"
+					},
+					"abrTokenAddress": {
+						"type": "string"
+					},
+					"poolImpact": {
+						"$ref": "#/components/schemas/SwapCalcInfo"
+					},
+					"lpFeeTotal": {
+						"type": "string"
+					},
+					"transferFee": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"feePaymentMethod",
+					"fee",
+					"estimatedAmount"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BridgeQuoteOption": {
+				"properties": {
+					"messenger": {
+						"type": "string",
+						"enum": [
+							"ALLBRIDGE",
+							"WORMHOLE",
+							"CCTP",
+							"CCTP_V2",
+							"OFT",
+							"X_RESERVE"
+						],
+						"nullable": false
+					},
+					"messengerIndex": {
+						"$ref": "#/components/schemas/Messenger"
+					},
+					"estimatedTimeMs": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"paymentMethods": {
+						"items": {
+							"$ref": "#/components/schemas/BridgeQuotePayment"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"messenger",
+					"estimatedTimeMs",
+					"paymentMethods"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BridgeQuoteResponse": {
+				"properties": {
+					"amountInt": {
+						"type": "string"
+					},
+					"amountFloat": {
+						"type": "string"
+					},
+					"sourceTokenAddress": {
+						"type": "string"
+					},
+					"destinationTokenAddress": {
+						"type": "string"
+					},
+					"options": {
+						"items": {
+							"$ref": "#/components/schemas/BridgeQuoteOption"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"amountInt",
+					"amountFloat",
+					"sourceTokenAddress",
+					"destinationTokenAddress",
+					"options"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ChainDetailsWithTokens": {
+				"description": "Contains tokens list",
+				"properties": {
+					"chainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol",
+						"description": "The symbol of the chain representing one of the supported blockchain networks (e.g., \"ETH\" for Ethereum). For more details, see: {@link ChainSymbol}."
+					},
+					"chainId": {
+						"type": "string",
+						"description": "Common Blockchain Id</br>\nA 0x-prefixed hexadecimal string</br>\nOptional."
+					},
+					"name": {
+						"type": "string",
+						"description": "Blockchain name"
+					},
+					"chainType": {
+						"$ref": "#/components/schemas/ChainType",
+						"description": "Blockchain type. For more details, see: {@link ChainType}."
+					},
+					"allbridgeChainId": {
+						"type": "number",
+						"format": "double",
+						"description": "Allbridge's Id"
+					},
+					"bridgeId": {
+						"type": "string",
+						"description": "Algo Bridge appId"
+					},
+					"paddingUtilId": {
+						"type": "string",
+						"description": "Algo Padding appId"
+					},
+					"bridgeAddress": {
+						"type": "string",
+						"description": "Bridge contract address"
+					},
+					"oftBridgeAddress": {
+						"type": "string",
+						"description": "OFT Bridge contract address\nOptional. Defined if the chain supports OFT"
+					},
+					"yieldAddress": {
+						"type": "string",
+						"description": "Yield contract address"
+					},
+					"abrPayer": {
+						"$ref": "#/components/schemas/AbrPayerChainInfo",
+						"description": "ABR payer chain info"
+					},
+					"transferTime": {
+						"$ref": "#/components/schemas/TransferTime",
+						"description": "Average transfer time to other blockchains"
+					},
+					"txCostAmount": {
+						"$ref": "#/components/schemas/TxCostAmount",
+						"description": "Transfers costs"
+					},
+					"confirmations": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of confirmations required"
+					},
+					"suiAddresses": {
+						"$ref": "#/components/schemas/SuiAddresses",
+						"description": "Sui addresses\nOptional. Defined for SUI"
+					},
+					"tokens": {
+						"items": {
+							"$ref": "#/components/schemas/TokenWithChainDetails"
+						},
+						"type": "array",
+						"description": "Tokens"
+					}
+				},
+				"required": [
+					"chainSymbol",
+					"name",
+					"chainType",
+					"allbridgeChainId",
+					"bridgeAddress",
+					"transferTime",
+					"txCostAmount",
+					"confirmations",
+					"tokens"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Record_string.ChainDetailsWithTokens_": {
+				"properties": {},
+				"additionalProperties": {
+					"$ref": "#/components/schemas/ChainDetailsWithTokens"
+				},
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"ChainDetailsMap": {
+				"$ref": "#/components/schemas/Record_string.ChainDetailsWithTokens_"
+			},
+			"CYDToken": {
+				"properties": {
+					"symbol": {
+						"type": "string",
+						"description": "Token symbol"
+					},
+					"name": {
+						"type": "string",
+						"description": "Token name"
+					},
+					"decimals": {
+						"type": "number",
+						"format": "double",
+						"description": "Token decimals"
+					},
+					"poolAddress": {
+						"type": "string",
+						"description": "Token pool address"
+					},
+					"tokenAddress": {
+						"type": "string",
+						"description": "Token address"
+					},
+					"originTokenAddress": {
+						"type": "string",
+						"description": "Token origin address"
+					},
+					"cctpAddress": {
+						"type": "string",
+						"description": "Token CCTP address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpFeeShare": {
+						"type": "string",
+						"description": "Token CCTP V2 address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpV2Address": {
+						"type": "string",
+						"description": "Token CCTP address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"cctpV2FeeShare": {
+						"type": "string",
+						"description": "Token CCTP V2 address</br>\nOptional. Defined if CCTP supported by token"
+					},
+					"xReserve": {
+						"$ref": "#/components/schemas/XReserveTokenInfo",
+						"description": "XReserve bridge configuration for token.\nOptional. Defined if XReserve supported by token"
+					},
+					"oftId": {
+						"type": "string",
+						"description": "Internal identifier for the same token across different chains.\n\nUsed to link representations of a token deployed on multiple networks (e.g., Ethereum, BSC).\nTokens with the same `oftId` are considered to be equivalent.\n\nOptional. Defined if OFT supported by token"
+					},
+					"feeShare": {
+						"type": "string",
+						"description": "Token fee share"
+					},
+					"apr": {
+						"type": "string"
+					},
+					"apr7d": {
+						"type": "string",
+						"description": "Token APR based on last 7 days"
+					},
+					"apr30d": {
+						"type": "string",
+						"description": "Token APR based on last 30 days"
+					},
+					"lpRate": {
+						"type": "string",
+						"description": "Token LP rate"
+					},
+					"yieldId": {
+						"type": "number",
+						"format": "double"
+					},
+					"suiAddresses": {
+						"$ref": "#/components/schemas/SuiAddresses",
+						"description": "Sui addresses\nOptional. Defined for SUI"
+					},
+					"allbridgeChainId": {
+						"type": "number",
+						"format": "double",
+						"description": "Allbridge's Id"
+					},
+					"bridgeId": {
+						"type": "string",
+						"description": "Algo Bridge appId"
+					},
+					"paddingUtilId": {
+						"type": "string",
+						"description": "Algo Padding appId"
+					},
+					"bridgeAddress": {
+						"type": "string",
+						"description": "Bridge contract address"
+					},
+					"oftBridgeAddress": {
+						"type": "string",
+						"description": "OFT Bridge contract address\nOptional. Defined if the chain supports OFT"
+					},
+					"yieldAddress": {
+						"type": "string",
+						"description": "Yield contract address"
+					},
+					"abrPayer": {
+						"$ref": "#/components/schemas/AbrPayerChainInfo",
+						"description": "ABR payer chain info"
+					},
+					"transferTime": {
+						"$ref": "#/components/schemas/TransferTime",
+						"description": "Average transfer time to other blockchains"
+					},
+					"txCostAmount": {
+						"$ref": "#/components/schemas/TxCostAmount",
+						"description": "Transfers costs"
+					},
+					"confirmations": {
+						"type": "number",
+						"format": "double",
+						"description": "Number of confirmations required"
+					},
+					"chainSymbol": {
+						"$ref": "#/components/schemas/ChainSymbol",
+						"description": "The symbol of the chain representing one of the supported blockchain networks (e.g., \"ETH\" for Ethereum). For more details, see: {@link ChainSymbol}."
+					},
+					"chainId": {
+						"type": "string",
+						"description": "Common Blockchain Id</br>\nA 0x-prefixed hexadecimal string</br>\nOptional."
+					},
+					"chainType": {
+						"$ref": "#/components/schemas/ChainType",
+						"description": "Blockchain type. For more details, see: {@link ChainType}."
+					},
+					"chainName": {
+						"type": "string",
+						"description": "Blockchain network name"
+					},
+					"tokens": {
+						"items": {
+							"$ref": "#/components/schemas/TokenWithChainDetailsYield"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"symbol",
+					"name",
+					"decimals",
+					"poolAddress",
+					"tokenAddress",
+					"feeShare",
+					"apr",
+					"apr7d",
+					"apr30d",
+					"lpRate",
+					"allbridgeChainId",
+					"bridgeAddress",
+					"transferTime",
+					"txCostAmount",
+					"confirmations",
+					"chainSymbol",
+					"chainType",
+					"chainName",
+					"yieldAddress",
+					"tokens"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GasFeeOptions": {
+				"description": "Describes available options of paying the gas fee and the amount to pay when using the corresponding method.\n\nFor {@link FeePaymentMethod.WITH_NATIVE_CURRENCY} value contains the amount in the smallest denomination of the source chain currency\n\nFor {@link FeePaymentMethod.WITH_STABLECOIN} value contains the amount in the smallest denomination of the source token",
+				"properties": {
+					"native": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					},
+					"stablecoin": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					},
+					"abr": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					},
+					"adminFeeShareWithExtras": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"native"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AddressStatus": {
+				"enum": [
+					"OK",
+					"INVALID",
+					"FORBIDDEN",
+					"UNINITIALIZED",
+					"CONTRACT_ADDRESS",
+					"WRONG_ASSOCIATED_ACCOUNT_OWNER"
+				],
+				"type": "string"
+			},
+			"GasBalanceResponse": {
+				"properties": {
+					"gasBalance": {
+						"type": "string",
+						"nullable": true
+					},
+					"status": {
+						"$ref": "#/components/schemas/AddressStatus"
+					}
+				},
+				"required": [
+					"gasBalance",
+					"status"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExtraGasMaxLimits": {
+				"properties": {
+					"native": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					},
+					"stablecoin": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					},
+					"abr": {
+						"$ref": "#/components/schemas/AmountFormatted"
+					}
+				},
+				"type": "object",
+				"description": "Describes MAX extra gas value can to be passed when using the corresponding method.\n\nFor {@link FeePaymentMethod.WITH_NATIVE_CURRENCY} value contains {@link ExtraGasMaxLimit} the amount of the source chain currency\n\nFor {@link FeePaymentMethod.WITH_STABLECOIN} value contains {@link ExtraGasMaxLimit} the amount of the source token"
+			},
+			"ExtraGasMaxLimit": {
+				"$ref": "#/components/schemas/AmountFormatted",
+				"description": "Describes the same MAX extra gas amount."
+			},
+			"ExtraGasMaxLimitResponse": {
+				"description": "Provide extra gas information",
+				"properties": {
+					"extraGasMax": {
+						"$ref": "#/components/schemas/ExtraGasMaxLimits",
+						"description": "See {@link ExtraGasMaxLimits}"
+					},
+					"destinationChain": {
+						"properties": {
+							"transfer": {
+								"$ref": "#/components/schemas/AmountFormatted",
+								"description": "cost of send tx on chain"
+							},
+							"swap": {
+								"$ref": "#/components/schemas/AmountFormatted",
+								"description": "cost of swap tx on chain"
+							},
+							"gasAmountMax": {
+								"$ref": "#/components/schemas/ExtraGasMaxLimit",
+								"description": "gasAmountMax maximum amount you can receive as extra gas on dest chain"
+							}
+						},
+						"required": [
+							"transfer",
+							"swap",
+							"gasAmountMax"
+						],
+						"type": "object",
+						"description": "Information due to destination chain"
+					},
+					"exchangeRate": {
+						"type": "string",
+						"description": "Exchange rate"
+					},
+					"abrExchangeRate": {
+						"type": "string",
+						"description": "Exchange rate"
+					},
+					"sourceNativeTokenPrice": {
+						"type": "string",
+						"description": "Source native token price"
+					}
+				},
+				"required": [
+					"extraGasMax",
+					"destinationChain",
+					"exchangeRate",
+					"sourceNativeTokenPrice"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AssetType.credit4": {
+				"type": "string",
+				"enum": [
+					"credit_alphanum4"
+				],
+				"nullable": false
+			},
+			"AssetType.credit12": {
+				"type": "string",
+				"enum": [
+					"credit_alphanum12"
+				],
+				"nullable": false
+			},
+			"HorizonApi.BalanceLineAsset": {
+				"properties": {
+					"balance": {
+						"type": "string"
+					},
+					"limit": {
+						"type": "string"
+					},
+					"asset_type": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/AssetType.credit4"
+							},
+							{
+								"$ref": "#/components/schemas/AssetType.credit12"
+							}
+						]
+					},
+					"asset_code": {
+						"type": "string"
+					},
+					"asset_issuer": {
+						"type": "string"
+					},
+					"buying_liabilities": {
+						"type": "string"
+					},
+					"selling_liabilities": {
+						"type": "string"
+					},
+					"last_modified_ledger": {
+						"type": "number",
+						"format": "double"
+					},
+					"is_authorized": {
+						"type": "boolean"
+					},
+					"is_authorized_to_maintain_liabilities": {
+						"type": "boolean"
+					},
+					"is_clawback_enabled": {
+						"type": "boolean"
+					},
+					"sponsor": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"balance",
+					"limit",
+					"asset_type",
+					"asset_code",
+					"asset_issuer",
+					"buying_liabilities",
+					"selling_liabilities",
+					"last_modified_ledger",
+					"is_authorized",
+					"is_authorized_to_maintain_liabilities",
+					"is_clawback_enabled"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PoolInfo": {
+				"description": "General Pool Interface",
+				"properties": {
+					"aValue": {
+						"type": "string",
+						"description": "Pool A value"
+					},
+					"dValue": {
+						"type": "string",
+						"description": "Pool D value"
+					},
+					"tokenBalance": {
+						"type": "string",
+						"description": "Pool token balance"
+					},
+					"vUsdBalance": {
+						"type": "string",
+						"description": "Pool virtual USD balance"
+					},
+					"totalLpAmount": {
+						"type": "string",
+						"description": "Pool total liquidity amount"
+					},
+					"accRewardPerShareP": {
+						"type": "string",
+						"description": "Current accumulated reward per share shifted by P bits"
+					},
+					"p": {
+						"type": "number",
+						"format": "double",
+						"description": "P value, needed for accRewardPerShareP"
+					},
+					"imbalance": {
+						"type": "string",
+						"description": "Pool imbalance"
+					}
+				},
+				"required": [
+					"aValue",
+					"dValue",
+					"tokenBalance",
+					"vUsdBalance",
+					"totalLpAmount",
+					"accRewardPerShareP",
+					"p",
+					"imbalance"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Required_PoolInfo_": {
+				"properties": {
+					"aValue": {
+						"type": "string",
+						"description": "Pool A value"
+					},
+					"dValue": {
+						"type": "string",
+						"description": "Pool D value"
+					},
+					"tokenBalance": {
+						"type": "string",
+						"description": "Pool token balance"
+					},
+					"vUsdBalance": {
+						"type": "string",
+						"description": "Pool virtual USD balance"
+					},
+					"totalLpAmount": {
+						"type": "string",
+						"description": "Pool total liquidity amount"
+					},
+					"accRewardPerShareP": {
+						"type": "string",
+						"description": "Current accumulated reward per share shifted by P bits"
+					},
+					"p": {
+						"type": "number",
+						"format": "double",
+						"description": "P value, needed for accRewardPerShareP"
+					},
+					"imbalance": {
+						"type": "string",
+						"description": "Pool imbalance"
+					}
+				},
+				"required": [
+					"aValue",
+					"dValue",
+					"tokenBalance",
+					"vUsdBalance",
+					"totalLpAmount",
+					"accRewardPerShareP",
+					"p",
+					"imbalance"
+				],
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"UserLiquidityDetails": {
+				"properties": {
+					"lpAmount": {
+						"type": "string"
+					},
+					"rewardDebt": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"lpAmount",
+					"rewardDebt"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "rest-api",
+		"version": "3.30.0-alpha.2",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/yield/tokens": {
+			"get": {
+				"operationId": "GetYieldTokens",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/TokenWithChainDetails"
+									},
+									"type": "array"
+								},
+								"examples": {
+									"Available yield tokens": {
+										"value": [
+											{
+												"chainSymbol": "ETH",
+												"chainId": "1",
+												"name": "USD Coin",
+												"symbol": "USDC",
+												"decimals": 6,
+												"tokenAddress": "0x0000000000000000000000000000000000000001",
+												"yieldAddress": "0x0000000000000000000000000000000000000002",
+												"tokens": [
+													{
+														"chainSymbol": "ETH",
+														"chainId": "1",
+														"name": "USD Coin",
+														"symbol": "USDC",
+														"decimals": 6,
+														"tokenAddress": "0x0000000000000000000000000000000000000001",
+														"yieldAddress": "0x0000000000000000000000000000000000000002",
+														"yieldId": "1"
+													}
+												]
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Yield"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/yield/allowance": {
+			"get": {
+				"operationId": "GetYieldAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Yield allowance amount": {
+										"value": "100000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield",
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/check/yield/allowance": {
+			"get": {
+				"operationId": "CheckYieldAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								},
+								"examples": {
+									"Yield allowance check result": {
+										"value": true
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/yield/balance": {
+			"get": {
+				"operationId": "GetYieldTokenBalance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								},
+								"examples": {
+									"Yield token balance in smallest units": {
+										"value": {
+											"result": "2500000"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/yield/deposit/calculate": {
+			"get": {
+				"operationId": "GetYieldAmountToBeDeposited",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Estimated CYD amount on deposit": {
+										"value": "2.4987"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/yield/withdrawn/calculate": {
+			"get": {
+				"operationId": "GetYieldAmountToBeWithdrawn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/YieldWithdrawAmount"
+									},
+									"type": "array"
+								},
+								"examples": {
+									"Estimated withdrawn token amounts": {
+										"value": [
+											{
+												"amount": "1.25",
+												"token": {
+													"chainSymbol": "ETH",
+													"chainId": "1",
+													"name": "USD Coin",
+													"symbol": "USDC",
+													"decimals": 6,
+													"tokenAddress": "0x0000000000000000000000000000000000000001",
+													"yieldAddress": "0x0000000000000000000000000000000000000002",
+													"yieldId": "1"
+												}
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "yieldAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/yield/approve": {
+			"get": {
+				"operationId": "ApproveYield",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Yield approve raw transaction": {
+										"value": "0xffff"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amount",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/yield/deposit": {
+			"get": {
+				"operationId": "DepositYield",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Yield deposit raw transaction": {
+										"value": "0xffff"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "minVirtualAmount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/yield/withdraw": {
+			"get": {
+				"operationId": "WithdrawYield",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Yield withdraw raw transaction": {
+										"value": "0xffff"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Yield",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "yieldAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/solana/add-memo": {
+			"get": {
+				"operationId": "SolanaAddMemo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Solana raw transaction with memo": {
+										"value": "0a0b0c0d"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Solana",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "tx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "memo",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/solana/replace-fee-payer": {
+			"get": {
+				"operationId": "SponsorWrapRawTx",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Solana raw transaction with replaced fee payer": {
+										"value": "0a0b0c0d"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Solana",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sponsor",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "fundLamports",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/utils/stellar/submit": {
+			"get": {
+				"operationId": "SubmitTransactionStellar",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HorizonApi.SubmitTransactionResponse"
+								},
+								"examples": {
+									"Submit response": {
+										"value": {
+											"hash": "stellar-tx-hash"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Stellar"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "xdrTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/soroban/send": {
+			"get": {
+				"operationId": "SendTransactionSoroban",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Api.SendTransactionResponse"
+								},
+								"examples": {
+									"Send response": {
+										"value": {
+											"hash": "soroban-tx-hash",
+											"status": "PENDING"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Soroban"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "xdrTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/soroban/confirm": {
+			"get": {
+				"operationId": "ConfirmSorobanTx",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Api.GetTransactionResponse"
+								},
+								"examples": {
+									"Confirmation response": {
+										"value": {
+											"status": "SUCCESS"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Soroban"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "hash",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "secondsToWait",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/utils/sui/build-send-from-custom-tx": {
+			"get": {
+				"operationId": "SuiBuildSendTxFromCustomTx",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Raw Sui bridge transaction built from custom tx": {
+										"value": "{\"version\":2,\"sender\":\"0x0\",\"expiration\":{\"None\":true},\"gasData\":{\"budget\":\"1\",\"price\":\"1\",\"owner\":\"0x0\",\"payment\":[]}}"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"SUI",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "baseTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "inputCoin",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "params",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/sui/raw2base64": {
+			"get": {
+				"operationId": "SuiRaw2Base64",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Base64 encoded Sui transaction": {
+										"value": "AAECAw=="
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"SUI",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "rawTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/utils/tron/raw2hex": {
+			"get": {
+				"operationId": "TronRaw2Hex",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Hex encoded Tron transaction": {
+										"value": "0a0b0c0d"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Utils",
+					"Tron",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "rawTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/approve": {
+			"get": {
+				"operationId": "Approve",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"EVM approve transaction": {
+										"value": {
+											"from": "0x0000000000000000000000000000000000000000",
+											"to": "0x0000000000000000000000000000000000000000",
+											"value": "1000",
+											"data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+										}
+									},
+									"Tron approve transaction": {
+										"value": {
+											"visible": false,
+											"txID": "0000000000000000000000000000000000000000000000000000000000000000",
+											"raw_data": {
+												"contract": [],
+												"ref_block_bytes": "0000",
+												"ref_block_hash": "0000000000000000",
+												"expiration": 0,
+												"timestamp": 0
+											},
+											"raw_data_hex": "00"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Transfers",
+					"Raw Transactions",
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amount",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"default": "bridge",
+							"type": "string",
+							"enum": [
+								"bridge",
+								"pool",
+								"yield"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/bridge/approve": {
+			"get": {
+				"operationId": "BridgeApprove",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"EVM bridge approve transaction": {
+										"value": {
+											"from": "0x0000000000000000000000000000000000000000",
+											"to": "0x0000000000000000000000000000000000000000",
+											"value": "1000",
+											"data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+										}
+									},
+									"Tron bridge approve transaction": {
+										"value": {
+											"visible": false,
+											"txID": "0000000000000000000000000000000000000000000000000000000000000000",
+											"raw_data": {
+												"contract": [],
+												"ref_block_bytes": "0000",
+												"ref_block_hash": "0000000000000000",
+												"expiration": 0,
+												"timestamp": 0
+											},
+											"raw_data_hex": "00"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amount",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/swap": {
+			"get": {
+				"operationId": "GetRawSwap",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"EVM swap transaction": {
+										"value": {
+											"from": "0x0000000000000000000000000000000000000000",
+											"to": "0x0000000000000000000000000000000000000000",
+											"value": "1000",
+											"data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+										}
+									},
+									"Solana swap transaction in hex form": {
+										"value": "0a0b0c0d"
+									},
+									"Sui swap transaction in json form": {
+										"value": "{\"version\":2,\"sender\":\"0x0\",\"expiration\":{\"None\":true},\"gasData\":{\"budget\":\"1\",\"price\":\"1\",\"owner\":\"0x0\",\"payment\":[]}}"
+									},
+									"Sui swap transaction in base64 form": {
+										"value": "AAECAw=="
+									},
+									"Stacks swap transaction": {
+										"value": "80800000000400b168de3a000000000000000100000000000000000000000000000000"
+									},
+									"Tron swap transaction in hex form": {
+										"value": "0a0b0c0d"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "recipient",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "minimumReceiveAmount",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeParams",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"AUTO",
+								"PRICE_PER_UNIT_IN_MICRO_LAMPORTS",
+								"EXTRA_FEE_IN_LAMPORTS"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeValue",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaPayTxFeeWithStablecoinSwap",
+						"required": false,
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "outputFormat",
+						"required": false,
+						"schema": {
+							"default": "json",
+							"type": "string",
+							"enum": [
+								"json",
+								"base64",
+								"hex"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/raw/bridge": {
+			"get": {
+				"operationId": "GetRawSwapAndBridge",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"EVM transaction": {
+										"value": {
+											"from": "0x0000000000000000000000000000000000000000",
+											"to": "0x0000000000000000000000000000000000000000",
+											"value": "1000",
+											"data": "0x0000000000000000000000000000000000000000000000000000000000000000"
+										}
+									},
+									"Solana transaction": {
+										"value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+									},
+									"Stellar transaction": {
+										"value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+									},
+									"Stacks transaction": {
+										"value": "80800000000400b168de3a000000000000000100000000000000000000000000000000"
+									},
+									"Tron transaction": {
+										"value": {
+											"visible": false,
+											"txID": "0000000000000000000000000000000000000000000000000000000000000000",
+											"raw_data": {
+												"contract": [],
+												"ref_block_bytes": "0000",
+												"ref_block_hash": "0000000000000000",
+												"expiration": 0,
+												"timestamp": 0
+											},
+											"raw_data_hex": "00"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "recipient",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "fee",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "extraGas",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeParams",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"AUTO",
+								"PRICE_PER_UNIT_IN_MICRO_LAMPORTS",
+								"EXTRA_FEE_IN_LAMPORTS"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeValue",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaPayTxFeeWithStablecoinSwap",
+						"required": false,
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "outputFormat",
+						"required": false,
+						"schema": {
+							"default": "json",
+							"type": "string",
+							"enum": [
+								"json",
+								"base64",
+								"hex"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/raw/stellar/restore": {
+			"get": {
+				"operationId": "SimulateAndCheckRestoreTxRequiredSoroban",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Restore XDR transaction": {
+										"value": "AAAAAwAAAADXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "xdrTx",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/stellar/trustline": {
+			"get": {
+				"operationId": "BuildChangeTrustLineXdrTx",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Trustline XDR transaction": {
+										"value": "AAAAAgAAAADXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/algorand/optin": {
+			"get": {
+				"operationId": "BuildRawTransactionAssetOptIn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawAlgTransaction"
+								},
+								"examples": {
+									"Algorand raw opt-in transaction": {
+										"value": [
+											"82a3736967c4400000000000000000000000000000000000000000000000000000000000000000"
+										]
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"default": "asset",
+							"type": "string",
+							"enum": [
+								"asset",
+								"app"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/transfer/time": {
+			"get": {
+				"operationId": "GetTransferTime",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "number",
+									"format": "double",
+									"nullable": true
+								},
+								"examples": {
+									"Average transfer time in milliseconds": {
+										"value": 90000
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/transfer/status": {
+			"get": {
+				"operationId": "GetTransferStatus",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TransferStatusResponse"
+								},
+								"examples": {
+									"Transfer status response": {
+										"value": {
+											"txId": "0x1234",
+											"sourceChainSymbol": "ETH",
+											"destinationChainSymbol": "TRX",
+											"sendAmount": "1000000",
+											"sendAmountFormatted": 1,
+											"stableFee": "1000",
+											"stableFeeFormatted": 0.001,
+											"sourceTokenAddress": "0x0000000000000000000000000000000000000001",
+											"destinationTokenAddress": "T1111111111111111111111111111111111",
+											"senderAddress": "0x0000000000000000000000000000000000000002",
+											"recipientAddress": "T2222222222222222222222222222222222",
+											"signaturesCount": 2,
+											"signaturesNeeded": 4,
+											"send": {
+												"txId": "0x1234",
+												"sourceChainId": 1,
+												"destinationChainId": 728126428,
+												"fee": "1000",
+												"feeFormatted": 0.001,
+												"stableFee": "1000",
+												"stableFeeFormatted": 0.001,
+												"amount": "1000000",
+												"amountFormatted": 1,
+												"virtualAmount": "999000",
+												"bridgeContract": "0x0000000000000000000000000000000000000003",
+												"sender": "0x0000000000000000000000000000000000000002",
+												"recipient": "T2222222222222222222222222222222222",
+												"sourceTokenAddress": "0x0000000000000000000000000000000000000001",
+												"destinationTokenAddress": "T1111111111111111111111111111111111",
+												"hash": "0xhash",
+												"messenger": "ALLBRIDGE",
+												"blockTime": 1710000000,
+												"blockId": "0xblock"
+											},
+											"receive": {
+												"txId": "0x5678",
+												"sourceChainId": 1,
+												"destinationChainId": 728126428,
+												"fee": "1000",
+												"feeFormatted": 0.001,
+												"stableFee": "1000",
+												"stableFeeFormatted": 0.001,
+												"amount": "999000",
+												"amountFormatted": 0.999,
+												"virtualAmount": "999000",
+												"bridgeContract": "T3333333333333333333333333333333333",
+												"sender": "0x0000000000000000000000000000000000000002",
+												"recipient": "T2222222222222222222222222222222222",
+												"sourceTokenAddress": "0x0000000000000000000000000000000000000001",
+												"destinationTokenAddress": "T1111111111111111111111111111111111",
+												"hash": "0xreceivehash",
+												"messenger": "ALLBRIDGE",
+												"blockTime": 1710000030,
+												"blockId": "0xreceiveblock"
+											},
+											"responseTime": 42
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "chain",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "txId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/pending/info": {
+			"get": {
+				"operationId": "GetPendingStatusInfo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PendingStatusInfoResponse"
+								},
+								"examples": {
+									"Pending transfer information": {
+										"value": {
+											"pendingTxs": 2,
+											"pendingAmount": {
+												"int": "2500000",
+												"float": "2.5"
+											},
+											"estimatedAmount": {
+												"min": {
+													"int": "997000",
+													"float": "0.997"
+												},
+												"max": {
+													"int": "999000",
+													"float": "0.999"
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/swap/details": {
+			"get": {
+				"operationId": "SwapDetails",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SwapCalcInfo"
+								},
+								"examples": {
+									"Swap details response": {
+										"value": {
+											"sourceLiquidityFee": "0.001",
+											"sourceSwap": "0.0005",
+											"destinationLiquidityFee": "0.0003",
+											"destinationSwap": "0.0002"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge/details": {
+			"get": {
+				"operationId": "BridgeDetails",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SwapCalcInfo"
+								},
+								"examples": {
+									"Bridge details response": {
+										"value": {
+											"sourceLiquidityFee": "0.001",
+											"sourceSwap": "0.0005",
+											"destinationLiquidityFee": "0.0003",
+											"destinationSwap": "0.0002"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge/receive/calculate": {
+			"get": {
+				"operationId": "GetAmountToBeReceived",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BridgeAmounts"
+								},
+								"examples": {
+									"Amount to be received": {
+										"value": {
+											"amountInFloat": "1",
+											"amountReceivedInFloat": "0.9985"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "refreshingPools",
+						"required": false,
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"in": "query",
+						"name": "relayerFeeInStables",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge/send/calculate": {
+			"get": {
+				"operationId": "GetAmountToSend",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BridgeAmounts"
+								},
+								"examples": {
+									"Amount to send": {
+										"value": {
+											"amountInFloat": "1",
+											"amountReceivedInFloat": "0.9985"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "refreshingPools",
+						"required": false,
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					{
+						"in": "query",
+						"name": "relayerFeeInStables",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge/allowance": {
+			"get": {
+				"operationId": "GetBridgeAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Allowance amount in token smallest units": {
+										"value": "100000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/check/allowance": {
+			"get": {
+				"operationId": "CheckAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								},
+								"examples": {
+									"Allowance check result": {
+										"value": true
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Tokens",
+					"Pool",
+					"Yield"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"default": "bridge",
+							"type": "string",
+							"enum": [
+								"bridge",
+								"pool",
+								"yield"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/check/bridge/allowance": {
+			"get": {
+				"operationId": "CheckBridgeAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								},
+								"examples": {
+									"Bridge allowance check result": {
+										"value": true
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers",
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "contractAddress",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge/quote": {
+			"get": {
+				"operationId": "BridgeQuote",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/BridgeQuoteResponse"
+								},
+								"examples": {
+									"Bridge quote with multiple messengers and fee payment methods": {
+										"value": {
+											"amountInt": "100500000",
+											"amountFloat": "100.5",
+											"sourceTokenAddress": "0x0000000000000000000000000000000000000001",
+											"destinationTokenAddress": "T1111111111111111111111111111111111",
+											"options": [
+												{
+													"messenger": "ALLBRIDGE",
+													"messengerIndex": 1,
+													"estimatedTimeMs": 90000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "5000",
+															"pendingTxs": 2,
+															"pendingAmount": "2500000",
+															"estimatedAmount": {
+																"min": "100100000",
+																"max": "100100000"
+															},
+															"relayerFeeInNative": "5000",
+															"poolImpact": {
+																"sourceLiquidityFee": "0.001",
+																"sourceSwap": "0.0005",
+																"destinationLiquidityFee": "0.0003",
+																"destinationSwap": "0.0002"
+															},
+															"lpFeeTotal": "-500"
+														},
+														{
+															"feePaymentMethod": "WITH_STABLECOIN",
+															"fee": "1200",
+															"pendingTxs": 2,
+															"pendingAmount": "2500000",
+															"estimatedAmount": {
+																"min": "99890000",
+																"max": "99890000"
+															},
+															"relayerFeeInStable": "1200",
+															"poolImpact": {
+																"sourceLiquidityFee": "0.001",
+																"sourceSwap": "0.0005",
+																"destinationLiquidityFee": "0.0003",
+																"destinationSwap": "0.0002"
+															},
+															"lpFeeTotal": "-500"
+														},
+														{
+															"feePaymentMethod": "WITH_ABR",
+															"fee": "980",
+															"pendingTxs": 2,
+															"pendingAmount": "2500000",
+															"estimatedAmount": {
+																"min": "100100000",
+																"max": "100100000"
+															},
+															"relayerFeeInAbr": "980",
+															"abrPayerAddress": "0x00000000000000000000000000000000000000ab",
+															"abrTokenAddress": "0x00000000000000000000000000000000000000cd",
+															"poolImpact": {
+																"sourceLiquidityFee": "0.001",
+																"sourceSwap": "0.0005",
+																"destinationLiquidityFee": "0.0003",
+																"destinationSwap": "0.0002"
+															},
+															"lpFeeTotal": "-500"
+														}
+													]
+												},
+												{
+													"messenger": "WORMHOLE",
+													"messengerIndex": 2,
+													"estimatedTimeMs": 120000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "5500",
+															"estimatedAmount": {
+																"min": "100050000",
+																"max": "100050000"
+															},
+															"relayerFeeInNative": "5500",
+															"poolImpact": {
+																"sourceLiquidityFee": "0.001",
+																"sourceSwap": "0.0005",
+																"destinationLiquidityFee": "0.0003",
+																"destinationSwap": "0.0002"
+															},
+															"lpFeeTotal": "-500"
+														}
+													]
+												},
+												{
+													"messenger": "CCTP",
+													"messengerIndex": 3,
+													"estimatedTimeMs": 300000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "6000",
+															"estimatedAmount": {
+																"min": "100000000",
+																"max": "100000000"
+															},
+															"relayerFeeInNative": "6000",
+															"transferFee": "250"
+														}
+													]
+												},
+												{
+													"messenger": "CCTP_V2",
+													"messengerIndex": 4,
+													"estimatedTimeMs": 240000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "5800",
+															"estimatedAmount": {
+																"min": "100020000",
+																"max": "100020000"
+															},
+															"relayerFeeInNative": "5800",
+															"transferFee": "220"
+														}
+													]
+												},
+												{
+													"messenger": "OFT",
+													"messengerIndex": 5,
+													"estimatedTimeMs": 150000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "5100",
+															"estimatedAmount": {
+																"min": "100080000",
+																"max": "100080000"
+															},
+															"relayerFeeInNative": "5100",
+															"transferFee": "0"
+														}
+													]
+												},
+												{
+													"messenger": "X_RESERVE",
+													"messengerIndex": 6,
+													"estimatedTimeMs": 60000,
+													"paymentMethods": [
+														{
+															"feePaymentMethod": "WITH_NATIVE_CURRENCY",
+															"fee": "4500",
+															"estimatedAmount": {
+																"min": "99950000",
+																"max": "99950000"
+															},
+															"relayerFeeInNative": "4500",
+															"transferFee": "0"
+														}
+													]
+												}
+											]
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/chains": {
+			"get": {
+				"operationId": "ChainDetailsMap",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ChainDetailsMap"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"swap",
+								"pool"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/tokens": {
+			"get": {
+				"operationId": "GetTokens",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"items": {
+												"$ref": "#/components/schemas/CYDToken"
+											},
+											"type": "array"
+										},
+										{
+											"items": {
+												"$ref": "#/components/schemas/TokenWithChainDetails"
+											},
+											"type": "array"
+										}
+									]
+								},
+								"examples": {
+									"Supported tokens": {
+										"value": [
+											{
+												"symbol": "USDC",
+												"name": "USD Coin",
+												"decimals": 6,
+												"poolAddress": "0x0000000000000000000000000000000000000002",
+												"tokenAddress": "0x0000000000000000000000000000000000000001",
+												"feeShare": "0.001",
+												"apr": "0.12",
+												"apr7d": "0.1234",
+												"apr30d": "0.1199",
+												"lpRate": "1.01",
+												"chainSymbol": "ETH",
+												"chainType": "EVM",
+												"chainId": "1",
+												"chainName": "Ethereum",
+												"allbridgeChainId": 1,
+												"bridgeAddress": "0x0000000000000000000000000000000000000003",
+												"confirmations": 12,
+												"txCostAmount": {
+													"transfer": "5000",
+													"swap": "1000"
+												},
+												"transferTime": {
+													"ALLBRIDGE": 90000
+												}
+											}
+										]
+									},
+									"Supported tokens filtered by chain": {
+										"value": [
+											{
+												"symbol": "USDC",
+												"name": "USD Coin",
+												"decimals": 6,
+												"poolAddress": "0x0000000000000000000000000000000000000002",
+												"tokenAddress": "0x0000000000000000000000000000000000000001",
+												"feeShare": "0.001",
+												"apr": "0.12",
+												"apr7d": "0.1234",
+												"apr30d": "0.1199",
+												"lpRate": "1.01",
+												"chainSymbol": "ETH",
+												"chainType": "EVM",
+												"chainId": "1",
+												"chainName": "Ethereum",
+												"allbridgeChainId": 1,
+												"bridgeAddress": "0x0000000000000000000000000000000000000003",
+												"confirmations": 12,
+												"txCostAmount": {
+													"transfer": "5000",
+													"swap": "1000"
+												},
+												"transferTime": {
+													"ALLBRIDGE": 90000
+												}
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"swap",
+								"pool",
+								"yield"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "chain",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"BSC",
+								"ETH",
+								"BAS",
+								"SOL",
+								"TRX",
+								"POL",
+								"ARB",
+								"CEL",
+								"AVA",
+								"SRB",
+								"STLR",
+								"OPT",
+								"SUI",
+								"SNC",
+								"UNI",
+								"LIN",
+								"ALG",
+								"STX"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/token/balance": {
+			"get": {
+				"operationId": "GetTokenBalance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								},
+								"examples": {
+									"Token balance in smallest units": {
+										"value": {
+											"result": "1000000"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/token/native/balance": {
+			"get": {
+				"operationId": "GetTokenNativeBalance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AmountFormatted"
+								},
+								"examples": {
+									"Native balance response": {
+										"value": {
+											"int": "1000000",
+											"float": "1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "chain",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/token/details": {
+			"get": {
+				"operationId": "GetTokenByChainAndAddress",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"$ref": "#/components/schemas/CYDToken"
+										},
+										{
+											"$ref": "#/components/schemas/TokenWithChainDetails"
+										}
+									]
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "chain",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"BSC",
+								"ETH",
+								"BAS",
+								"SOL",
+								"TRX",
+								"POL",
+								"ARB",
+								"CEL",
+								"AVA",
+								"SRB",
+								"STLR",
+								"OPT",
+								"SUI",
+								"SNC",
+								"UNI",
+								"LIN",
+								"ALG",
+								"STX"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/gas/fee": {
+			"get": {
+				"operationId": "GetGasFeeOptions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GasFeeOptions"
+								},
+								"examples": {
+									"Gas fee options": {
+										"value": {
+											"native": {
+												"int": "5000",
+												"float": "0.000005"
+											},
+											"stablecoin": {
+												"int": "1200",
+												"float": "0.0012"
+											},
+											"abr": {
+												"int": "980",
+												"float": "0.00098"
+											},
+											"adminFeeShareWithExtras": "0.1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/gas/balance": {
+			"get": {
+				"operationId": "GetGasBalance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GasBalanceResponse"
+								},
+								"examples": {
+									"Gas balance response": {
+										"value": {
+											"gasBalance": "0.125",
+											"status": "OK"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "chain",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"BSC",
+								"ETH",
+								"BAS",
+								"SOL",
+								"TRX",
+								"POL",
+								"ARB",
+								"CEL",
+								"AVA",
+								"SRB",
+								"STLR",
+								"OPT",
+								"SUI",
+								"SNC",
+								"UNI",
+								"LIN",
+								"ALG",
+								"STX"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/gas/extra/limits": {
+			"get": {
+				"operationId": "GetExtraGasMaxLimits",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ExtraGasMaxLimitResponse"
+								},
+								"examples": {
+									"Extra gas limit response": {
+										"value": {
+											"extraGasMax": {
+												"native": {
+													"int": "1000000",
+													"float": "0.001"
+												},
+												"stablecoin": {
+													"int": "500000",
+													"float": "0.5"
+												},
+												"abr": {
+													"int": "490000",
+													"float": "0.49"
+												}
+											},
+											"destinationChain": {
+												"gasAmountMax": {
+													"int": "250000",
+													"float": "0.00025"
+												},
+												"swap": {
+													"int": "1000",
+													"float": "0.000001"
+												},
+												"transfer": {
+													"int": "2000",
+													"float": "0.000002"
+												}
+											},
+											"exchangeRate": "1.02",
+											"abrExchangeRate": "0.98",
+											"sourceNativeTokenPrice": "3200.15"
+										}
+									},
+									"Extra gas limit response for a specific messenger": {
+										"value": {
+											"extraGasMax": {
+												"native": {
+													"int": "1000000",
+													"float": "0.001"
+												},
+												"stablecoin": {
+													"int": "500000",
+													"float": "0.5"
+												},
+												"abr": {
+													"int": "490000",
+													"float": "0.49"
+												}
+											},
+											"destinationChain": {
+												"gasAmountMax": {
+													"int": "250000",
+													"float": "0.00025"
+												},
+												"swap": {
+													"int": "1000",
+													"float": "0.000001"
+												},
+												"transfer": {
+													"int": "2000",
+													"float": "0.000002"
+												}
+											},
+											"exchangeRate": "1.02",
+											"abrExchangeRate": "0.98",
+											"sourceNativeTokenPrice": "3200.15"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sourceToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "destinationToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "messenger",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"ALLBRIDGE",
+								"WORMHOLE",
+								"CCTP",
+								"CCTP_V2",
+								"OFT",
+								"X_RESERVE"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/check/stellar/balanceline": {
+			"get": {
+				"operationId": "CheckBalanceLine",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HorizonApi.BalanceLineAsset"
+								},
+								"examples": {
+									"Existing Stellar balance line": {
+										"value": {
+											"balance": "10.5",
+											"limit": "1000000",
+											"asset_code": "USDC",
+											"asset_issuer": "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF",
+											"buying_liabilities": "0.0",
+											"selling_liabilities": "0.0",
+											"last_modified_ledger": 123456,
+											"is_authorized": true,
+											"is_authorized_to_maintain_liabilities": true,
+											"is_clawback_enabled": false
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "token",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/check/algorand/optin": {
+			"get": {
+				"operationId": "CheckAlgorandAssetOptIn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								},
+								"examples": {
+									"Algorand opt-in check result": {
+										"value": true
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Transfers"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "sender",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "type",
+						"required": false,
+						"schema": {
+							"default": "asset",
+							"type": "string",
+							"enum": [
+								"asset",
+								"app"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/raw/pool/approve": {
+			"get": {
+				"operationId": "PoolApprove",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Pool approve raw transaction": {
+										"value": "0xffff"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amount",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/deposit": {
+			"get": {
+				"operationId": "Deposit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Pool deposit raw transaction": {
+										"value": "0xffff"
+									},
+									"Stacks pool deposit transaction": {
+										"value": "80800000000400b168de3a000000000000000100000000000000000000000000000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeParams",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"AUTO",
+								"PRICE_PER_UNIT_IN_MICRO_LAMPORTS",
+								"EXTRA_FEE_IN_LAMPORTS"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeValue",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/withdraw": {
+			"get": {
+				"operationId": "Withdraw",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Pool withdraw raw transaction": {
+										"value": "0xffff"
+									},
+									"Stacks pool withdraw transaction": {
+										"value": "80800000000400b168de3a000000000000000100000000000000000000000000000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeParams",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"AUTO",
+								"PRICE_PER_UNIT_IN_MICRO_LAMPORTS",
+								"EXTRA_FEE_IN_LAMPORTS"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeValue",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/raw/claim": {
+			"get": {
+				"operationId": "ClaimRewards",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/RawTransaction"
+								},
+								"examples": {
+									"Pool claim rewards raw transaction": {
+										"value": "0xffff"
+									},
+									"Stacks pool claim rewards transaction": {
+										"value": "80800000000400b168de3a000000000000000100000000000000000000000000000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Raw Transactions"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeParams",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"AUTO",
+								"PRICE_PER_UNIT_IN_MICRO_LAMPORTS",
+								"EXTRA_FEE_IN_LAMPORTS"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "solanaTxFeeValue",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/check/pool/allowance": {
+			"get": {
+				"operationId": "CheckPoolAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "boolean"
+								},
+								"examples": {
+									"Pool allowance check result": {
+										"value": true
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Tokens",
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/pool/info/server": {
+			"get": {
+				"operationId": "GetPoolInfoByServer",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PoolInfo"
+								},
+								"examples": {
+									"Pool info from server": {
+										"value": {
+											"aValue": "100",
+											"dValue": "2000000",
+											"tokenBalance": "1500000",
+											"vUsdBalance": "1499000",
+											"totalLpAmount": "3000000",
+											"accRewardPerShareP": "42",
+											"p": 48,
+											"imbalance": "0.0001"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/pool/info/blockchain": {
+			"get": {
+				"operationId": "GetPoolInfoFromBlockchain",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Required_PoolInfo_"
+								},
+								"examples": {
+									"Pool info from blockchain": {
+										"value": {
+											"aValue": "100",
+											"dValue": "2000000",
+											"tokenBalance": "1500000",
+											"vUsdBalance": "1499000",
+											"totalLpAmount": "3000000",
+											"accRewardPerShareP": "42",
+											"p": 48,
+											"imbalance": "0.0001"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/pool/allowance": {
+			"get": {
+				"operationId": "GetPoolAllowance",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Pool allowance amount": {
+										"value": "100000000"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool",
+					"Tokens"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "feePaymentMethod",
+						"required": false,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"WITH_NATIVE_CURRENCY",
+								"WITH_STABLECOIN",
+								"WITH_ABR"
+							]
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/details": {
+			"get": {
+				"operationId": "GetUserPoolInfo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserLiquidityDetails"
+								},
+								"examples": {
+									"User liquidity position": {
+										"value": {
+											"lpAmount": "12.5",
+											"rewardDebt": "0.03"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/deposit/calculate": {
+			"get": {
+				"operationId": "GetAmountToBeDeposited",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Estimated LP amount on deposit": {
+										"value": "12.345678"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/withdrawn/calculate": {
+			"get": {
+				"operationId": "GetAmountToBeWithdrawn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"Estimated token amount on withdraw": {
+										"value": "10.125"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "ownerAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/vusd/calculate": {
+			"get": {
+				"operationId": "GetVUsdFromAmount",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AmountFormatted"
+								},
+								"examples": {
+									"vUsd amount for the provided token amount": {
+										"value": {
+											"int": "1000000",
+											"float": "1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "amountFormat",
+						"required": true,
+						"schema": {
+							"type": "string",
+							"enum": [
+								"INT",
+								"FLOAT"
+							]
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/amount-from-vusd/calculate": {
+			"get": {
+				"operationId": "GetAmountFromVUsd",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AmountFormatted"
+								},
+								"examples": {
+									"Token amount for the provided vUsd amount": {
+										"value": {
+											"int": "1000000",
+											"float": "1"
+										}
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "vUsdAmount",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "tokenAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/liquidity/apr/format": {
+			"get": {
+				"operationId": "FormatApr",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								},
+								"examples": {
+									"APR formatted as a percentage string": {
+										"value": "12.34%"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HttpExceptionBody"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Pool"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "apr",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

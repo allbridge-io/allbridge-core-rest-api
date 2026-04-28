@@ -7,15 +7,23 @@ dotenv.config({ path: '.env' });
 const main = async () => {
   const baseUrl = getEnvVar('REST_API_URL');
   const txId = getEnvVar("SENT_TX_ID");
-  const chainSymbol = "TRX"; // TRX, ETH, BSC, etc.
+  const chainSymbol = 'TRX';
 
-  console.log("Fetching transfer status...");
   try {
-    const response = await axios.get(`${baseUrl}/transfer/status?chain=${chainSymbol}&txId=${txId}`);
-    const sendStatus = response.data;
-    console.log("Send Status: ", sendStatus);
+    const requestParams = new URLSearchParams({
+      chain: chainSymbol,
+      txId,
+    });
+    const { data: transferStatus } = await axios.get(
+      `${baseUrl}/transfer/status?${requestParams.toString()}`,
+    );
+    console.log('Transfer status:', {
+      chainSymbol,
+      txId,
+      transferStatus,
+    });
   } catch (error) {
-    console.error("Error fetching transfer status: ", error);
+    console.error('Error fetching transfer status:', error);
   }
 };
 
