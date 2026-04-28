@@ -1,0 +1,5 @@
+# bigint-buffer is patched locally via pnpm patchedDependencies.
+# Trivy still reports the upstream CVE on the transitive package version, so
+# we suppress the scanner-level finding here until the upstream dependency tree
+# no longer includes bigint-buffer@1.1.5.
+CVE-2025-3194

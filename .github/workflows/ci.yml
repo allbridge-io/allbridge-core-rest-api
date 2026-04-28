@@ -23,8 +23,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: '22'
-  PNPM_VERSION: '9'
+  NODE_VERSION: '24'
+  PNPM_VERSION: '10'
   SECURITY_SEVERITY: 'CRITICAL,HIGH'
   SECURITY_FAIL_ON_VULN: 'false'
 
