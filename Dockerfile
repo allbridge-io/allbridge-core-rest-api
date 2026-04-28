@@ -7,9 +7,8 @@ RUN apk update && \
     apk add --no-cache bash g++ make openssl python3 && \
     rm -rf /var/cache/apk/*
 
-# Install pnpm globally and configure for monorepos
-RUN npm install -g npm@latest pnpm@latest && \
-    pnpm config set inject-workspace-packages=true
+# Install pnpm globally
+RUN npm install -g npm@latest pnpm@latest
 
 # Set the working directory
 WORKDIR /app
@@ -19,6 +18,7 @@ ENV NODE_ENV=production
 COPY pnpm-workspace.yaml ./
 COPY pnpm-lock.yaml ./
 COPY package.json ./
+COPY .npmrc ./
 # Copy only the necessary files for the rest-api package
 COPY rest-api/package.json ./rest-api/
 COPY patches/bigint-buffer@1.1.5.patch ./patches/
