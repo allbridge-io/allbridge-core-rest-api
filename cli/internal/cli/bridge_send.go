@@ -58,6 +58,9 @@ func newBridgeSendCmd() *cobra.Command {
 		approveAmount string
 		approveWait   time.Duration
 		skipChecks    bool
+		api           string
+		nextFeeToken  string
+		nextRefundTo  string
 	)
 	c := &cobra.Command{
 		Use:   "send",
@@ -71,11 +74,36 @@ broadcasts an approve transaction (via /raw/bridge/approve), waits for it to
 be mined, and only then proceeds with the bridge transaction.
 
 Native signing and broadcasting are currently implemented for EVM wallets only.
-Use tx build/sign/broadcast directly for lower-level control.`,
+Use tx build/sign/broadcast directly for lower-level control.
+
+Pass --api next to drive the Allbridge NEXT product. NEXT support is
+currently dry-run only: the CLI fetches a route, calls /tx/create and
+prints the unsigned transaction. Sign and broadcast it with your chain's
+native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			rt, err := resolve(cmd)
 			if err != nil {
 				return err
+			}
+			kind, err := parseAPIKind(api)
+			if err != nil {
+				return err
+			}
+			if kind == apiNext {
+				return runNextBridgeSend(cmd.Context(), rt, nextSendParams{
+					fromRef:    fromRef,
+					toRef:      toRef,
+					amount:     amount,
+					sender:     sender,
+					recipient:  recipient,
+					messenger:  messenger,
+					feeTokenID: nextFeeToken,
+					refundTo:   nextRefundTo,
+					dryRun:     dryRun,
+				})
+			}
+			if kind == apiBoth {
+				return userErr("--api both is not supported for `bridge send` (it would broadcast twice); pick core or next explicitly")
 			}
 			if fromRef == "" || toRef == "" || amount == "" || recipient == "" || messenger == "" || feeMethod == "" {
 				return userErr("--from, --to, --amount, --recipient, --messenger, --fee-method are required")
@@ -304,6 +332,9 @@ Use tx build/sign/broadcast directly for lower-level control.`,
 	f.StringVar(&approveAmount, "approve-amount", "", "approve this amount instead of the bridge amount; empty = unlimited")
 	f.DurationVar(&approveWait, "approve-wait", 2*time.Minute, "max time to wait for the approve tx to be mined")
 	f.BoolVar(&skipChecks, "skip-checks", false, "skip native/token balance + allowance pre-flight checks")
+	f.StringVar(&api, "api", "core", "which API to drive: core|next (both is invalid for send)")
+	f.StringVar(&nextFeeToken, "next-fee-token", "", "(--api next) relayer-fee tokenId; \"native\" picks chain native, empty defaults to native")
+	f.StringVar(&nextRefundTo, "next-refund-to", "", "(--api next) refund address for NEAR Intents routes")
 	return c
 }
 

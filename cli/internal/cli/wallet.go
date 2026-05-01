@@ -1,12 +1,14 @@
 package cli
 
 import (
+	"bufio"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+	"sync"
 
 	solanago "github.com/gagliardetto/solana-go"
 	"github.com/mr-tron/base58"
@@ -362,15 +364,25 @@ func promptNewPassphrase() (string, error) {
 	return a, nil
 }
 
+// stdinReader is a process-wide buffered wrapper around os.Stdin so that
+// successive readSecret() calls each consume exactly one line. The plain
+// os.Stdin.Read variant gulps every byte available on a pipe in one go,
+// which collapses two piped passphrase lines into a single answer and
+// then EOFs the second prompt — see git log for the bug it fixed.
+var (
+	stdinReaderOnce sync.Once
+	stdinReader     *bufio.Reader
+)
+
 func readSecret() (string, error) {
 	fd := int(os.Stdin.Fd())
 	if !term.IsTerminal(fd) {
-		buf := make([]byte, 4096)
-		n, err := os.Stdin.Read(buf)
-		if err != nil {
+		stdinReaderOnce.Do(func() { stdinReader = bufio.NewReader(os.Stdin) })
+		line, err := stdinReader.ReadString('\n')
+		if err != nil && line == "" {
 			return "", err
 		}
-		return strings.TrimRight(string(buf[:n]), "\r\n"), nil
+		return strings.TrimRight(line, "\r\n"), nil
 	}
 	pw, err := term.ReadPassword(fd)
 	fmt.Fprintln(os.Stderr)

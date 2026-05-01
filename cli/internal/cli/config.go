@@ -18,8 +18,9 @@ func newConfigCmd() *cobra.Command {
 		Long: `Read and write CLI settings. The config file lives at
 ${XDG_CONFIG_HOME:-~/.config}/allbridge/config.yaml. Known keys:
 
-    api.url           REST API base URL (default: https://core-rest-api.allbridge.io)
+    api.url           Core REST API base URL (default: https://core-rest-api.allbridge.io)
     api.timeout       per-request timeout, e.g. 30s, 1m
+    nextApi.url       NEXT REST API base URL (default: https://api.next.allbridge.io)
     network           mainnet | testnet
     defaultWallet     wallet name used when --wallet is omitted
     rpc.<CHAIN>       per-chain RPC URL used by sign/broadcast
@@ -46,6 +47,10 @@ var configKeys = map[string]struct {
 	"api.timeout": {
 		get: func(c *config.Config) string { return c.API.Timeout },
 		set: func(c *config.Config, v string) { c.API.Timeout = v },
+	},
+	"nextApi.url": {
+		get: func(c *config.Config) string { return c.NextAPI.URL },
+		set: func(c *config.Config, v string) { c.NextAPI.URL = v },
 	},
 	"network": {
 		get: func(c *config.Config) string { return c.Network },

@@ -19,8 +19,10 @@ on:
       - '.idea/**'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
-  cancel-in-progress: true
+  # Keep semantic-release bump commits from sharing the same concurrency group as the original push.
+  # Otherwise the follow-up "chore(release)" run can cancel the run that actually published the release.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}-${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore(release)') && 'release' || 'normal' }}
+  cancel-in-progress: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'chore(release)') }}
 
 env:
   NODE_VERSION: '24'

@@ -84,6 +84,33 @@ allbridge transfers status 0xabc123…
 
 Add `--json` to any command for machine-readable output.
 
+## Wallets
+
+The CLI ships with an encrypted local keystore (scrypt + AES-GCM). For
+the three families with a native signer — EVM, Solana, Tron — you can
+generate the key on-device with `wallet add`. For everything else, hold
+the key in your existing tool and use the [detached signing](#detached-signing-bring-your-own-tool)
+flow below.
+
+```bash
+# Generate a fresh key on-device. --reveal prints the private key once
+# for backup; without --reveal only the encrypted form is stored.
+allbridge wallet add main      --family EVM    --reveal
+allbridge wallet add main-sol  --family SOLANA --reveal
+allbridge wallet add main-trx  --family TRX
+
+# Or import an existing key.
+allbridge wallet import legacy     --family EVM    --hex 0xabc...
+allbridge wallet import legacy-sol --family SOLANA --base58 5J3...
+
+allbridge wallet list
+allbridge wallet set-default main
+```
+
+The keystore lives at `$XDG_CONFIG_HOME/allbridge/keystore.json` (or
+`~/.config/allbridge/`). Each signing command prompts for the keystore
+password interactively.
+
 ## Shell completion
 
 ```bash

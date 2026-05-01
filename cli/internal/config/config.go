@@ -11,10 +11,15 @@ import (
 )
 
 type Config struct {
+	// API holds settings for the Allbridge Core REST API (the legacy product).
 	API struct {
 		URL     string `json:"url" yaml:"url"`
 		Timeout string `json:"timeout,omitempty" yaml:"timeout,omitempty"` // e.g. "30s"
 	} `json:"api" yaml:"api"`
+	// NextAPI holds settings for the Allbridge NEXT REST API (the new product).
+	NextAPI struct {
+		URL string `json:"url" yaml:"url"`
+	} `json:"nextApi" yaml:"nextApi"`
 	Network       string            `json:"network,omitempty" yaml:"network,omitempty"` // mainnet|testnet
 	DefaultWallet string            `json:"defaultWallet,omitempty" yaml:"defaultWallet,omitempty"`
 	RPC           map[string]string `json:"rpc,omitempty" yaml:"rpc,omitempty"` // chainSymbol -> RPC URL
@@ -25,12 +30,18 @@ const (
 	fileName = "config.yaml"
 )
 
-const DefaultAPIURL = "https://core-rest-api.allbridge.io"
+const (
+	// DefaultAPIURL is the public Allbridge Core REST endpoint.
+	DefaultAPIURL = "https://core-rest-api.allbridge.io"
+	// DefaultNextAPIURL is the public Allbridge NEXT REST endpoint.
+	DefaultNextAPIURL = "https://api.next.allbridge.io"
+)
 
 func Defaults() Config {
 	c := Config{}
 	c.API.URL = DefaultAPIURL
 	c.API.Timeout = "30s"
+	c.NextAPI.URL = DefaultNextAPIURL
 	c.Network = "mainnet"
 	c.RPC = map[string]string{}
 	return c

@@ -10,28 +10,31 @@ import (
 
 	"github.com/allbridge-io/rest-api/cli/internal/api"
 	"github.com/allbridge-io/rest-api/cli/internal/config"
+	"github.com/allbridge-io/rest-api/cli/internal/next"
 	"github.com/allbridge-io/rest-api/cli/internal/render"
 	"github.com/allbridge-io/rest-api/cli/internal/version"
 )
 
 type globalFlags struct {
-	output      string
-	jsonOnly    bool
-	noColor     bool
-	verbose     bool
-	quiet       bool
-	configPath  string
-	apiURLFlag  string
-	networkFlag string
-	yes         bool
+	output         string
+	jsonOnly       bool
+	noColor        bool
+	verbose        bool
+	quiet          bool
+	configPath     string
+	apiURLFlag     string
+	nextAPIURLFlag string
+	networkFlag    string
+	yes            bool
 }
 
 type runtime struct {
-	format render.Format
-	styles render.Styles
-	client *api.Client
-	cfg    config.Config
-	flags  *globalFlags
+	format     render.Format
+	styles     render.Styles
+	client     *api.Client  // Allbridge Core REST client
+	nextClient *next.Client // Allbridge NEXT REST client
+	cfg        config.Config
+	flags      *globalFlags
 }
 
 var gflags = &globalFlags{}
@@ -108,7 +111,8 @@ broadcast with ` + "`tx broadcast`" + `. See README for cookbooks.`,
 	pf.BoolVarP(&gflags.verbose, "verbose", "v", false, "verbose progress output")
 	pf.BoolVarP(&gflags.quiet, "quiet", "q", false, "suppress progress output")
 	pf.StringVar(&gflags.configPath, "config", "", "override config file path")
-	pf.StringVar(&gflags.apiURLFlag, "api-url", "", "override API base URL")
+	pf.StringVar(&gflags.apiURLFlag, "api-url", "", "override Core API base URL")
+	pf.StringVar(&gflags.nextAPIURLFlag, "next-api-url", "", "override NEXT API base URL")
 	pf.StringVar(&gflags.networkFlag, "network", "", "override network (mainnet|testnet)")
 	pf.BoolVarP(&gflags.yes, "yes", "y", false, "assume yes to all prompts")
 
@@ -162,6 +166,9 @@ func resolve(_ *cobra.Command) (*runtime, error) {
 	if gflags.apiURLFlag != "" {
 		cfg.API.URL = gflags.apiURLFlag
 	}
+	if gflags.nextAPIURLFlag != "" {
+		cfg.NextAPI.URL = gflags.nextAPIURLFlag
+	}
 	if gflags.networkFlag != "" {
 		cfg.Network = gflags.networkFlag
 	}
@@ -176,6 +183,15 @@ func resolve(_ *cobra.Command) (*runtime, error) {
 		BaseURL:   cfg.API.URL,
 		Timeout:   timeout,
 		UserAgent: fmt.Sprintf("allbridge-cli/%s", version.Version),
+	})
+	if err != nil {
+		return nil, &ExitError{Code: ExitUser, Message: err.Error(), Cause: err}
+	}
+
+	nextCl, err := next.New(next.Options{
+		BaseURL:   cfg.NextAPI.URL,
+		Timeout:   timeout,
+		UserAgent: fmt.Sprintf("allbridge-cli-next/%s", version.Version),
 	})
 	if err != nil {
 		return nil, &ExitError{Code: ExitUser, Message: err.Error(), Cause: err}
@@ -196,10 +212,11 @@ func resolve(_ *cobra.Command) (*runtime, error) {
 	styles := render.NewStyles(color)
 
 	return &runtime{
-		format: format,
-		styles: styles,
-		client: cl,
-		cfg:    cfg,
-		flags:  gflags,
+		format:     format,
+		styles:     styles,
+		client:     cl,
+		nextClient: nextCl,
+		cfg:        cfg,
+		flags:      gflags,
 	}, nil
 }

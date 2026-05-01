@@ -2,7 +2,8 @@
 
 BINARY    := allbridge
 PKG       := ./cmd/allbridge
-VERSION   ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
+VERSION_RAW ?= $(shell git describe --tags --match 'cli/v*' --always --dirty 2>/dev/null || echo dev)
+VERSION     := $(patsubst cli/%,%,$(VERSION_RAW))
 COMMIT    ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo none)
 DATE      := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 LDFLAGS   := -s -w \

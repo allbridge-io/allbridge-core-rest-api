@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/url"
 	"sort"
 	"strings"
@@ -26,49 +27,131 @@ func newTokensListCmd() *cobra.Command {
 		chain    string
 		tokenSym string
 		poolType string
+		api      string
 	)
 	c := &cobra.Command{
 		Use:   "ls",
-		Short: "List supported tokens",
-		Args:  cobra.NoArgs,
+		Short: "List supported tokens (Allbridge Core, NEXT, or both)",
+		Long: `List tokens supported by either product. Pass --api next for the new
+product, --api both for a unified view with a SOURCE column showing which
+API each entry comes from.`,
+		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			rt, err := resolve(cmd)
 			if err != nil {
 				return err
 			}
-			tokens, err := fetchTokens(cmd.Context(), rt, poolType)
+			kind, err := parseAPIKind(api)
+			if err != nil {
+				return err
+			}
+			rows, err := listTokensFromAPI(cmd.Context(), rt, kind, poolType, chain, tokenSym)
 			if err != nil {
 				return netErr(err)
 			}
-			tokens = filterTokens(tokens, chain, tokenSym)
-			sort.SliceStable(tokens, func(i, j int) bool {
-				if tokens[i]["chainSymbol"] != tokens[j]["chainSymbol"] {
-					return getStr(tokens[i], "chainSymbol") < getStr(tokens[j], "chainSymbol")
-				}
-				return getStr(tokens[i], "symbol") < getStr(tokens[j], "symbol")
-			})
 			if rt.format == render.FormatJSON || rt.format == render.FormatYAML {
-				return render.Auto(render.Out(), rt.format, tokens)
+				return render.Auto(render.Out(), rt.format, rows)
 			}
-			t := render.NewTable("chain", "symbol", "decimals", "address", "side fee", "apr")
-			for _, tk := range tokens {
-				t.Append(
-					getStr(tk, "chainSymbol"),
-					getStr(tk, "symbol"),
-					getStr(tk, "decimals"),
-					getStr(tk, "tokenAddress"),
-					getStr(tk, "feeShare"),
-					getStr(tk, "apr"),
-				)
-			}
-			t.Render(render.Out(), rt.styles)
+			renderTokensTable(rt, kind, rows)
 			return nil
 		},
 	}
 	c.Flags().StringVar(&chain, "chain", "", "filter by chain symbol (e.g. ETH)")
 	c.Flags().StringVar(&tokenSym, "symbol", "", "filter by token symbol (e.g. USDT)")
-	c.Flags().StringVar(&poolType, "type", "", "filter by pool type (swap|pool)")
+	c.Flags().StringVar(&poolType, "type", "", "(core only) filter by pool type (swap|pool)")
+	c.Flags().StringVar(&api, "api", "core", "which API to query: core|next|both")
 	return c
+}
+
+// unifiedToken is the table-row shape we render for `tokens ls`. Either
+// product fills it; for --api both, Source is "core" or "next" so the user
+// can see at a glance where each entry came from.
+type unifiedToken struct {
+	Source   string `json:"source"`
+	Chain    string `json:"chain"`
+	Symbol   string `json:"symbol"`
+	Decimals int    `json:"decimals"`
+	Address  string `json:"address"`
+	TokenID  string `json:"tokenId,omitempty"` // NEXT only
+	FeeShare string `json:"feeShare,omitempty"` // Core only
+	APR      string `json:"apr,omitempty"`      // Core only
+}
+
+func listTokensFromAPI(ctx context.Context, rt *runtime, kind apiKind, poolType, chain, sym string) ([]unifiedToken, error) {
+	var out []unifiedToken
+	if kind == apiCore || kind == apiBoth {
+		raw, err := fetchTokens(ctx, rt, poolType)
+		if err != nil {
+			return nil, err
+		}
+		raw = filterTokens(raw, chain, sym)
+		for _, tk := range raw {
+			dec := 0
+			if d := getStr(tk, "decimals"); d != "" {
+				_, _ = fmt.Sscanf(d, "%d", &dec)
+			}
+			out = append(out, unifiedToken{
+				Source: "core", Chain: getStr(tk, "chainSymbol"), Symbol: getStr(tk, "symbol"),
+				Decimals: dec, Address: getStr(tk, "tokenAddress"),
+				FeeShare: getStr(tk, "feeShare"), APR: getStr(tk, "apr"),
+			})
+		}
+	}
+	if kind == apiNext || kind == apiBoth {
+		toks, err := rt.nextClient.Tokens(ctx)
+		if err != nil {
+			return nil, err
+		}
+		chainU := strings.ToUpper(chain)
+		symU := strings.ToUpper(sym)
+		for _, t := range toks {
+			if chainU != "" && strings.ToUpper(t.Chain) != chainU {
+				continue
+			}
+			if symU != "" && strings.ToUpper(t.Symbol) != symU {
+				continue
+			}
+			out = append(out, unifiedToken{
+				Source: "next", Chain: t.Chain, Symbol: t.Symbol,
+				Decimals: t.Decimals, Address: t.Address, TokenID: t.TokenID,
+			})
+		}
+	}
+	sort.SliceStable(out, func(i, j int) bool {
+		if out[i].Chain != out[j].Chain {
+			return out[i].Chain < out[j].Chain
+		}
+		if out[i].Symbol != out[j].Symbol {
+			return out[i].Symbol < out[j].Symbol
+		}
+		return out[i].Source < out[j].Source
+	})
+	return out, nil
+}
+
+func renderTokensTable(rt *runtime, kind apiKind, rows []unifiedToken) {
+	var t *render.Table
+	if kind == apiBoth {
+		t = render.NewTable("source", "chain", "symbol", "decimals", "address", "tokenId/fee")
+		for _, r := range rows {
+			extra := r.FeeShare
+			if r.Source == "next" {
+				extra = r.TokenID
+			}
+			t.Append(r.Source, r.Chain, r.Symbol, r.Decimals, r.Address, extra)
+		}
+	} else if kind == apiNext {
+		t = render.NewTable("chain", "symbol", "decimals", "address", "tokenId")
+		for _, r := range rows {
+			t.Append(r.Chain, r.Symbol, r.Decimals, r.Address, r.TokenID)
+		}
+	} else {
+		t = render.NewTable("chain", "symbol", "decimals", "address", "side fee", "apr")
+		for _, r := range rows {
+			t.Append(r.Chain, r.Symbol, r.Decimals, r.Address, r.FeeShare, r.APR)
+		}
+	}
+	t.Render(render.Out(), rt.styles)
 }
 
 func newTokensShowCmd() *cobra.Command {

@@ -109,11 +109,16 @@ func newBridgeQuoteCmd() *cobra.Command {
 		fromRef string
 		toRef   string
 		amount  string
+		api     string
 	)
 	c := &cobra.Command{
 		Use:   "quote",
 		Short: "Get a quote for a cross-chain transfer",
-		Long:  "Returns messenger options, fees and estimated received amount.",
+		Long: `Returns messenger options, fees and estimated received amount.
+
+By default queries Allbridge Core. Use --api next to query the new
+Allbridge NEXT product, or --api both to fetch quotes from both APIs
+side-by-side with a recommendation of which delivers more.`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			rt, err := resolve(cmd)
 			if err != nil {
@@ -122,38 +127,52 @@ func newBridgeQuoteCmd() *cobra.Command {
 			if amount == "" || fromRef == "" || toRef == "" {
 				return userErr("--from, --to, --amount are required")
 			}
-			tokens, err := fetchTokens(cmd.Context(), rt, "")
-			if err != nil {
-				return netErr(err)
-			}
-			src, err := resolveTokenRef(tokens, fromRef)
+			kind, err := parseAPIKind(api)
 			if err != nil {
 				return err
 			}
-			dst, err := resolveTokenRef(tokens, toRef)
-			if err != nil {
-				return err
+			switch kind {
+			case apiNext:
+				return runNextQuote(cmd.Context(), rt, fromRef, toRef, amount)
+			case apiBoth:
+				return runBothQuote(cmd.Context(), rt, fromRef, toRef, amount)
 			}
-
-			q := url.Values{}
-			q.Set("amount", amount)
-			q.Set("sourceToken", getStr(src, "tokenAddress"))
-			q.Set("destinationToken", getStr(dst, "tokenAddress"))
-			var quote json.RawMessage
-			if err := rt.client.Get(cmd.Context(), "/bridge/quote", q, &quote); err != nil {
-				return netErr(err)
-			}
-			if rt.format == render.FormatJSON || rt.format == render.FormatYAML {
-				return render.Auto(render.Out(), rt.format, json.RawMessage(quote))
-			}
-			renderQuote(rt, src, dst, amount, quote)
-			return nil
+			return runCoreQuote(cmd.Context(), rt, fromRef, toRef, amount)
 		},
 	}
 	c.Flags().StringVar(&fromRef, "from", "", "source token ref CHAIN:SYMBOL or CHAIN:ADDRESS")
 	c.Flags().StringVar(&toRef, "to", "", "destination token ref")
 	c.Flags().StringVar(&amount, "amount", "", "amount in human units (e.g. 100)")
+	c.Flags().StringVar(&api, "api", "core", "which API to query: core|next|both")
 	return c
+}
+
+func runCoreQuote(ctx context.Context, rt *runtime, fromRef, toRef, amount string) error {
+	tokens, err := fetchTokens(ctx, rt, "")
+	if err != nil {
+		return netErr(err)
+	}
+	src, err := resolveTokenRef(tokens, fromRef)
+	if err != nil {
+		return err
+	}
+	dst, err := resolveTokenRef(tokens, toRef)
+	if err != nil {
+		return err
+	}
+	q := url.Values{}
+	q.Set("amount", amount)
+	q.Set("sourceToken", getStr(src, "tokenAddress"))
+	q.Set("destinationToken", getStr(dst, "tokenAddress"))
+	var quote json.RawMessage
+	if err := rt.client.Get(ctx, "/bridge/quote", q, &quote); err != nil {
+		return netErr(err)
+	}
+	if rt.format == render.FormatJSON || rt.format == render.FormatYAML {
+		return render.Auto(render.Out(), rt.format, quote)
+	}
+	renderQuote(rt, src, dst, amount, quote)
+	return nil
 }
 
 func newBridgeCalcCmd() *cobra.Command {
