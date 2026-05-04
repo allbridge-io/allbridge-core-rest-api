@@ -95,11 +95,13 @@ type Tx struct {
 	Tx              string `json:"tx,omitempty"` // empty for native-value sends
 }
 
-// CreateTxResponse is what /tx/create returns. AmountOut and AmountMin both
-// arrive in destination-token base units.
+// CreateTxResponse is what /tx/create returns. AmountOut and AmountMin
+// both arrive in destination-token base units. The wire field is
+// `amountOutMin` (verified against the live testnet response); earlier
+// internal docs saying `amountMin` were wrong.
 type CreateTxResponse struct {
 	AmountOut string `json:"amountOut"`
-	AmountMin string `json:"amountMin"`
+	AmountMin string `json:"amountOutMin"`
 	Tx        Tx     `json:"tx"`
 }
 

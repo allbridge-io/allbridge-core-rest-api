@@ -78,6 +78,12 @@ func newTxBuildBridgeCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			if sender, err = resolveAddressRef(sender); err != nil {
+				return err
+			}
+			if recipient, err = resolveAddressRef(recipient); err != nil {
+				return err
+			}
 			if fromRef == "" || toRef == "" || amount == "" || sender == "" || recipient == "" || messenger == "" || feeMethod == "" {
 				return userErr("--from, --to, --amount, --sender, --recipient, --messenger, --fee-method are required")
 			}
@@ -170,6 +176,12 @@ func newTxBuildSwapCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			rt, err := resolve(cmd)
 			if err != nil {
+				return err
+			}
+			if sender, err = resolveAddressRef(sender); err != nil {
+				return err
+			}
+			if recipient, err = resolveAddressRef(recipient); err != nil {
 				return err
 			}
 			if fromRef == "" || toRef == "" || amount == "" || sender == "" || recipient == "" {

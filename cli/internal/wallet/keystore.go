@@ -113,10 +113,21 @@ func Load() (*Store, error) {
 	}
 	path := filepath.Join(dir, fileName)
 	st := &Store{Version: 1, Entries: map[string]Entry{}, path: path}
-	buf, err := os.ReadFile(path)
+
+	info, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
 		return st, nil
 	}
+	if err != nil {
+		return nil, fmt.Errorf("wallet: stat keystore: %w", err)
+	}
+	// Self-check: keystore must be 0600 or stricter. If group/world has
+	// any bit set, warn once — the user almost certainly didn't mean to
+	// expose ciphertext + salt + KDF params (offline brute-force fodder
+	// even though there's no plaintext key).
+	warnIfLooseMode(path, info.Mode())
+
+	buf, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("wallet: read keystore: %w", err)
 	}
@@ -128,6 +139,19 @@ func Load() (*Store, error) {
 	}
 	st.path = path
 	return st, nil
+}
+
+var keystoreModeWarn sync.Once
+
+func warnIfLooseMode(path string, mode os.FileMode) {
+	if mode.Perm()&0o077 == 0 {
+		return // no group/world bits → fine
+	}
+	keystoreModeWarn.Do(func() {
+		fmt.Fprintf(os.Stderr,
+			"⚠ keystore at %s has mode %o; recommend `chmod 600 %s` (group/world bits expose ciphertext to other users on this machine)\n",
+			path, mode.Perm(), path)
+	})
 }
 
 func (s *Store) Save() error {
@@ -144,7 +168,19 @@ func (s *Store) Save() error {
 	if err := os.WriteFile(tmp, buf, 0o600); err != nil {
 		return err
 	}
-	return os.Rename(tmp, s.path)
+	// os.Rename is atomic on POSIX but fails on Windows when the target
+	// already exists. Try the rename first; if it fails on a
+	// non-non-existent target, remove and retry. Keeps POSIX behaviour
+	// unchanged (the first Rename succeeds and we never hit the retry).
+	if err := os.Rename(tmp, s.path); err != nil {
+		if removeErr := os.Remove(s.path); removeErr != nil && !errors.Is(removeErr, os.ErrNotExist) {
+			return fmt.Errorf("wallet: replace keystore: %w (rename: %v)", removeErr, err)
+		}
+		if err := os.Rename(tmp, s.path); err != nil {
+			return fmt.Errorf("wallet: rename keystore: %w", err)
+		}
+	}
+	return nil
 }
 
 func (s *Store) Path() string { return s.path }

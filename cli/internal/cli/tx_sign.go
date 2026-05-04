@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -155,9 +156,68 @@ func readBytes(path string) ([]byte, error) {
 	return os.ReadFile(path)
 }
 
+// promptPassphrase resolves the keystore passphrase from the highest-
+// priority source available so the same binary works equally well at an
+// interactive shell prompt and inside CI/cron pipelines.
+//
+// Resolution order (first match wins):
+//
+//	--passphrase-cmd <cmd>      shell command whose stdout is the passphrase
+//	--passphrase-file <path>    file contents (trailing whitespace stripped)
+//	$ALLBRIDGE_PASSPHRASE       env var
+//	stdin (if not a TTY)        single line, useful for `echo $PASS | ...`
+//	interactive prompt          fallback for human use
+//
+// Trailing newlines / carriage returns are stripped from every source so
+// `echo "secret" > file` and `pass show name` both work without surprises.
 func promptPassphrase(name string) (string, error) {
+	if pp, ok, err := resolveNonInteractivePassphrase(); err != nil {
+		return "", err
+	} else if ok {
+		return pp, nil
+	}
 	fmt.Fprintf(os.Stderr, "passphrase for %s: ", name)
 	return readSecret()
+}
+
+// resolveNonInteractivePassphrase walks the cmd / file / env precedence
+// chain and returns the first hit. ok=false means no non-interactive
+// source was configured and the caller should prompt the user.
+func resolveNonInteractivePassphrase() (string, bool, error) {
+	if cmdLine := strings.TrimSpace(gflags.passphraseCmd); cmdLine != "" {
+		out, err := exec.Command("sh", "-c", cmdLine).Output()
+		if err != nil {
+			return "", false, fmt.Errorf("--passphrase-cmd: %w", err)
+		}
+		return strings.TrimRight(string(out), "\r\n"), true, nil
+	}
+	if path := strings.TrimSpace(gflags.passphraseFile); path != "" {
+		// Mode self-check: warn (don't fail — user might be on a
+		// filesystem where mode bits are advisory, e.g. exFAT) if the
+		// file is readable by group or other.
+		if info, statErr := os.Stat(path); statErr == nil {
+			if mode := info.Mode().Perm(); mode&0o077 != 0 {
+				fmt.Fprintf(os.Stderr,
+					"⚠ %s has mode %o; recommend `chmod 600 %s` (passphrase readable by other users)\n",
+					path, mode, path)
+			}
+		}
+		buf, err := os.ReadFile(path)
+		if err != nil {
+			return "", false, fmt.Errorf("--passphrase-file %s: %w", path, err)
+		}
+		return strings.TrimRight(string(buf), "\r\n"), true, nil
+	}
+	if v := os.Getenv("ALLBRIDGE_PASSPHRASE"); v != "" {
+		// Unset immediately so we don't leak the secret to any child
+		// process we later spawn (clipboard helpers, link openers,
+		// `--passphrase-cmd` shell). The env entry would otherwise
+		// stay readable through Go's os.Environ() and inherit by
+		// default into every exec.Cmd.
+		_ = os.Unsetenv("ALLBRIDGE_PASSPHRASE")
+		return strings.TrimRight(v, "\r\n"), true, nil
+	}
+	return "", false, nil
 }
 
 func zero(b []byte) {

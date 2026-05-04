@@ -61,6 +61,9 @@ func newBridgeSendCmd() *cobra.Command {
 		api           string
 		nextFeeToken  string
 		nextRefundTo  string
+		progress         bool
+		progressInterval time.Duration
+		progressTimeout  time.Duration
 	)
 	c := &cobra.Command{
 		Use:   "send",
@@ -76,10 +79,16 @@ be mined, and only then proceeds with the bridge transaction.
 Native signing and broadcasting are currently implemented for EVM wallets only.
 Use tx build/sign/broadcast directly for lower-level control.
 
-Pass --api next to drive the Allbridge NEXT product. NEXT support is
-currently dry-run only: the CLI fetches a route, calls /tx/create and
-prints the unsigned transaction. Sign and broadcast it with your chain's
-native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
+Pass --api next to drive the Allbridge NEXT product. NEXT routes are
+fetched via /quote and the unsigned transaction comes from /tx/create.
+Native sign+broadcast is wired for Solana, EVM and Tron — pass --rpc
+or set rpc.<chain> in config so the CLI can fetch nonce/gas/blockhash.
+For EVM and Tron, --approve auto-approves the source token spending on
+relayerFee.approvalSpender if allowance is insufficient.
+
+Pass --progress to keep the command alive after broadcast and follow the
+transfer until it's delivered on the destination chain (or until
+--progress-timeout elapses). Works with both --api core and --api next.`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			rt, err := resolve(cmd)
 			if err != nil {
@@ -89,17 +98,37 @@ native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
 			if err != nil {
 				return err
 			}
+			// Expand `@walletname` shortcuts in address-typed flags so
+			// users can type `--recipient @sol-main` instead of a raw
+			// base58. Done once, before either Core or NEXT path runs.
+			if recipient, err = resolveAddressRef(recipient); err != nil {
+				return err
+			}
+			if sender, err = resolveAddressRef(sender); err != nil {
+				return err
+			}
+			if nextRefundTo, err = resolveAddressRef(nextRefundTo); err != nil {
+				return err
+			}
 			if kind == apiNext {
 				return runNextBridgeSend(cmd.Context(), rt, nextSendParams{
-					fromRef:    fromRef,
-					toRef:      toRef,
-					amount:     amount,
-					sender:     sender,
-					recipient:  recipient,
-					messenger:  messenger,
-					feeTokenID: nextFeeToken,
-					refundTo:   nextRefundTo,
-					dryRun:     dryRun,
+					fromRef:           fromRef,
+					toRef:             toRef,
+					amount:            amount,
+					sender:            sender,
+					recipient:         recipient,
+					messenger:         messenger,
+					messengerExplicit: cmd.Flags().Changed("messenger"),
+					feeTokenID:        nextFeeToken,
+					refundTo:          nextRefundTo,
+					dryRun:            dryRun,
+					walletName:        walletName,
+					rpcURL:            rpcURL,
+					approve:           approve,
+					approveWait:       approveWait,
+					progress:          progress,
+					progressInterval:  progressInterval,
+					progressTimeout:   progressTimeout,
 				})
 			}
 			if kind == apiBoth {
@@ -305,9 +334,18 @@ native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
 				Receipt:          receipt,
 			}
 			if rt.format == render.FormatJSON || rt.format == render.FormatYAML {
-				return render.Auto(render.Out(), rt.format, result)
+				if err := render.Auto(render.Out(), rt.format, result); err != nil {
+					return err
+				}
+			} else {
+				renderBridgeSendResult(rt, result)
 			}
-			renderBridgeSendResult(rt, result)
+			if progress {
+				q := url.Values{}
+				q.Set("chain", sourceChain)
+				q.Set("txId", receipt.Hash)
+				return runTransfersStatusCore(cmd, rt, receipt.Hash, q, true, progressInterval, progressTimeout)
+			}
 			return nil
 		},
 	}
@@ -315,8 +353,8 @@ native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
 	f.StringVar(&fromRef, "from", "", "source token ref CHAIN:SYMBOL_OR_ADDRESS")
 	f.StringVar(&toRef, "to", "", "destination token ref")
 	f.StringVar(&amount, "amount", "", "send amount in token precision")
-	f.StringVar(&sender, "sender", "", "sender address; defaults to selected wallet address")
-	f.StringVar(&recipient, "recipient", "", "recipient address on the destination chain")
+	f.StringVar(&sender, "sender", "", "sender address (or @walletname); defaults to selected wallet address")
+	f.StringVar(&recipient, "recipient", "", "recipient address on the destination chain (or @walletname)")
 	f.StringVar(&messenger, "messenger", "ALLBRIDGE", "messenger: ALLBRIDGE|WORMHOLE|CCTP|CCTP_V2|OFT|X_RESERVE")
 	f.StringVar(&feeMethod, "fee-method", "WITH_NATIVE_CURRENCY", "WITH_NATIVE_CURRENCY|WITH_STABLECOIN|WITH_ABR")
 	f.StringVar(&fee, "fee", "", "explicit fee amount in token precision")
@@ -335,6 +373,9 @@ native tooling. Native sign+broadcast for NEXT will land in v0.2.x.`,
 	f.StringVar(&api, "api", "core", "which API to drive: core|next (both is invalid for send)")
 	f.StringVar(&nextFeeToken, "next-fee-token", "", "(--api next) relayer-fee tokenId; \"native\" picks chain native, empty defaults to native")
 	f.StringVar(&nextRefundTo, "next-refund-to", "", "(--api next) refund address for NEAR Intents routes")
+	f.BoolVar(&progress, "progress", false, "after broadcast, follow the transfer until it's delivered on the destination chain (or --progress-timeout fires)")
+	f.DurationVar(&progressInterval, "progress-interval", 10*time.Second, "polling interval for --progress")
+	f.DurationVar(&progressTimeout, "progress-timeout", 30*time.Minute, "timeout for --progress")
 	return c
 }
 
@@ -525,8 +566,14 @@ func renderBridgeSendResult(rt *runtime, r bridgeSendResult) {
 	fprintln(out, s.Header.Render("BRIDGE SENT"))
 	if r.ApproveTxHash != "" {
 		kv(out, s, "approveTxHash", r.ApproveTxHash)
+		if u := txExplorerURL(r.SourceChain, r.ApproveTxHash, rt.cfg.Network); u != "" {
+			kv(out, s, "approveLink", u)
+		}
 	}
 	kv(out, s, "txHash", r.TxHash)
+	if u := txExplorerURL(r.SourceChain, r.TxHash, rt.cfg.Network); u != "" {
+		kv(out, s, "link", u)
+	}
 	kv(out, s, "route", r.SourceChain+" -> "+r.DestinationChain)
 	kv(out, s, "amount", r.Amount)
 	kv(out, s, "sender", r.Sender)

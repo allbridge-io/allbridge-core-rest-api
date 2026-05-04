@@ -52,6 +52,12 @@ or broadcasts.`,
 			if fromRef == "" || toRef == "" || amount == "" {
 				return userErr("--from, --to, --amount are required")
 			}
+			if sender, err = resolveAddressRef(sender); err != nil {
+				return err
+			}
+			if recipient, err = resolveAddressRef(recipient); err != nil {
+				return err
+			}
 			if (sender == "") != (recipient == "") {
 				return userErr("--sender and --recipient must be provided together")
 			}

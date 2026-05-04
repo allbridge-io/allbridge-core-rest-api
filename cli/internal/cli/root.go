@@ -26,6 +26,8 @@ type globalFlags struct {
 	nextAPIURLFlag string
 	networkFlag    string
 	yes            bool
+	passphraseCmd  string
+	passphraseFile string
 }
 
 type runtime struct {
@@ -115,6 +117,8 @@ broadcast with ` + "`tx broadcast`" + `. See README for cookbooks.`,
 	pf.StringVar(&gflags.nextAPIURLFlag, "next-api-url", "", "override NEXT API base URL")
 	pf.StringVar(&gflags.networkFlag, "network", "", "override network (mainnet|testnet)")
 	pf.BoolVarP(&gflags.yes, "yes", "y", false, "assume yes to all prompts")
+	pf.StringVar(&gflags.passphraseCmd, "passphrase-cmd", "", "shell command whose stdout supplies the keystore passphrase (e.g. \"pass show ab/main\")")
+	pf.StringVar(&gflags.passphraseFile, "passphrase-file", "", "file whose contents supply the keystore passphrase (chmod 0400 recommended)")
 
 	addToGroup := func(g string, cmds ...*cobra.Command) {
 		for _, c := range cmds {

@@ -49,14 +49,19 @@ func Defaults() Config {
 
 var (
 	loadOnce sync.Once
+	cacheMu  sync.RWMutex
 	cached   Config
 	loadErr  error
 )
 
 func Load() (Config, error) {
 	loadOnce.Do(func() {
+		cacheMu.Lock()
 		cached, loadErr = readFromDisk()
+		cacheMu.Unlock()
 	})
+	cacheMu.RLock()
+	defer cacheMu.RUnlock()
 	return cached, loadErr
 }
 
@@ -76,7 +81,11 @@ func Save(c Config) error {
 	if err := os.WriteFile(path, buf, 0o600); err != nil {
 		return fmt.Errorf("config: write %s: %w", path, err)
 	}
+	// Refresh the cache so subsequent Load() calls see the new value
+	// instead of the snapshot from process start.
+	cacheMu.Lock()
 	cached = c
+	cacheMu.Unlock()
 	return nil
 }
 

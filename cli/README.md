@@ -111,6 +111,54 @@ The keystore lives at `$XDG_CONFIG_HOME/allbridge/keystore.json` (or
 `~/.config/allbridge/`). Each signing command prompts for the keystore
 password interactively.
 
+### Non-interactive passphrase (CI / cron / scheduled jobs)
+
+For automated environments where prompting isn't possible, the CLI
+resolves the passphrase from the highest-priority source available:
+
+```
+1. --passphrase-cmd "<shell command>"   stdout becomes the passphrase
+2. --passphrase-file <path>             file contents (chmod 0400)
+3. $ALLBRIDGE_PASSPHRASE                env var
+4. stdin (when not a TTY)               echo "$PASS" | allbridge ...
+5. interactive prompt                   default for human use
+```
+
+Examples:
+
+```bash
+# Delegate to a secret manager (1Password, Bitwarden, pass, gpg-agent, ...)
+allbridge bridge send ... --passphrase-cmd "op read op://Vault/allbridge/passphrase"
+allbridge bridge send ... --passphrase-cmd "pass show allbridge/main"
+
+# Static file on a hardened mount
+chmod 0400 ~/.config/allbridge/passphrase
+allbridge bridge send ... --passphrase-file ~/.config/allbridge/passphrase
+
+# Env var (simplest, but visible in /proc/<pid>/environ on Linux)
+ALLBRIDGE_PASSPHRASE="..." allbridge bridge send ...
+```
+
+All sources have trailing `\r\n` stripped so `echo "secret" > file` and
+`pass show name` both work without surprises.
+
+#### Security notes
+
+- Prefer `--passphrase-cmd` with a real secret manager (`op`, `pass`,
+  `bw`, `gpg-agent`) over the env var. The env var is the easiest to
+  set up but the easiest to leak: anything readable by the same UID
+  can `cat /proc/<pid>/environ`.
+- The CLI calls `os.Unsetenv("ALLBRIDGE_PASSPHRASE")` immediately
+  after first read so the secret doesn't propagate into helper
+  processes (clipboard, link openers, the `--passphrase-cmd` shell)
+  via `exec`'s default env-inherit. Other tools that import the value
+  before invoking `allbridge` are still on you to clean up.
+- `--passphrase-file` and `keystore.json` should be `chmod 600`. The
+  CLI prints a warning to stderr if either is broader than that.
+  Running on exFAT / SMB / FAT32 (where mode bits are advisory)
+  silences the warning but doesn't change the underlying exposure;
+  use a real POSIX filesystem for secrets.
+
 ## Shell completion
 
 ```bash
@@ -151,6 +199,25 @@ cast wallet sign --keystore ~/.foundry/keystores/main \
 allbridge tx broadcast --chain ETH --rpc $ETH_RPC --in signed.hex
 ```
 
+### EVM — sign with a Ledger hardware wallet
+
+The CLI doesn't ship native USB HID code; instead lean on `cast wallet
+send --ledger` (foundry), which streams the prompts to the device.
+
+```bash
+allbridge tx build bridge --from ETH:USDT --to SOL:USDT --amount 100 \
+    --sender 0xYou --recipient 7xKX... --messenger ALLBRIDGE \
+    --fee-method WITH_NATIVE_CURRENCY > unsigned.json
+
+# `cast` builds, signs and broadcasts in one go on the Ledger.
+# Requires the Ethereum app open on the device.
+cast send "$(jq -r .to unsigned.json)" \
+    --rpc-url "$ETH_RPC" \
+    --ledger --hd-path "m/44'/60'/0'/0/0" \
+    --value "$(jq -r .value unsigned.json)" \
+    "$(jq -r .data unsigned.json)"
+```
+
 ### Solana — sign with `solana` CLI
 
 ```bash
@@ -160,6 +227,24 @@ allbridge tx build bridge --from SOL:USDC --to ETH:USDC --amount 100 \
 
 solana transfer-with-memo ...    # or solana sign-offline-transaction
 # (solana CLI signs the deserialised tx; copy the signed base64 back)
+
+allbridge tx broadcast --chain SOL --in signed.b64
+```
+
+### Solana — sign with a Ledger hardware wallet
+
+The Solana CLI talks to Ledger via the `usb://ledger` keypair URI:
+
+```bash
+allbridge tx build bridge --from SOL:USDC --to ETH:USDC --amount 100 \
+    --sender "$(solana-keygen pubkey usb://ledger)" \
+    --recipient 0x... --messenger ALLBRIDGE \
+    --output-format base64 > unsigned.b64
+
+# Sign offline with the Ledger Solana app open.
+solana sign-offline-transaction \
+    --keypair usb://ledger \
+    "$(cat unsigned.b64)" > signed.b64
 
 allbridge tx broadcast --chain SOL --in signed.b64
 ```

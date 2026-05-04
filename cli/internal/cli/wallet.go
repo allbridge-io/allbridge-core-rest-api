@@ -89,10 +89,11 @@ func newWalletAddCmd() *cobra.Command {
 	)
 	c := &cobra.Command{
 		Use:   "add <name>",
-		Short: "Generate a new wallet (EVM today; other families: use `wallet import`)",
-		Long: `Generates a fresh secp256k1 keypair on-device, derives the address, encrypts
-the secret with scrypt + AES-GCM and stores it in the local keystore. The
-private key never leaves your machine.
+		Short: "Generate a new wallet (EVM, SOLANA or TRX; other families: use `wallet import`)",
+		Long: `Generates a fresh keypair on-device, derives the address, encrypts the
+secret with scrypt + AES-GCM and stores it in the local keystore. The
+private key never leaves your machine. Supported families for native
+generation: EVM (secp256k1), SOLANA (ed25519), TRX (secp256k1).
 
 Pass --reveal to print the private key once for offline backup. Without
 --reveal you can recover the private key only by re-importing it from a
@@ -212,18 +213,32 @@ func newWalletImportCmd() *cobra.Command {
 				}
 				raw = b
 			default:
-				prompt := []byte("private key (hex, no 0x): ")
-				_, _ = os.Stderr.Write(prompt)
-				h, err := readSecret()
-				if err != nil {
-					return walletErr(err.Error())
+				// Solana keys are conventionally base58 (matches Phantom /
+				// solana CLI export); everything else gets the hex prompt.
+				if fam == wallet.FamilySolana {
+					_, _ = os.Stderr.Write([]byte("private key (base58): "))
+					s, err := readSecret()
+					if err != nil {
+						return walletErr(err.Error())
+					}
+					b, err := decodeBase58Secret(fam, s, "private key")
+					if err != nil {
+						return err
+					}
+					raw = b
+				} else {
+					_, _ = os.Stderr.Write([]byte("private key (hex, no 0x): "))
+					h, err := readSecret()
+					if err != nil {
+						return walletErr(err.Error())
+					}
+					h = strings.TrimPrefix(strings.TrimSpace(h), "0x")
+					b, err := hex.DecodeString(h)
+					if err != nil {
+						return userErrf("invalid hex private key: %v", err)
+					}
+					raw = b
 				}
-				h = strings.TrimPrefix(strings.TrimSpace(h), "0x")
-				b, err := hex.DecodeString(h)
-				if err != nil {
-					return userErrf("invalid hex private key: %v", err)
-				}
-				raw = b
 			}
 
 			addr, err := wallet.SecretToAddress(fam, raw)
@@ -345,6 +360,17 @@ func newWalletShowCmd() *cobra.Command {
 }
 
 func promptNewPassphrase() (string, error) {
+	// When a non-interactive source is configured, take it as canonical
+	// (single read, no "confirm:" — the confirmation is for typo
+	// protection at the TTY only). Length check still applies.
+	if pp, ok, err := resolveNonInteractivePassphrase(); err != nil {
+		return "", err
+	} else if ok {
+		if len(pp) < 8 {
+			return "", errors.New("passphrase must be at least 8 chars")
+		}
+		return pp, nil
+	}
 	fmt.Fprint(os.Stderr, "passphrase: ")
 	a, err := readSecret()
 	if err != nil {
