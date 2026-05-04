@@ -1,3 +1,9 @@
+## [3.29.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.28.0...v3.29.0) (2026-05-04)
+
+### Features
+
+* implement address resolution for sender and recipient in CLI commands ([0ff6563](https://github.com/allbridge-io/allbridge-core-rest-api/commit/0ff6563f016c67ff1c0b5e154b70001124e8133e))
+
 ## [3.28.0](https://github.com/allbridge-io/allbridge-core-rest-api/compare/v3.27.6...v3.28.0) (2026-04-28)
 
 ### Features
